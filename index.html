@@ -6,8 +6,9 @@
     <title>Document</title>
 </head>
 <body>
-    <button onclick="buttonClicked()">Press me</button>
+    <button ></button>Press me</button>
     <script>
+        document.querySelector("button").addEventListener("click", ()=>buttonclicked())
     function buttonClicked() {
         alert("pressed");
         if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.buttonPressed) {
