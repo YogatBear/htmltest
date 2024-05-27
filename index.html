@@ -8,27 +8,7 @@
 <body>
     <button>Press me</button>
     <script>
-        document.querySelector("button").addEventListener("click", ()=>{ 
-        fetch("https://us-central1-arnacon-nl.cloudfunctions.net/insertFileToBucket", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer`
-      },
-      body:JSON.stringify({
-        fileName:"testiunf",
-        type:"token"
-      })
-    }).then(response => response.json())
-      .then(data => {
-        console.log('Response from server:', data);
-        return
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-
-        })
+    document.querySelector("button").addEventListener("click", ()=>{alert("pressed"))
     </script>
 </body>
 </html>
