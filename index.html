@@ -11,6 +11,7 @@
     function buttonClicked() {
         alert("pressed");
         if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.buttonPressed) {
+            console.log("sent press")
             window.webkit.messageHandlers.buttonPressed.postMessage("Button was pressed!");
         }
     }
