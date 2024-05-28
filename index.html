@@ -65,7 +65,7 @@
         <button id="accept-call-btn">Accept</button>
         <button id="reject-call-btn">Reject</button>
     </div>
-<!--     <div id="data">data</div> -->
+    <div id="error"></div>
     <script>
         const numberField = document.getElementById("numberField");
         const buttons = document.querySelectorAll(".num-button");
@@ -126,7 +126,7 @@
             const data = JSON.parse(_data)
             const action = data.action;
             const body = data.body;
-            // document.getElementById("data").textContent = data;
+            try{
             // ALL ACTIONS FROM HTML
             if(action === "ringing"){    // show calling screen
                 if(!(body.to && body.from)){
@@ -156,6 +156,9 @@
                 // show getting call screen
                 infoDiv.textContent = `RECEIVING CALL FROM ${receiver}`;
                 document.querySelector("#call-buttons").style.display = "inline-block"
+            }}
+            catch(e){
+                document.getElementById("error").textContent = e;
             }
             
         }
