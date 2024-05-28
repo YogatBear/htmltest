@@ -59,30 +59,37 @@
         <div class="num-button">0</div>
     </div>
     <button id="call-button">Call</button>
-    <div id="info">Waiting for data...</div>
+    <button id="hang-up">Hang up</button>
+    <div id="info">Current Action</div>
     <script>
         const numberField = document.getElementById("numberField");
         const buttons = document.querySelectorAll(".num-button");
         const infoDiv = document.getElementById("info");
         const callButton = document.querySelector("#call-button");
         const infoButton = document.querySelector("#info-button");
+        const hangUpButton = document.querySelector("#hang-up");
 
         buttons.forEach(button => {
             button.addEventListener("click", () => {
                 numberField.value += button.textContent;
             });
         });
-        callButton.addEventListener("click", () => {buttonClicked()});
-        
+        callButton.addEventListener("click", () => {callButtonClicked()});
+        hangUpButton.addEventListener("click", () => {endCall()});
         
 
-        function buttonClicked() {
+        function callButtonClicked() {
             if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.buttonPressed) {
-                window.webkit.messageHandlers.buttonPressed.postMessage(numberField.value);
+                const request = {action:"call", body:{from:"test.eth", to:numberField.value}};
+                sendData(object)
                 console.log("Message sent to Swift with value: " + numberField.value);
             } else {
                 console.log("Message handler not found");
             }
+        }
+        function endCall(){
+            const hangUpObject = {action:"end-call"};
+            sendData(hangUpObject);
         }
         function updateInfo(data) {
             try{
@@ -91,6 +98,45 @@
             }catch(e){
                 console.log(e)}
             }
+        function sendData(data){
+            window.webkit.messageHandlers.buttonPressed.postMessage(JSON.stringify(data));
+        }
+        function receiveData(data){
+            const action = data.action;
+            const body = data.body;
+
+            // ALL ACTIONS FROM HTML
+            if(action === "ringing"){    // show calling screen
+                if(!(body.to && body.from)){
+                    return;
+                }
+                const receiver = body.to;
+                //show calling screem with receiver's ens
+                infoDiv.textContent = `RINGING ${receiver}`
+            }
+            else if(action === "call-started"){
+                const receiver = body.to;
+                // show in call screen with receiever ens
+                infoDiv.textContent = `IN CALL WITH ${receiver}`
+            }
+            else if(action === "call-ended"){
+                const receiver = body.to;
+                // show in call screen with receiever ens
+                infoDiv.textContent = `CALL ENDED WITH ${receiver}`
+            }
+
+            // ALL ACTIONS FROM NATIVE
+            else if(action === "receiving-call"){
+                if(!body.from){
+                    return
+                }
+                const receiver = body.from;
+                // show getting call screen
+                infoDiv.textContent = `RECEIVING CALL FROM ${receiver}`;
+
+            }
+            
+        }
     </script>
 </body>
 </html>
