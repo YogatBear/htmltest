@@ -99,12 +99,12 @@
             }
         }
         function acceptCall(){
-            const request = {action:"accept-call", body:{from:"receiver.eth")}
+            const request = {action:"accept-call", body:{from:"receiver.eth"}}
             sendData(request)
             document.querySelector("#call-buttons").style.display = "none"
         }
         function rejectCall(){
-            const request = {action:"reject-call", body:{from:"receiver.eth"}
+            const request = {action:"reject-call", body:{from:"receiver.eth"}}
             sendData(request)
             document.querySelector("#call-buttons").style.display = "none"
         }
@@ -166,4 +166,3 @@
     </script>
 </body>
 </html>
-
