@@ -67,7 +67,7 @@
     </div>
     <div id="error"></div>
     <script>
-    try{
+        let currentCaller = "";
         const numberField = document.getElementById("numberField");
         const buttons = document.querySelectorAll(".num-button");
         const infoDiv = document.getElementById("info");
@@ -99,12 +99,12 @@
             }
         }
         function acceptCall(){
-            const request = {action:"accept-call", body:{from:"receiver.eth"}}
+            const request = {action:"accept-call", body:{from:currentCaller}}
             sendData(request)
             document.querySelector("#call-buttons").style.display = "none"
         }
         function rejectCall(){
-            const request = {action:"reject-call", body:{from:"receiver.eth"}}
+            const request = {action:"reject-call", body:{from:currentCaller}}
             sendData(request)
             document.querySelector("#call-buttons").style.display = "none"
         }
@@ -156,13 +156,10 @@
                 // show getting call screen
                 infoDiv.textContent = `RECEIVING CALL FROM ${receiver}`;
                 document.querySelector("#call-buttons").style.display = "inline-block"
+                currentCaller = receiever;
             }
-            }
-            
         }
-            catch(e){
-                document.getElementById("error").textContent = e;
-            }
+            
     </script>
 </body>
 </html>
