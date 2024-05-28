@@ -81,7 +81,7 @@
         function callButtonClicked() {
             if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.buttonPressed) {
                 const request = {action:"call", body:{from:"test.eth", to:numberField.value}};
-                sendData(object)
+                sendData(request)
                 console.log("Message sent to Swift with value: " + numberField.value);
             } else {
                 console.log("Message handler not found");
