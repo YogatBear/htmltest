@@ -61,6 +61,10 @@
     <button id="call-button">Call</button>
     <button id="hang-up">Hang up</button>
     <div id="info">Current Action</div>
+    <div id="call-buttons" style="display:none">
+        <button id="accept-call-btn">Accept</button>
+        <button id="reject-call-btn">Reject</button>
+    </div>
 <!--     <div id="data">data</div> -->
     <script>
         const numberField = document.getElementById("numberField");
@@ -70,6 +74,8 @@
         const infoButton = document.querySelector("#info-button");
         const hangUpButton = document.querySelector("#hang-up");
 
+        
+
         buttons.forEach(button => {
             button.addEventListener("click", () => {
                 numberField.value += button.textContent;
@@ -77,6 +83,9 @@
         });
         callButton.addEventListener("click", () => {callButtonClicked()});
         hangUpButton.addEventListener("click", () => {endCall()});
+
+        document.querySelector("#accept-call-btn").addEventListener("click", acceptCall)
+        document.querySelector("#reject-call-btn").addEventListener("click", rejectCall)
         
 
         function callButtonClicked() {
@@ -88,6 +97,17 @@
                 console.log("Message handler not found");
             }
         }
+        function acceptCall(){
+            const request = {action:"accept-call", body:{from:"receiver.eth")}
+            sendData(request)
+            document.querySelector("#call-buttons").style.display = "inline-block"
+        }
+        function rejectCall(){
+            const request = {action:"reject-call", body:{from:"receiver.eth"}
+            sendData(request)
+            document.querySelector("#call-buttons").style.display = "none"
+        }
+        
         function endCall(){
             const hangUpObject = {action:"end-call"};
             sendData(hangUpObject);
@@ -135,7 +155,7 @@
                 const receiver = body.from;
                 // show getting call screen
                 infoDiv.textContent = `RECEIVING CALL FROM ${receiver}`;
-
+                document.querySelector("#call-buttons").style.display = "inline-block"
             }
             
         }
