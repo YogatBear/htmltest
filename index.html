@@ -59,7 +59,6 @@
         <div class="num-button">0</div>
     </div>
     <button id="call-button">Call</button>
-    <button id="info-button">update info</button>
     <div id="info">Waiting for data...</div>
     <script>
         const numberField = document.getElementById("numberField");
@@ -74,9 +73,6 @@
             });
         });
         callButton.addEventListener("click", () => {buttonClicked()});
-        infoButton.addEventListener("click", () => {
-            updateInfo("new data");
-        });
         
         
 
