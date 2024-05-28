@@ -59,19 +59,25 @@
         <div class="num-button">0</div>
     </div>
     <button id="call-button">Call</button>
+    <button id="info-button">update info</button>
     <div id="info">Waiting for data...</div>
     <script>
         const numberField = document.getElementById("numberField");
         const buttons = document.querySelectorAll(".num-button");
         const infoDiv = document.getElementById("info");
         const callButton = document.querySelector("#call-button");
+        const infoButton = document.querySelector("#info-button");
 
         buttons.forEach(button => {
             button.addEventListener("click", () => {
                 numberField.value += button.textContent;
             });
         });
-        callButton.addEventListener("click", () => {buttonClicked()})
+        callButton.addEventListener("click", () => {buttonClicked()});
+        infoButton.addEventListener("click", () => {
+            updateInfo();
+        });
+        
         
 
         function buttonClicked() {
