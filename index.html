@@ -89,8 +89,12 @@
             }
         }
         function updateInfo(data) {
+            try{
             infoDiv.textContent = data;
-        }
+            
+            }catch(e){
+                console.log(e)}
+            }
     </script>
 </body>
 </html>
