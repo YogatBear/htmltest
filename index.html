@@ -67,6 +67,7 @@
     </div>
     <div id="error"></div>
     <script>
+    try{
         const numberField = document.getElementById("numberField");
         const buttons = document.querySelectorAll(".num-button");
         const infoDiv = document.getElementById("info");
@@ -126,7 +127,6 @@
             const data = JSON.parse(_data)
             const action = data.action;
             const body = data.body;
-            try{
             // ALL ACTIONS FROM HTML
             if(action === "ringing"){    // show calling screen
                 if(!(body.to && body.from)){
@@ -156,7 +156,8 @@
                 // show getting call screen
                 infoDiv.textContent = `RECEIVING CALL FROM ${receiver}`;
                 document.querySelector("#call-buttons").style.display = "inline-block"
-            }}
+            }
+            }
             catch(e){
                 document.getElementById("error").textContent = e;
             }
