@@ -121,9 +121,9 @@
         window.addEventListener('message', function (event) {
 
             console.log(event)
-            if (event.origin !== "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/") {
-                return;
-            }
+            // if (event.origin !== "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/") {
+            //     return;
+            // }
             // Handle the message from the iframe
             const data = JSON.parse(event.data);
             console.log(data)
