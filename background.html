@@ -127,7 +127,6 @@
             "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/inCall.html",
             "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/incomingCall.html"
         );
-        let currentCaller = ""
         window.addEventListener('message', function (event) {
 
             console.log(event)
@@ -139,19 +138,15 @@
             console.log(data)
             if (data.action === 'call') {
                 controller.call(data.to);
-                currentCaller = data.to
             }
             else if (data.action === 'end-call') {
                 controller.rejectCall(data.to);
-                currentCaller = data.to
             }
             if (data.action === 'accept-call') {
                 controller.acceptCall(data.from);
-                currentCaller = data.to
             }
             if (data.action === 'reject-call') {
                 controller.rejectCall(data.from);
-                currentCaller = data.to
             }
         }, false);
 
