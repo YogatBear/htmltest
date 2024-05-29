@@ -35,8 +35,18 @@
 </head>
 <body>
     <div class="container">
-        <h2>John Doe</h2>
+        <h2 id="name"></h2>
         <button>Hang Up</button>
     </div>
+    <script>
+                    // Get the search parameters from the current URL
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Now you can access individual parameters using methods like get()
+        const to = urlParams.get('to'); // Returns 'value1'
+        if(to){
+            document.querySelector("#name").textContent = to;
+        }
+    </script>
 </body>
 </html>
