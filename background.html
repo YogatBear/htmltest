@@ -19,94 +19,120 @@
             height: 80%;
             border: none;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: none; /* Hide all iframes by default */
         }
     </style>
 </head>
 <body>
-    <iframe src="https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/mainScreen.html"></iframe>
+    <iframe id="mainScreen" src="https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/mainScreen.html"></iframe>
+    <iframe id="ringingScreen" src="https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/ringing.html"></iframe>
+    <iframe id="inCallScreen" src="https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/inCall.html"></iframe>
+    <iframe id="incomingCallScreen" src="https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/incomingCall.html"></iframe>
+
     <script>
         class Controller {
-    constructor(ens){
-        this.ens = ens
-    }
-    sendData(data){
-        // define send data to native lang here
-    }
-    call(to){
-        const callObject = {
-            action:"call", 
-            body: { to:to }
-        }
-        this.sendData(callObject)
-    }
-    acceptCall(from){
-        const request = {
-            action:"accept-call", 
-            body:{from:from}
-        }
-        this.sendData(request)
-    }
-    rejectCall(){
-        const request = {
-            action:"reject-call",
-            body:{from:from}
-        }
-        this.sendData(request)
-    }
-    ring(to){
-        // show ringing screen
-    }
-    callStarted(_with){
-        // show in call screen with name of caller
-    }
-    callEnded(){
-        // end call logic
-    }
-    receivingCall(from){
-        //receiving call logic
-    }
-    receiveData(_data){
-        const data = JSON.parse(_data)
-        const action = data.action;
-        const body = data.body;
-        if(action === "ringing"){    // show calling screen
-            if(!body.to){
-                return;
+            constructor(ens) {
+                this.ens = ens;
+                this.currentPage = "";
             }
-            this.ring(to)
-        }
-        else if(action === "call-started"){
-            const caller = body.from;
-            this.callStarted(caller)
-        }
-        else if(action === "call-ended"){
-            const receiver = body.to;
-            this.callEnded()
-        }
-    
-        // ALL ACTIONS FROM NATIVE
-        else if(action === "receiving-call"){
-            if(!body.from){
-                return
+
+            setPage(pageId) {
+                // Hide all iframes
+                document.querySelectorAll('iframe').forEach(iframe => iframe.style.display = 'none');
+                // Show the selected iframe
+                const iframe = document.getElementById(pageId);
+                if (iframe) {
+                    iframe.style.display = 'block';
+                    this.currentPage = pageId;
+                }
             }
-            const caller = body.from;
-            this.receivingCall(caller)
+
+            sendData(data) {
+                // Define send data to native lang here
+            }
+
+            call(to) {
+                const callObject = {
+                    action: "call",
+                    body: { to: to }
+                };
+                this.sendData(callObject);
+                this.setPage('ringingScreen'); // Show ringing screen
+            }
+
+            acceptCall(from) {
+                const request = {
+                    action: "accept-call",
+                    body: { from: from }
+                };
+                this.sendData(request);
+                this.setPage('inCallScreen'); // Show in-call screen
+            }
+
+            rejectCall() {
+                const request = {
+                    action: "reject-call",
+                    body: { from: from }
+                };
+                this.sendData(request);
+                this.setPage('mainScreen'); // Show main screen
+            }
+
+            ring(to) {
+                this.setPage('ringingScreen'); // Show ringing screen
+            }
+
+            callStarted(_with) {
+                this.setPage('inCallScreen'); // Show in-call screen
+            }
+
+            callEnded() {
+                this.setPage('mainScreen'); // End call logic and show main screen
+            }
+
+            receivingCall(from) {
+                this.setPage('incomingCallScreen'); // Receiving call logic and show incoming call screen
+            }
+
+            receiveData(_data) {
+                const data = JSON.parse(_data);
+                const action = data.action;
+                const body = data.body;
+                if (action === "ringing") {
+                    if (!body.to) {
+                        return;
+                    }
+                    this.ring(body.to);
+                } else if (action === "call-started") {
+                    this.callStarted(body.from);
+                } else if (action === "call-ended") {
+                    this.callEnded();
+                } else if (action === "receiving-call") {
+                    if (!body.from) {
+                        return;
+                    }
+                    this.receivingCall(body.from);
+                }
+            }
         }
-    }
-}
-    const controller = new Controller("test.eth")
-        window.addEventListener('message', function(event) {
+
+        const controller = new Controller("test.eth");
+
+        window.addEventListener('message', function (event) {
             // Validate the origin of the message
             if (event.origin !== 'https://example.com') {
                 return;
             }
 
             // Handle the message from the iframe
-            const data = JSON.parse(event.data)
+            const data = JSON.parse(event.data);
             if (data.action === 'call') {
-                controller.call(data.to)
+                controller.call(data.to);
             }
         }, false);
+
+        // Example to set initial page
+        controller.setPage('mainScreen');
     </script>
 </body>
 </html>
