@@ -85,11 +85,11 @@
             }
 
             ring(to) {
-                this.setPage('ringingScreen', param={key:"to",value:"test"}); // Show ringing screen
+                this.setPage('ringingScreen', param={key:"to",value:to}); // Show ringing screen
             }
 
             callStarted(_with) {
-                this.setPage('inCallScreen', param={key:"to",value:"testing"}); // Show in-call screen
+                this.setPage('inCallScreen', param={key:"to",value:_with}); // Show in-call screen
             }
 
             callEnded() {
