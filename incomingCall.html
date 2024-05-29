@@ -67,7 +67,7 @@
         const acceptButton = document.querySelector(".accept")
         const rejectButton = document.querySelector(".reject")
 
-        acceptButton.addEventListener("click, "()=>{
+        acceptButton.addEventListener("click"()=>{
             window.parent.postMessage(JSON.stringify({action:"accept-call", from:from}), "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/background.html")
         })
         rejectButton.addEventListener("click", ()=>{
