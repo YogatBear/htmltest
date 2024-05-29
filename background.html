@@ -19,36 +19,35 @@
             height: 80%;
             border: none;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: none; /* Hide all iframes by default */
         }
     </style>
 </head>
 <body>
-    <iframe id="mainScreen" src="https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/mainScreen.html"></iframe>
-    <iframe id="ringingScreen" src="https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/ringing.html"></iframe>
-    <iframe id="inCallScreen" src="https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/inCall.html"></iframe>
-    <iframe id="incomingCallScreen" src="https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/incomingCall.html"></iframe>
+    <iframe id="screen" src=""></iframe>
 
     <script>
         class Controller {
-            constructor(ens) {
+            constructor(ens, main, ringing, inCall, incomingCall) {
                 this.ens = ens;
-                this.currentPage = "";
+                this.urls = {
+                    "main" : main,
+                    "ringing" : ringing,
+                    "inCall" : inCall,
+                    "incomingCall" : incomingCall
+                }
+                const iframe = document.getElementById("screen");
+                iframe.src = main
             }
-
             setPage(pageId, param = {}) {
                 console.log("param", param, Object.keys(param).length)
-                // Hide all iframes
-                document.querySelectorAll('iframe').forEach(iframe => iframe.style.display = 'none');
                 // Show the selected iframe
-                const iframe = document.getElementById(pageId);
+                const iframe = document.getElementById("screen");
                 if (iframe) {
+                    iframe.src = this.urls[pageId]
                     if(Object.keys(param).length >= 1){
-                        iframe.src = iframe.src + `?${param.key}=${param.value}`
+                        iframe.src += `?${param.key}=${param.value}`
                     }
                     console.log(iframe.src)
-                    iframe.style.display = 'block';
-                    this.currentPage = pageId;
                 }
             }
 
@@ -85,19 +84,19 @@
             }
 
             ring(to) {
-                this.setPage('ringingScreen', {key:"to",value:to}); // Show ringing screen
+                this.setPage('ringing', {key:"to",value:to}); // Show ringing screen
             }
 
             callStarted(_with) {
-                this.setPage('inCallScreen', {key:"to",value:_with}); // Show in-call screen
+                this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
             }
 
             callEnded() {
-                this.setPage('mainScreen'); // End call logic and show main screen
+                this.setPage('main'); // End call logic and show main screen
             }
 
             receivingCall(from) {
-                this.setPage('incomingCallScreen', {key:"from",value:from}); // Receiving call logic and show incoming call screen
+                this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
             }
 
             receiveData(_data) {
@@ -122,7 +121,12 @@
             }
         }
 
-        const controller = new Controller("test.eth");
+                const controller = new Controller("test.eth", 
+            "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/mainScreen.html",
+            "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/ringing.html",
+            "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/inCall.html",
+            "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/incomingCall.html"
+        );
         let currentCaller = ""
         window.addEventListener('message', function (event) {
 
@@ -151,8 +155,6 @@
             }
         }, false);
 
-        // Example to set initial page
-        controller.setPage('mainScreen');
     </script>
 </body>
 </html>
