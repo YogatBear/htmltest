@@ -49,11 +49,21 @@
 </head>
 <body>
     <div class="container">
-        <h2>John Doe</h2>
+        <h2>Incoming call</h2>
+        <h2 id="name"></h2>
         <div class="buttons">
             <button class="accept">Accept</button>
             <button class="reject">Reject</button>
         </div>
     </div>
+    <script>
+                    // Get the search parameters from the current URL
+        const urlParams = new URLSearchParams(window.location.search);
+        // Now you can access individual parameters using methods like get()
+        const from = urlParams.get('from'); // Returns 'value1'
+        if(from){
+            document.querySelector("#name").textContent = from;
+        }
+    </script>
 </body>
 </html>
