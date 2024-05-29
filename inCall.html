@@ -45,9 +45,9 @@
         // Now you can access individual parameters using methods like get()
         const to = urlParams.get('to'); // Returns 'value1'
         if(to){
-            document.querySelector("button").textContent = to;
+            document.querySelector("#name").textContent = to;
         }
-        const hangUp = document.querySelector("#hangUp")
+        const hangUp = document.querySelector("button")
         hangUp.addEventListener("click", ()=>{
             window.parent.postMessage(JSON.stringify({action:"end-call", to:to}), "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/background.html")
         })
