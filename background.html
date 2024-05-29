@@ -24,5 +24,89 @@
 </head>
 <body>
     <iframe src="https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/mainScreen.html"></iframe>
+    <script>
+        class Controller {
+    constructor(ens){
+        this.ens = ens
+    }
+    sendData(data){
+        // define send data to native lang here
+    }
+    call(to){
+        const callObject = {
+            action:"call", 
+            body: { to:to }
+        }
+        this.sendData(callObject)
+    }
+    acceptCall(from){
+        const request = {
+            action:"accept-call", 
+            body:{from:from}
+        }
+        this.sendData(request)
+    }
+    rejectCall(){
+        const request = {
+            action:"reject-call",
+            body:{from:from}
+        }
+        this.sendData(request)
+    }
+    ring(to){
+        // show ringing screen
+    }
+    callStarted(_with){
+        // show in call screen with name of caller
+    }
+    callEnded(){
+        // end call logic
+    }
+    receivingCall(from){
+        //receiving call logic
+    }
+    receiveData(_data){
+        const data = JSON.parse(_data)
+        const action = data.action;
+        const body = data.body;
+        if(action === "ringing"){    // show calling screen
+            if(!body.to){
+                return;
+            }
+            this.ring(to)
+        }
+        else if(action === "call-started"){
+            const caller = body.from;
+            this.callStarted(caller)
+        }
+        else if(action === "call-ended"){
+            const receiver = body.to;
+            this.callEnded()
+        }
+    
+        // ALL ACTIONS FROM NATIVE
+        else if(action === "receiving-call"){
+            if(!body.from){
+                return
+            }
+            const caller = body.from;
+            this.receivingCall(caller)
+        }
+    }
+}
+    const controller = new Controller("test.eth")
+        window.addEventListener('message', function(event) {
+            // Validate the origin of the message
+            if (event.origin !== 'https://example.com') {
+                return;
+            }
+
+            // Handle the message from the iframe
+            const data = JSON.parse(event.data)
+            if (data.action === 'call') {
+                controller.call(data.to)
+            }
+        }, false);
+    </script>
 </body>
 </html>
