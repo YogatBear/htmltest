@@ -138,7 +138,7 @@
                 currentCaller = data.to
             }
             else if (data.action === 'end-call') {
-                controller.callEnded(data.to);
+                controller.rejectCall(data.to);
                 currentCaller = data.to
             }
             if (data.action === 'accept-call') {
