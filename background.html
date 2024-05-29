@@ -49,6 +49,7 @@
 
             sendData(data) {
                 // Define send data to native lang here
+                window.webkit.messageHandlers.buttonPressed.postMessage(JSON.stringify(data));
             }
 
             call(to) {
@@ -66,7 +67,7 @@
                     body: { from: from }
                 };
                 this.sendData(request);
-                this.setPage('inCallScreen'); // Show in-call screen
+                // this.setPage('inCallScreen'); // Show in-call screen
             }
 
             rejectCall() {
@@ -75,7 +76,7 @@
                     body: { from: from }
                 };
                 this.sendData(request);
-                this.setPage('mainScreen'); // Show main screen
+                // this.setPage('mainScreen'); // Show main screen
             }
 
             ring(to) {
@@ -129,6 +130,15 @@
             console.log(data)
             if (data.action === 'call') {
                 controller.call(data.to);
+            }
+            else if (data.action === 'end-call') {
+                controller.callEnded(data.to);
+            }
+            if (data.action === 'accept-call') {
+                controller.acceptCall(data.from);
+            }
+            if (data.action === 'reject-call') {
+                controller.rejectCall(data.from);
             }
         }, false);
 
