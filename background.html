@@ -118,14 +118,18 @@
 
         const controller = new Controller("test.eth");
 
-        // window.addEventListener('message', function (event) {
-        //     console.log(event)
-        //     // Handle the message from the iframe
-        //     const data = JSON.parse(event.data);
-        //     if (data.action === 'call') {
-        //         controller.call(data.to);
-        //     }
-        // }, false);
+        window.addEventListener('message', function (event) {
+
+            console.log(event)
+            if (event.origin !== "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/") {
+                return;
+            }
+            // Handle the message from the iframe
+            const data = JSON.parse(event.data);
+            if (data.action === 'call') {
+                controller.call(data.to);
+            }
+        }, false);
 
         // Example to set initial page
         controller.setPage('mainScreen');
