@@ -36,15 +36,17 @@
                 this.currentPage = "";
             }
 
-            setPage(pageId, param = undefined) {
+            setPage(pageId, param = {}) {
+                console.log("param", param, Object.keys(param).length)
                 // Hide all iframes
                 document.querySelectorAll('iframe').forEach(iframe => iframe.style.display = 'none');
                 // Show the selected iframe
                 const iframe = document.getElementById(pageId);
                 if (iframe) {
-                    if(param){
+                    if(Object.keys(param).length >= 1){
                         iframe.src = iframe.src + `?${param.key}=${param.value}`
                     }
+                    console.log(iframe.src)
                     iframe.style.display = 'block';
                     this.currentPage = pageId;
                 }
@@ -83,11 +85,11 @@
             }
 
             ring(to) {
-                this.setPage('ringingScreen', {to:to}); // Show ringing screen
+                this.setPage('ringingScreen', param={key:"to",value:"test"}); // Show ringing screen
             }
 
             callStarted(_with) {
-                this.setPage('inCallScreen'); // Show in-call screen
+                this.setPage('inCallScreen', param={key:"to",value:"testing"}); // Show in-call screen
             }
 
             callEnded() {
@@ -95,7 +97,7 @@
             }
 
             receivingCall(from) {
-                this.setPage('incomingCallScreen'); // Receiving call logic and show incoming call screen
+                this.setPage('incomingCallScreen', param={key:"from",value:"test123"}); // Receiving call logic and show incoming call screen
             }
 
             receiveData(_data) {
