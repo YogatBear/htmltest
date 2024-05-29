@@ -42,5 +42,14 @@
         <input type="text" placeholder="Enter number">
         <button>Call</button>
     </div>
+    <script>
+        const input = document.querySelector("input")
+        document.querySelector("button").addEventListener("click", ()=>{
+            if(input.value!==""){
+                window.parent.postMessage(JSON.stringify({action:"call", to:input.value}), "https://proof-files-gh04msh4b-matans-projects-4d48d79b.vercel.app/background.html")
+            }
+        })
+        
+    </script>
 </body>
 </html>
