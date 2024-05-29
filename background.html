@@ -75,7 +75,7 @@
                 // this.setPage('inCallScreen'); // Show in-call screen
             }
 
-            rejectCall() {
+            rejectCall(from) {
                 const request = {
                     action: "reject-call",
                     body: { from: from }
