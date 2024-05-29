@@ -47,7 +47,7 @@
         document.querySelector("button").addEventListener("click", ()=>{
             console.log("calling...", input.value)
             if(input.value!==""){
-                window.parent.postMessage(JSON.stringify({action:"call", to:input.value}), "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app")
+                window.parent.postMessage(JSON.stringify({action:"call", to:input.value}), "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/background.html")
             }
         })
         
