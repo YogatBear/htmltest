@@ -85,11 +85,11 @@
             }
 
             ring(to) {
-                this.setPage('ringingScreen', param={key:"to",value:to}); // Show ringing screen
+                this.setPage('ringingScreen', {key:"to",value:to}); // Show ringing screen
             }
 
             callStarted(_with) {
-                this.setPage('inCallScreen', param={key:"to",value:_with}); // Show in-call screen
+                this.setPage('inCallScreen', {key:"to",value:_with}); // Show in-call screen
             }
 
             callEnded() {
@@ -97,7 +97,7 @@
             }
 
             receivingCall(from) {
-                this.setPage('incomingCallScreen', param={key:"from",value:"test123"}); // Receiving call logic and show incoming call screen
+                this.setPage('incomingCallScreen', {key:"from",value:from}); // Receiving call logic and show incoming call screen
             }
 
             receiveData(_data) {
