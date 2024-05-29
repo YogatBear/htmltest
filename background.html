@@ -126,6 +126,7 @@
             }
             // Handle the message from the iframe
             const data = JSON.parse(event.data);
+            console.log(data)
             if (data.action === 'call') {
                 controller.call(data.to);
             }
