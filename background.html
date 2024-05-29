@@ -36,12 +36,15 @@
                 this.currentPage = "";
             }
 
-            setPage(pageId) {
+            setPage(pageId, param = undefined) {
                 // Hide all iframes
                 document.querySelectorAll('iframe').forEach(iframe => iframe.style.display = 'none');
                 // Show the selected iframe
                 const iframe = document.getElementById(pageId);
                 if (iframe) {
+                    if(param){
+                        iframe.src = iframe.src + `?${param.key}=${param.value}`
+                    }
                     iframe.style.display = 'block';
                     this.currentPage = pageId;
                 }
@@ -58,7 +61,7 @@
                     body: { to: to }
                 };
                 this.sendData(callObject);
-                this.setPage('ringingScreen'); // Show ringing screen
+                // this.setPage('ringingScreen'); // Show ringing screen
             }
 
             acceptCall(from) {
@@ -80,7 +83,7 @@
             }
 
             ring(to) {
-                this.setPage('ringingScreen'); // Show ringing screen
+                this.setPage('ringingScreen', {to:to}); // Show ringing screen
             }
 
             callStarted(_with) {
@@ -118,9 +121,9 @@
         }
 
         const controller = new Controller("test.eth");
-
+        const currentCaller = ""
         window.addEventListener('message', function (event) {
-
+    
             console.log(event)
             // if (event.origin !== "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/") {
             //     return;
@@ -130,15 +133,19 @@
             console.log(data)
             if (data.action === 'call') {
                 controller.call(data.to);
+                currentCaller = data.to
             }
             else if (data.action === 'end-call') {
                 controller.callEnded(data.to);
+                currentCaller = data.to
             }
             if (data.action === 'accept-call') {
                 controller.acceptCall(data.from);
+                currentCaller = data.to
             }
             if (data.action === 'reject-call') {
                 controller.rejectCall(data.from);
+                currentCaller = data.to
             }
         }, false);
 
