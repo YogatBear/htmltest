@@ -47,6 +47,10 @@
         if(to){
             document.querySelector("#name").textContent = to;
         }
+        const hangUp = document.querySelector("#hangUp")
+        hangUp.addEventListener("click", ()=>{
+            window.parent.postMessage(JSON.stringify({action:"end-call", to:to}), "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/background.html")
+        })
     </script>
 </body>
 </html>
