@@ -119,6 +119,7 @@
         const controller = new Controller("test.eth");
 
         window.addEventListener('message', function (event) {
+            console.log(event)
             // Handle the message from the iframe
             const data = JSON.parse(event.data);
             if (data.action === 'call') {
