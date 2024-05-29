@@ -119,11 +119,6 @@
         const controller = new Controller("test.eth");
 
         window.addEventListener('message', function (event) {
-            // Validate the origin of the message
-            if (event.origin !== 'https://example.com') {
-                return;
-            }
-
             // Handle the message from the iframe
             const data = JSON.parse(event.data);
             if (data.action === 'call') {
