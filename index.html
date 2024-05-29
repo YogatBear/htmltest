@@ -75,7 +75,6 @@
         const infoButton = document.querySelector("#info-button");
         const hangUpButton = document.querySelector("#hang-up");
 
-        
 
         buttons.forEach(button => {
             button.addEventListener("click", () => {
@@ -88,30 +87,106 @@
         document.querySelector("#accept-call-btn").addEventListener("click", acceptCall)
         document.querySelector("#reject-call-btn").addEventListener("click", rejectCall)
         
+class Controller {
+    constructor(ens){
+        this.ens = ens
+    }
+    sendData(data){
+        // define send data to native lang here
+        window.webkit.messageHandlers.buttonPressed.postMessage(JSON.stringify(data));
+    }
+    call(to){
+        const callObject = {
+            action:"call", 
+            body: { to:to }
+        }
+        this.sendData(callObject)
+    }
+    acceptCall(from){
+        const request = {
+            action:"accept-call", 
+            body:{from:from}
+        }
+        this.sendData(request)
+    }
+    rejectCall(){
+        const request = {
+            action:"reject-call",
+            body:{from:from}
+        }
+        this.sendData(request)
+    }
+    ring(to){
+        // show ringing screen
+        infoDiv.textContent = `RINGING ${to}`
+    }
+    callStarted(_with){
+        // show in call screen with name of caller
+        infoDiv.textContent = `IN CALL WITH ${_with}`
+    }
+    callEnded(_with){
+        // end call logic
+        infoDiv.textContent = `CALL ENDED WITH ${_with}`
+    }
+    receivingCall(from){
+        //receiving call logic
+        infoDiv.textContent = `RECEIVING CALL FROM ${receiver}`;
+        document.querySelector("#call-buttons").style.display = "inline-block"
+        currentCaller = receiver;
+    }
+    receiveData(_data){
+        const data = JSON.parse(_data)
+        const action = data.action;
+        const body = data.body;
+        if(action === "ringing"){    // show calling screen
+            if(!body.to){
+                return;
+            }
+            this.ring(to)
+        }
+        else if(action === "call-started"){
+            const caller = body.from;
+            this.callStarted(caller)
+        }
+        else if(action === "call-ended"){
+            const caller = body.from;
+            this.callEnded(caller)
+        }
+    
+        // ALL ACTIONS FROM NATIVE
+        else if(action === "receiving-call"){
+            if(!body.from){
+                return
+            }
+            const caller = body.from;
+            this.receivingCall(caller)
+        }
+    }
+}
+
+        
+        
+        const controller = new Controller("test.eth")
 
         function callButtonClicked() {
             if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.buttonPressed) {
-                const request = {action:"call", body:{from:"test.eth", to:numberField.value}};
-                sendData(request)
+                controller.call(numberField.value)
                 console.log("Message sent to Swift with value: " + numberField.value);
             } else {
                 console.log("Message handler not found");
             }
         }
         function acceptCall(){
-            const request = {action:"accept-call", body:{from:currentCaller}}
-            sendData(request)
+            controller.acceptCall(currentCaller)
             document.querySelector("#call-buttons").style.display = "none"
         }
         function rejectCall(){
-            const request = {action:"reject-call", body:{from:currentCaller}}
-            sendData(request)
+            controller.rejectCall(currentCaller)
             document.querySelector("#call-buttons").style.display = "none"
         }
         
         function endCall(){
-            const hangUpObject = {action:"end-call"};
-            sendData(hangUpObject);
+            controller.callEnded()
         }
         function updateInfo(data) {
             try{
@@ -120,44 +195,44 @@
             }catch(e){
                 console.log(e)}
             }
-        function sendData(data){
-            window.webkit.messageHandlers.buttonPressed.postMessage(JSON.stringify(data));
-        }
-        function receiveData(_data){
-            const data = JSON.parse(_data)
-            const action = data.action;
-            const body = data.body;
-            // ALL ACTIONS FROM HTML
-            if(action === "ringing"){    // show calling screen
-                if(!(body.to && body.from)){
-                    return;
-                }
-                const receiver = body.to;
-                //show calling screem with receiver's ens
-                infoDiv.textContent = `RINGING ${receiver}`
-            }
-            else if(action === "call-started"){
-                const receiver = body.to;
-                // show in call screen with receiever ens
-                infoDiv.textContent = `IN CALL WITH ${receiver}`
-            }
-            else if(action === "call-ended"){
-                const receiver = body.to;
-                // show in call screen with receiever ens
-                infoDiv.textContent = `CALL ENDED WITH ${receiver}`
-            }
+        // function sendData(data){
+        //     window.webkit.messageHandlers.buttonPressed.postMessage(JSON.stringify(data));
+        // }
+        // function receiveData(_data){
+        //     const data = JSON.parse(_data)
+        //     const action = data.action;
+        //     const body = data.body;
+        //     // ALL ACTIONS FROM HTML
+        //     if(action === "ringing"){    // show calling screen
+        //         if(!(body.to && body.from)){
+        //             return;
+        //         }
+        //         const receiver = body.to;
+        //         //show calling screem with receiver's ens
+        //         infoDiv.textContent = `RINGING ${receiver}`
+        //     }
+        //     else if(action === "call-started"){
+        //         const receiver = body.to;
+        //         // show in call screen with receiever ens
+        //         infoDiv.textContent = `IN CALL WITH ${receiver}`
+        //     }
+            // else if(action === "call-ended"){
+            //     const receiver = body.to;
+            //     // show in call screen with receiever ens
+            //     infoDiv.textContent = `CALL ENDED WITH ${receiver}`
+            // }
 
-            // ALL ACTIONS FROM NATIVE
-            else if(action === "receiving-call"){
-                if(!body.from){
-                    return
-                }
-                const receiver = body.from;
-                // show getting call screen
-                infoDiv.textContent = `RECEIVING CALL FROM ${receiver}`;
-                document.querySelector("#call-buttons").style.display = "inline-block"
-                currentCaller = receiver;
-            }
+            // // ALL ACTIONS FROM NATIVE
+            // else if(action === "receiving-call"){
+            //     if(!body.from){
+            //         return
+            //     }
+            //     const receiver = body.from;
+            //     // show getting call screen
+            //     infoDiv.textContent = `RECEIVING CALL FROM ${receiver}`;
+            //     document.querySelector("#call-buttons").style.display = "inline-block"
+            //     currentCaller = receiver;
+            // }
         }
             
     </script>
