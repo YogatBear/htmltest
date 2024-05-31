@@ -23,7 +23,6 @@
     </style>
 </head>
 <body>
-    <p id="message">messages</p>
     <iframe id="screen" src=""></iframe>
 
     <script>
@@ -53,16 +52,12 @@
             }
 
             sendMessageToNativeApp(jsonData) {
-                const p = document.querySelector("#message")
                 if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.buttonPressed) {
-                    p.textContent = "ios"
                     window.webkit.messageHandlers.buttonPressed.postMessage(JSON.stringify(jsonData))
                 } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
-                    p.textContent = "android"
                     window.AndroidBridge.processAction(JSON.strigify(jsonData));
                 } else {
                     console.log("Native interface not available");
-                    p.textContent = "not available"
                 }
             }
 
@@ -71,8 +66,6 @@
                     action: "call",
                     body: { to: to }
                 };
-                const p = document.querySelector("#message")
-                p.textContent = JSON.stringify(callObject);
                 this.sendMessageToNativeApp(callObject);
                 // this.setPage('ringingScreen'); // Show ringing screen
             }
