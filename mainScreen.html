@@ -43,13 +43,18 @@
         <button>Call</button>
     </div>
     <script>
-        const input = document.querySelector("input")
-        document.querySelector("button").addEventListener("click", ()=>{
-            console.log("calling...", input.value)
-            if(input.value!==""){
-                window.parent.processAction(JSON.stringify({action:"call", to:input.value}), "https://htmltest-theta.vercel.app/background.html")
+        const input = document.querySelector("input");
+        document.querySelector("button").addEventListener("click", () => {
+            console.log("calling...", input.value);
+            if (input.value !== "") {
+                const message = JSON.stringify({ action: "call", body: { to: input.value } });
+                if (window.AndroidBridge && window.AndroidBridge.processAction) {
+                    window.AndroidBridge.processAction(message);
+                } else {
+                    console.log("Native interface not available");
+                }
             }
-        })
+        });
         
     </script>
 </body>
