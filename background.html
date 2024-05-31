@@ -51,7 +51,7 @@
                 }
             }
 
-             function sendMessageToNativeApp(jsonData) {
+            sendMessageToNativeApp(jsonData) {
                 if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
                     window.webkit.messageHandlers.nativeHandler.postMessage(jsonData);
                 } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
