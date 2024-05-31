@@ -51,9 +51,14 @@
                 }
             }
 
-            sendData(data) {
-                // Define send data to native lang here
-                window.webkit.messageHandlers.buttonPressed.postMessage(JSON.stringify(data));
+             function sendMessageToNativeApp(jsonData) {
+                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+                    window.webkit.messageHandlers.nativeHandler.postMessage(jsonData);
+                } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
+                    window.AndroidBridge.processAction(jsonData);
+                } else {
+                    console.log("Native interface not available");
+                }
             }
 
             call(to) {
@@ -61,7 +66,7 @@
                     action: "call",
                     body: { to: to }
                 };
-                this.sendData(callObject);
+                this.sendMessageToNativeApp(callObject);
                 // this.setPage('ringingScreen'); // Show ringing screen
             }
 
@@ -70,7 +75,7 @@
                     action: "accept-call",
                     body: { from: from }
                 };
-                this.sendData(request);
+                this.sendMessageToNativeApp(request);
                 // this.setPage('inCallScreen'); // Show in-call screen
             }
 
@@ -79,7 +84,7 @@
                     action: "reject-call",
                     body: { from: from }
                 };
-                this.sendData(request);
+                this.sendMessageToNativeApp(request);
                 // this.setPage('mainScreen'); // Show main screen
             }
 
