@@ -54,9 +54,9 @@
 
             sendMessageToNativeApp(jsonData) {
                 const p = document.querySelector("#message")
-                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.buttonPressed) {
                     p.textContent = "ios"
-                    window.webkit.messageHandlers.nativeHandler.postMessage(jsonData);
+                    window.webkit.messageHandlers.buttonPressed.postMessage(JSON.stringify(data))
                 } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
                     p.textContent = "android"
                     window.AndroidBridge.processAction(jsonData);
