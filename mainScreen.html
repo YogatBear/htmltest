@@ -47,7 +47,7 @@
         document.querySelector("button").addEventListener("click", ()=>{
             console.log("calling...", input.value)
             if(input.value!==""){
-                window.parent.postMessage(JSON.stringify({action:"call", to:input.value}), "https://htmltest-theta.vercel.app/background.html")
+                window.parent.processAction(JSON.stringify({action:"call", to:input.value}), "https://htmltest-theta.vercel.app/background.html")
             }
         })
         
