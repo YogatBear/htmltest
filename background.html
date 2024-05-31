@@ -64,7 +64,7 @@
             call(to) {
                 const callObject = {
                     action: "call",
-                    body: { to: to }
+                    body: { "to": to }
                 };
                 this.sendMessageToNativeApp(callObject);
                 // this.setPage('ringingScreen'); // Show ringing screen
