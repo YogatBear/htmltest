@@ -53,19 +53,19 @@
 
             sendMessageToNativeApp(jsonData) {
                 if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
-                    window.webkit.messageHandlers.nativeHandler.postMessage(jsonData);
+                    window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
                 } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
-                    window.AndroidBridge.processAction(jsonData);
+                    window.AndroidBridge.processAction(JSON.stringify(jsonData));
                 } else {
                     console.log("Native interface not available");
                 }
             }
 
             call(to) {
-                const callObject = JSON.stringify({
+                const callObject = {
                     action: "call",
                     body: {to: to}
-                });
+                };
                 this.sendMessageToNativeApp(callObject);
                 // this.setPage('ringingScreen'); // Show ringing screen
             }
