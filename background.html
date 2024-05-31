@@ -23,6 +23,7 @@
     </style>
 </head>
 <body>
+    <p id="message">messages</p>
     <iframe id="screen" src=""></iframe>
 
     <script>
@@ -52,12 +53,16 @@
             }
 
             sendMessageToNativeApp(jsonData) {
+                const p = document.querySelector("#message")
                 if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+                    p.textContent = "ios"
                     window.webkit.messageHandlers.nativeHandler.postMessage(jsonData);
                 } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
+                    p.textContent = "android"
                     window.AndroidBridge.processAction(jsonData);
                 } else {
                     console.log("Native interface not available");
+                    p.textContent = "not available"
                 }
             }
 
