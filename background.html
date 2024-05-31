@@ -57,6 +57,7 @@
                 if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.buttonPressed) {
                     p.textContent = "ios"
                     window.webkit.messageHandlers.buttonPressed.postMessage(JSON.stringify(data))
+                    p.textContent = JSON.stringify(data);
                 } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
                     p.textContent = "android"
                     window.AndroidBridge.processAction(JSON.strigify(jsonData));
