@@ -46,8 +46,9 @@
         const input = document.querySelector("input")
         document.querySelector("button").addEventListener("click", ()=>{
             console.log("calling...", input.value)
+            
             if(input.value!==""){
-                window.parent.postMessage(JSON.stringify({action:"call", to:input.value}), "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/background.html")
+                window.parent.postMessage(JSON.stringify({action:"call", to:input.value}), "http://127.0.0.1:3000/my-app/app/protocol.js/test.html")
             }
         })
         
