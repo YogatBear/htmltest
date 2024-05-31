@@ -55,7 +55,7 @@
             sendMessageToNativeApp(jsonData) {
                 const p = document.querySelector("#message")
                 if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.buttonPressed) {
-                    p.textContent = "ios"
+                    // p.textContent = "ios"
                     window.webkit.messageHandlers.buttonPressed.postMessage(JSON.stringify(data))
                     p.textContent = JSON.stringify(data);
                 } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
@@ -72,6 +72,7 @@
                     action: "call",
                     body: { to: to }
                 };
+                const p = document.querySelector("#message")
                 p.textContent = JSON.stringify(callObject);
                 this.sendMessageToNativeApp(callObject);
                 // this.setPage('ringingScreen'); // Show ringing screen
