@@ -181,8 +181,10 @@
                     controller.store(data.key, data.value);
                     break
                 case 'fetch':
-                    controller.fetch(data.key, data.d_value);
-                    break
+                    controller.fetch(data.key, data.d_value, function(response) {
+                        event.source.postMessage(JSON.stringify({key: data.key, value: response}), event.origin);
+                    });
+                    break;
                 default:
                     console.log('Unknown action');
                     break;
