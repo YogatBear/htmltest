@@ -51,13 +51,20 @@
                 }
             }
 
-            sendMessageToNativeApp(jsonData) {
+            sendMessageToNativeApp(jsonData, callback = null) {
                 if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
                     window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
                 } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
                     window.AndroidBridge.processAction(JSON.stringify(jsonData));
                 } else {
                     console.log("Native interface not available");
+                }
+        
+                // Setup callback if provided
+                if (callback) {
+                    const callbackId = 'callback_' + Date.now(); // Generate a unique ID for the callback
+                    this.callbacks[callbackId] = callback;
+                    jsonData['callbackId'] = callbackId; // Append callback ID to jsonData so the native app can refer back
                 }
             }
 
@@ -86,6 +93,22 @@
                 };
                 this.sendMessageToNativeApp(request);
                 // this.setPage('mainScreen'); // Show main screen
+            }
+
+            store(key, value) {
+                const request = {
+                    action: "store",
+                    body: { key: key, value: value }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            fetch(key, d_value, callback) {
+                const request = {
+                    action: "fetch",
+                    body: { key: key, d_value: d_value }
+                };
+                this.sendMessageToNativeApp(request, callback);
             }
 
             ring(to) {
@@ -141,18 +164,30 @@
             // Handle the message from the iframe
             const data = JSON.parse(event.data);
             console.log(data)
-            if (data.action === 'call') {
-                controller.call(data.to);
+            switch (data.action) {
+                case 'call':
+                    controller.call(data.to);
+                    break;
+                case 'end-call':
+                    controller.rejectCall(data.to);
+                    break;
+                case 'accept-call':
+                    controller.acceptCall(data.from);
+                    break;
+                case 'reject-call':
+                    controller.rejectCall(data.from);
+                    break;
+                case 'store':
+                    controller.store(data.key, data.value);
+                    break
+                case 'fetch':
+                    controller.fetch(data.key, data.d_value);
+                    break
+                default:
+                    console.log('Unknown action');
+                    break;
             }
-            else if (data.action === 'end-call') {
-                controller.rejectCall(data.to);
-            }
-            if (data.action === 'accept-call') {
-                controller.acceptCall(data.from);
-            }
-            if (data.action === 'reject-call') {
-                controller.rejectCall(data.from);
-            }
+            
         }, false);
 
     </script>
