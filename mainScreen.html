@@ -17,7 +17,7 @@
         .container {
             text-align: center;
         }
-        input[type="text"] {
+        input[type="text"], div {
             width: 200px;
             padding: 10px;
             margin-bottom: 20px;
@@ -41,17 +41,35 @@
     <div class="container">
         <input type="text" placeholder="Enter number">
         <button>Call</button>
+        <div id="recent-calls"></div>
     </div>
     <script>
-        const input = document.querySelector("input")
-            document.querySelector("button").addEventListener("click", ()=>{
-                console.log("calling...", input.value)
-                if(input.value!==""){
-                    window.parent.postMessage(JSON.stringify({action:"call", to:input.value}), "https://htmltest-theta.vercel.app/background.html")
-                }
-            })
+        const input = document.querySelector("input");
+        const recentCalls = document.getElementById("recent-calls");
 
-        
+        document.querySelector("button").addEventListener("click", () => {
+            console.log("calling...", input.value);
+            if(input.value !== ""){
+                window.parent.postMessage(JSON.stringify({action:"call", to:input.value}), "*");
+            }
+        });
+
+        // Fetch recent calls on startup
+        window.addEventListener("load", () => {
+            window.parent.postMessage(JSON.stringify({action: "fetch", key: "recent"}), "*");
+        });
+
+        // Listen for messages from the parent frame
+        window.addEventListener("message", event => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.key === "recent") {
+                    recentCalls.textContent = data.value || "No recent calls.";
+                }
+            } catch (error) {
+                console.error("Error parsing message data:", error);
+            }
+        });
     </script>
 </body>
 </html>
