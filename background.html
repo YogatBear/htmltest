@@ -77,35 +77,35 @@
 
             switch (action) {
                 case 'ring':
-                    this.#ring(body.to);
+                    this.ring(body.to);
                     break;
                 case 'call-started':
-                    this.#callStarted(body.from);
+                    this.callStarted(body.from);
                     break;
                 case 'reject-call':
-                    this.#callEnded(body.from);
+                    this.callEnded(body.from);
                     break;
                 case 'receiving-call':
-                    this.#receivingCall(body.from);
+                    this.receivingCall(body.from);
                     break;
                 default:
                     console.log('Unknown action:', action);
                     break;
             }
 
-            #ring(to) {
+            ring(to) {
                 this.setPage('ringing', {key:"to",value:to}); // Show ringing screen
             }
 
-            #callStarted(_with) {
+            callStarted(_with) {
                 this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
             }
 
-            #callEnded(from) {
+            callEnded(from) {
                 this.setPage('main'); // End call logic and show main screen
             }
 
-            #receivingCall(from) {
+            receivingCall(from) {
                 this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
             }
 
