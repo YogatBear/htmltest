@@ -74,6 +74,30 @@
                 }
             }
 
+            processAction(jsonString) {
+                const actionObject = JSON.parse(jsonString);
+                const action = actionObject.action;
+                const body = actionObject.body;
+    
+                switch (action) {
+                    case 'ring':
+                        this.#ring(body.to);
+                        break;
+                    case 'call-started':
+                        this.#callStarted(body.from);
+                        break;
+                    case 'reject-call':
+                        this.#callEnded(body.from);
+                        break;
+                    case 'receiving-call':
+                        this.#receivingCall(body.from);
+                        break;
+                    default:
+                        console.log('Unknown action:', action);
+                        break;
+                }
+            }
+
 
             call(to) {
                 const callObject = {
