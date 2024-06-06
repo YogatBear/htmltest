@@ -50,14 +50,13 @@
                     console.log(iframe.src)
                 }
             }
-
             sendMessageToNativeApp(jsonData, callback = null) {
                 if (callback) {
                     const callbackId = 'callback_' + Date.now(); // Generate a unique ID for the callback
                     this.callbacks[callbackId] = callback;
                     jsonData['callbackId'] = callbackId; // Append callback ID to jsonData so the native app can refer back
                 }
-
+            
                 if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
                     window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
                 } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
@@ -65,15 +64,50 @@
                 } else {
                     console.log("Native interface not available");
                 }
-
-                // Setup callback if provided
-                if (callback) {
-                    const callbackId = 'callback_' + Date.now(); // Generate a unique ID for the callback
-                    this.callbacks[callbackId] = callback;
-                    jsonData['callbackId'] = callbackId; // Append callback ID to jsonData so the native app can refer back
-                }
             }
 
+            //incoming
+
+            processAction(jsonString) {
+            const actionObject = JSON.parse(jsonString);
+            const action = actionObject.action;
+            const body = actionObject.body;
+
+            switch (action) {
+                case 'ring':
+                    this.#ring(body.to);
+                    break;
+                case 'call-started':
+                    this.#callStarted(body.from);
+                    break;
+                case 'reject-call':
+                    this.#callEnded(body.from);
+                    break;
+                case 'receiving-call':
+                    this.#receivingCall(body.from);
+                    break;
+                default:
+                    console.log('Unknown action:', action);
+                    break;
+            }
+
+            #ring(to) {
+                this.setPage('ringing', {key:"to",value:to}); // Show ringing screen
+            }
+
+            #callStarted(_with) {
+                this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
+            }
+
+            #callEnded(from) {
+                this.setPage('main'); // End call logic and show main screen
+            }
+
+            #receivingCall(from) {
+                this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
+            }
+
+            //outgoing
 
             call(to) {
                 const callObject = {
@@ -113,18 +147,23 @@
                 };
                 this.sendMessageToNativeApp(request, callback);
             }
+
             ring(to) {
                 this.setPage('ringing', {key:"to",value:to}); // Show ringing screen
             }
+
             callStarted(_with) {
                 this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
             }
+
             callEnded() {
                 this.setPage('main'); // End call logic and show main screen
             }
+
             receivingCall(from) {
                 this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
             }
+
             receiveData(_data) {
                 const data = JSON.parse(_data);
                 const action = data.action;
