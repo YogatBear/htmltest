@@ -64,12 +64,19 @@
             try {
                 const data = JSON.parse(event.data);
                 if (data.key === "recent") {
-                    recentCalls.textContent = data.value || "No recent calls.";
+                    // Handle the incoming Invite Log data
+                    const recentCalls = document.getElementById("recent-calls");
+                    let content = "";
+                    for (const caller in data.value) {
+                        content += `<div>${caller}: ${data.value[caller]}</div>`;
+                    }
+                    recentCalls.innerHTML = content; // Display data in the 'recent-calls' div
                 }
             } catch (error) {
                 console.error("Error parsing message data:", error);
             }
         });
+
     </script>
 </body>
 </html>
