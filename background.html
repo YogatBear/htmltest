@@ -126,7 +126,7 @@
             }
             dataFetched(jsonData) {
                 console.log('Received raw data:', JSON.stringify(jsonData));
-                const data = JSON.parse(jJSON.stringify(jsonData));
+                const data = JSON.parse(JSON.stringify(jsonData));
                 try {
                     // Directly use the JSON object if it's a property of jsonData
                     if (data.body && data.body.InvLog) {
