@@ -74,30 +74,6 @@
                 }
             }
 
-            processAction(jsonString) {
-                const actionObject = JSON.parse(jsonString);
-                const action = actionObject.action;
-                const body = actionObject.body;
-    
-                switch (action) {
-                    case 'ring':
-                        this.ring(body.to);
-                        break;
-                    case 'call-started':
-                        this.callStarted(body.from);
-                        break;
-                    case 'call-ended':
-                        this.callEnded(body.from);
-                        break;
-                    case 'receiving-call':
-                        this.receivingCall(body.from);
-                        break;
-                    default:
-                        console.log('Unknown action:', action);
-                        break;
-                }
-            }
-
             call(to) {
                 const callObject = {
                     action: "call",
@@ -148,6 +124,23 @@
             receivingCall(from) {
                 this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
             }
+            function dataFetched(jsonData) {
+                try {
+                    const data = JSON.parse(jsonData); // Parse the JSON string to an object
+                    switch (data.key) {
+                        case "InvLog":
+                            console.log("Inventory Log Data:", data.value);
+                            break;
+                        // You can add more cases here to handle different keys
+                        default:
+                            console.log("Unhandled key:", data.key);
+                            break;
+                    }
+                } catch (error) {
+                    console.error("Error parsing JSON or processing data:", error);
+                }
+            }
+            
             receiveData(_data) {
                 const data = JSON.parse(_data);
                 const action = data.action;
@@ -165,6 +158,7 @@
                     case 'receiving-call':
                         this.receivingCall(body.from);
                         break;
+                    case 'data-fetched;":
                     default:
                         console.log('Unknown action:', action);
                         break;
