@@ -62,7 +62,7 @@
         // Listen for messages from the parent frame
         window.addEventListener("message", event => {
             try {
-                const data = JSON.parse(event.data);
+                const data = event.data;
                 if (data.key === "recent") {
                     // Handle the incoming Invite Log data
                     const recentCalls = document.getElementById("recent-calls");
