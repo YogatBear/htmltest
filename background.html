@@ -129,7 +129,7 @@
                 const data = JSON.parse(JSON.stringify(jsonData));
                 try {
                     // Directly use the JSON object if it's a property of jsonData
-                    if (data.body && data.body.InvLog) {
+                    if ( data.InvLog) {
                         const invLogData = data.body.InvLog;  // Already an object, no need for JSON.parse()
                         console.log("Inventory Log Data:", invLogData);
             
