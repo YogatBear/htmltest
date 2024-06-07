@@ -152,20 +152,22 @@
                 const data = JSON.parse(_data);
                 const action = data.action;
                 const body = data.body;
-                if (action === "ringing") {
-                    if (!body.to) {
-                        return;
-                    }
-                    this.ring(body.to);
-                } else if (action === "call-started") {
-                    this.callStarted(body.from);
-                } else if (action === "call-ended") {
-                    this.callEnded();
-                } else if (action === "receiving-call") {
-                    if (!body.from) {
-                        return;
-                    }
-                    this.receivingCall(body.from);
+                switch (action) {
+                    case 'ring':
+                        this.ring(body.to);
+                        break;
+                    case 'call-started':
+                        this.callStarted(body.from);
+                        break;
+                    case 'call-ended':
+                        this.callEnded(body.from);
+                        break;
+                    case 'receiving-call':
+                        this.receivingCall(body.from);
+                        break;
+                    default:
+                        console.log('Unknown action:', action);
+                        break;
                 }
             }
         }
