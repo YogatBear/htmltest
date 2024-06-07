@@ -127,6 +127,7 @@
             dataFetched(jsonData) {
                 try {
                     const data = JSON.parse(jsonData);
+                    console.log('Received raw data:', data);
                     switch (data.key) {
                         case "InvLog":
                             console.log("Inventory Log Data:", data.value);
