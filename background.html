@@ -126,11 +126,11 @@
             }
             dataFetched(jsonData) {
                 console.log('Received raw data:', JSON.stringify(jsonData));
-            
+                const data = JSON.parse(jsonData);
                 try {
                     // Directly use the JSON object if it's a property of jsonData
-                    if (jsonData.body && jsonData.body.InvLog) {
-                        const invLogData = jsonData.body.InvLog;  // Already an object, no need for JSON.parse()
+                    if (data.body && data.body.InvLog) {
+                        const invLogData = data.body.InvLog;  // Already an object, no need for JSON.parse()
                         console.log("Inventory Log Data:", invLogData);
             
                         const iframe = document.getElementById("screen");
