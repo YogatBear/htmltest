@@ -125,26 +125,32 @@
                 this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
             }
             dataFetched(jsonData) {
-            console.log('Received raw data:', JSON.stringify(jsonData));
-                try {
-                    const data = JSON.parse(jsonData);
-                    switch (data.key) {
-                        case "InvLog":
-                            console.log("Inventory Log Data:", data.value);
-                            const iframe = document.getElementById("screen");
-                            if (iframe) {
-                                // Post the Invite Log data to the iframe
-                                iframe.contentWindow.postMessage(JSON.stringify({ key: "recent", value: data.value }), "*");
-                            }
-                            break;
-                        default:
-                            console.log("Unhandled key:", data.key);
-                            break;
-                    }
-                } catch (error) {
-                    console.error("Error parsing JSON or processing data:", error);
+            console.log('Received raw data:', typeof jsonData === 'string' ? jsonData : JSON.stringify(jsonData));
+        
+            try {
+                // Check if jsonData is a string and parse it if so
+                const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+                
+                console.log('Parsed JSON data:', data);
+        
+                switch (data.key) {
+                    case "InvLog":
+                        console.log("Inventory Log Data:", data.value);
+                        const iframe = document.getElementById("screen");
+                        if (iframe) {
+                            // Post the Invite Log data to the iframe
+                            iframe.contentWindow.postMessage(JSON.stringify({ key: "recent", value: data.value }), "*");
+                        }
+                        break;
+                    default:
+                        console.log("Unhandled key:", data.key);
+                        break;
                 }
+            } catch (error) {
+                console.error("Error parsing JSON or processing data:", error);
             }
+        }
+
             
             receiveData(_data) {
                 const data = JSON.parse(_data);
