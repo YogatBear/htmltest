@@ -125,27 +125,21 @@
                 this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
             }
             dataFetched(jsonData) {
-                console.log('Received raw data:', typeof jsonData === 'string' ? jsonData : JSON.stringify(jsonData));
+                console.log('Received raw data:', JSON.stringify(jsonData));
             
                 try {
-                    // Ensure jsonData is correctly parsed, regardless of its initial format.
-                    const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
-                    
-                    // Log the parsed data to see its structure
-                    console.log('Parsed JSON data:', JSON.stringify(data));
-            
-                    // Assuming data is an object and the actual payload is in a property 'InvLog' within a 'body' object
-                    if (data.body && data.body.InvLog) {
-                        const invLogData = JSON.parse(data.body.InvLog);
+                    // Directly use the JSON object if it's a property of jsonData
+                    if (jsonData.body && jsonData.body.InvLog) {
+                        const invLogData = jsonData.body.InvLog;  // Already an object, no need for JSON.parse()
                         console.log("Inventory Log Data:", invLogData);
             
                         const iframe = document.getElementById("screen");
                         if (iframe) {
-                            // Post the Invite Log data to the iframe
-                            iframe.contentWindow.postMessage(JSON.stringify({ key: "recent", value: invLogData }), "*");
+                            // Send the parsed data as an object to iframe
+                            iframe.contentWindow.postMessage({ key: "recent", value: invLogData }, "*");
                         }
                     } else {
-                        console.log("Unhandled key or missing data structure in:", JSON.stringify(data));
+                        console.log("Unhandled key or missing data structure in:", JSON.stringify(jsonData));
                     }
                 } catch (error) {
                     console.error("Error parsing JSON or processing data:", error);
