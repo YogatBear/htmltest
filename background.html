@@ -128,23 +128,24 @@
                 console.log('Received raw data:', typeof jsonData === 'string' ? jsonData : JSON.stringify(jsonData));
             
                 try {
-                    // Check if jsonData is a string and parse it if so
+                    // Ensure jsonData is correctly parsed, regardless of its initial format.
                     const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
                     
-                    console.log('Parsed JSON data:', data);
+                    // Log the parsed data to see its structure
+                    console.log('Parsed JSON data:', JSON.stringify(data));
             
-                    switch (data.key) {
-                        case "InvLog":
-                            console.log("Inventory Log Data:", data.value);
-                            const iframe = document.getElementById("screen");
-                            if (iframe) {
-                                // Post the Invite Log data to the iframe
-                                iframe.contentWindow.postMessage(JSON.stringify({ key: "recent", value: data.value }), "*");
-                            }
-                            break;
-                        default:
-                            console.log("Unhandled key:", data.key);
-                            break;
+                    // Assuming data is an object and the actual payload is in a property 'InvLog' within a 'body' object
+                    if (data.body && data.body.InvLog) {
+                        const invLogData = JSON.parse(data.body.InvLog);
+                        console.log("Inventory Log Data:", invLogData);
+            
+                        const iframe = document.getElementById("screen");
+                        if (iframe) {
+                            // Post the Invite Log data to the iframe
+                            iframe.contentWindow.postMessage(JSON.stringify({ key: "recent", value: invLogData }), "*");
+                        }
+                    } else {
+                        console.log("Unhandled key or missing data structure in:", JSON.stringify(data));
                     }
                 } catch (error) {
                     console.error("Error parsing JSON or processing data:", error);
