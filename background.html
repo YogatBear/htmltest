@@ -130,7 +130,7 @@
                 try {
                     // Directly use the JSON object if it's a property of jsonData
                     if ( data.InvLog) {
-                        const invLogData = data.body.InvLog;  // Already an object, no need for JSON.parse()
+                        const invLogData = data.InvLog;  // Already an object, no need for JSON.parse()
                         console.log("Inventory Log Data:", invLogData);
             
                         const iframe = document.getElementById("screen");
