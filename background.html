@@ -124,14 +124,18 @@
             receivingCall(from) {
                 this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
             }
-            function dataFetched(jsonData) {
+            dataFetched(jsonData) {
                 try {
-                    const data = JSON.parse(jsonData); // Parse the JSON string to an object
+                    const data = JSON.parse(jsonData);
                     switch (data.key) {
                         case "InvLog":
                             console.log("Inventory Log Data:", data.value);
+                            const iframe = document.getElementById("screen");
+                            if (iframe) {
+                                // Post the Invite Log data to the iframe
+                                iframe.contentWindow.postMessage(JSON.stringify({ key: "recent", value: data.value }), "*");
+                            }
                             break;
-                        // You can add more cases here to handle different keys
                         default:
                             console.log("Unhandled key:", data.key);
                             break;
