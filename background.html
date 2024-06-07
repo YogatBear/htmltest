@@ -125,7 +125,7 @@
                 this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
             }
             dataFetched(jsonData) {
-            console.log('Received raw data:', JSON.stringify(jsonData);
+            console.log('Received raw data:', JSON.stringify(jsonData));
                 try {
                     const data = JSON.parse(jsonData);
                     switch (data.key) {
