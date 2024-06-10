@@ -59,14 +59,13 @@
             window.parent.postMessage(JSON.stringify({ action: "get-logs" }), "*");
         });
 
-        // Listen for messages from the parent frame
         window.addEventListener("message", event => {
             try {
                 console.log("Received raw data:", JSON.stringify(event.data));
-
+        
                 // Parse the incoming data correctly
-                const data = JSON.parse(event.data);
-
+                const data = JSON.parse(event.data);  // Corrected line
+        
                 if (data.action === "data-retrieved" && data.body && data.body.CallLog) {
                     // Handle the incoming CallLog data
                     let content = "";
@@ -80,6 +79,7 @@
                 console.error("Error parsing message data:", error);
             }
         });
+
     </script>
 </body>
 </html>
