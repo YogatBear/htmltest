@@ -115,7 +115,7 @@
             getLogs() {
                 const request = {
                     action: "get-logs",
-                    body: { range: 10, contact: "" }
+                    body: { range: 10}
                 };
                 this.sendMessageToNativeApp(request);
             }
