@@ -65,7 +65,7 @@
                 console.log("Received raw data:", JSON.stringify(event.data));
 
                 // Parse the incoming data correctly
-                const data = JSON.parse();
+                const data = JSON.parse(event.data);
 
                 if (data.action === "data-retrieved" && data.body && data.body.CallLog) {
                     // Handle the incoming CallLog data
