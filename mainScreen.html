@@ -62,10 +62,10 @@
         // Listen for messages from the parent frame
         window.addEventListener("message", event => {
             try {
-                const data = JSON.parse(event.data);
-                if (data.action === "data-retrieved" && data.body.CallLog) {
+                console.log("Received raw data:", event.data);
+                const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+                if (data.action === "data-retrieved" && data.body && data.body.CallLog) {
                     // Handle the incoming CallLog data
-                    const recentCalls = document.getElementById("recent-calls");
                     let content = "";
                     data.body.CallLog.forEach(call => {
                         const [contact, timestamp, status] = call;
