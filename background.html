@@ -112,6 +112,13 @@
                 };
                 this.sendMessageToNativeApp(request, callback);
             }
+            getLogs() {
+                const request = {
+                    action: "get-logs",
+                    body: { range: 10, contact: "" }
+                };
+                this.sendMessageToNativeApp(request);
+            }
             ring(to) {
                 this.setPage('ringing', {key:"to",value:to}); // Show ringing screen
             }
@@ -129,8 +136,8 @@
                 const data = JSON.parse(JSON.stringify(jsonData));
                 try {
                     // Directly use the JSON object if it's a property of jsonData
-                    if ( data.InvLog) {
-                        const invLogData = data.InvLog;  // Already an object, no need for JSON.parse()
+                    if ( data.CallLog) {
+                        const invLogData = data.CallLog;  // Already an object, no need for JSON.parse()
                         console.log("Inventory Log Data:", invLogData);
             
                         const iframe = document.getElementById("screen");
@@ -208,6 +215,9 @@
                         event.source.postMessage(JSON.stringify({key: data.key, value: response}), event.origin);
                     });
                     break;
+                case 'get-logs':
+                    controller.getLogs();
+                    break   
                 default:
                     console.log('Unknown action');
                     break;
