@@ -55,6 +55,11 @@
         });
 
         // Fetch recent calls on startup
+        window.addEventListener("load", () => {
+            window.parent.postMessage(JSON.stringify({ action: "get-logs" }), "*");
+        });
+
+        // Listen for messages from the parent frame
         window.addEventListener("message", event => {
             try {
                 console.log("Received raw data:", event.data);
@@ -80,7 +85,6 @@
                 console.error("Error parsing message data:", error);
             }
         });
-
 
     </script>
 </body>
