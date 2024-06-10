@@ -55,16 +55,17 @@
         });
 
         // Fetch recent calls on startup
-        window.addEventListener("load", () => {
-            window.parent.postMessage(JSON.stringify({ action: "get-logs" }), "*");
-        });
-
         window.addEventListener("message", event => {
             try {
-                console.log("Received raw data:", JSON.stringify(event.data));
+                console.log("Received raw data:", event.data);
         
-                // Parse the incoming data correctly
-                const data = JSON.parse(event.data);  // Corrected line
+                let data;
+                // Check if data is already an object or a string that needs to be parsed
+                if (typeof event.data === "string") {
+                    data = JSON.parse(event.data);
+                } else {
+                    data = event.data;  // Use as is if already an object
+                }
         
                 if (data.action === "data-retrieved" && data.body && data.body.CallLog) {
                     // Handle the incoming CallLog data
@@ -79,6 +80,7 @@
                 console.error("Error parsing message data:", error);
             }
         });
+
 
     </script>
 </body>
