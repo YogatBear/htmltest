@@ -62,14 +62,14 @@
         // Listen for messages from the parent frame
         window.addEventListener("message", event => {
             try {
-                const data = event.data;
-                if (data.key === "recent") {
-                    // Handle the incoming Invite Log data
+                const data = JSON.parse(event.data);
+                if (data.action === "data-retrieved" && data.body.CallLog) {
+                    // Handle the incoming CallLog data
                     const recentCalls = document.getElementById("recent-calls");
                     let content = "";
-                    for (const caller in data.value) {
-                        content += `<div>${caller}: ${data.value[caller]}</div>`;
-                    }
+                    data.body.CallLog.forEach(call => {
+                        content += `<div>Contact: ${call.contact}, Timestamp: ${new Date(call.timestamp).toLocaleString()}, Status: ${call.status}</div>`;
+                    });
                     recentCalls.innerHTML = content; // Display data in the 'recent-calls' div
                 }
             } catch (error) {
