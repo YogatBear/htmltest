@@ -62,7 +62,7 @@
         // Listen for messages from the parent frame
         window.addEventListener("message", event => {
             try {
-                console.log("Received raw data:", event.data);
+                console.log("Received raw data:", JSON.stringify(event.data);
 
                 // Parse the incoming data correctly
                 const data = JSON.parse();
