@@ -72,12 +72,12 @@
                     data = event.data;  // Use as is if already an object
                 }
         
-                if (data.action === "data-retrieved" && data.body && data.body.CallLog) {
+                if (data.CallLog) {
                     // Handle the incoming CallLog data
                     let content = "";
-                    data.body.CallLog.forEach(call => {
+                    data.CallLog.forEach(call => {
                         const [contact, timestamp, status] = call;
-                        console.log(call);
+                        console.log("test2");
                         content += `<div>Contact: ${contact}, Timestamp: ${new Date(timestamp).toLocaleString()}, Status: ${status}</div>`;
                     });
                     recentCalls.innerHTML = content; // Display data in the 'recent-calls' div
