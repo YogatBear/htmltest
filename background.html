@@ -143,7 +143,7 @@
                         const iframe = document.getElementById("screen");
                         if (iframe) {
                             // Send the parsed data as an object to iframe
-                            iframe.contentWindow.postMessage({ key: "recent", value: invLogData }, "*");
+                            iframe.contentWindow.postMessage(jsonData, "*");
                         }
                     } else {
                         console.log("Unhandled key or missing data structure in:", JSON.stringify(jsonData));
