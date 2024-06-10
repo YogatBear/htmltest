@@ -63,7 +63,10 @@
         window.addEventListener("message", event => {
             try {
                 console.log("Received raw data:", event.data);
-                const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+
+                // Parse the incoming data correctly
+                const data = JSON.parse(typeof event.data === 'string' ? event.data : JSON.stringify(event.data));
+
                 if (data.action === "data-retrieved" && data.body && data.body.CallLog) {
                     // Handle the incoming CallLog data
                     let content = "";
