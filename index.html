@@ -3,238 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Main Page</title>
     <style>
         body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
             font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
         }
-        #numpad {
-            display: grid;
-            grid-template-columns: repeat(3, 60px);
-            gap: 10px;
-        }
-        .num-button {
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
-            text-align: center;
-            line-height: 60px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            cursor: pointer;
-            user-select: none;
-        }
-        input {
-            width: 200px;
-            height: 40px;
-            font-size: 24px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        #info {
-            margin-top: 20px;
-            font-size: 18px;
-            color: #333;
+        iframe {
+            width: 80%;
+            height: 80%;
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body>
-    <input type="text" id="numberField" placeholder="Enter number" />
-    <div id="numpad">
-        <div class="num-button">1</div>
-        <div class="num-button">2</div>
-        <div class="num-button">3</div>
-        <div class="num-button">4</div>
-        <div class="num-button">5</div>
-        <div class="num-button">6</div>
-        <div class="num-button">7</div>
-        <div class="num-button">8</div>
-        <div class="num-button">9</div>
-        <div class="num-button">0</div>
-    </div>
-    <button id="call-button">Call</button>
-    <button id="hang-up">Hang up</button>
-    <div id="info">Current Action</div>
-    <div id="call-buttons" style="display:none">
-        <button id="accept-call-btn">Accept</button>
-        <button id="reject-call-btn">Reject</button>
-    </div>
-    <div id="error"></div>
+    <iframe id="screen" src=""></iframe>
     <script>
-        let currentCaller = "";
-        const numberField = document.getElementById("numberField");
-        const buttons = document.querySelectorAll(".num-button");
-        const infoDiv = document.getElementById("info");
-        const callButton = document.querySelector("#call-button");
-        const infoButton = document.querySelector("#info-button");
-        const hangUpButton = document.querySelector("#hang-up");
+        class Controller {
+            constructor(ens, main, ringing, inCall, incomingCall) {
+                this.ens = ens;
+                this.urls = {
+                    "main" : main,
+                    "ringing" : ringing,
+                    "inCall" : inCall,
+                    "incomingCall" : incomingCall
+                }
+                this.callbacks = {}; // Initialize callbacks storage
+                const iframe = document.getElementById("screen");
+                iframe.src = main
+            }
+            setPage(pageId, param = {}) {
+                console.log("param", param, Object.keys(param).length)
+                // Show the selected iframe
+                const iframe = document.getElementById("screen");
+                if (iframe) {
+                    iframe.src = this.urls[pageId]
+                    if(Object.keys(param).length >= 1){
+                        iframe.src += `?${param.key}=${param.value}`
+                    }
+                    console.log(iframe.src)
+                }
+            }
 
+            sendMessageToNativeApp(jsonData, callback = null) {
+                if (callback) {
+                    const callbackId = 'callback_' + Date.now(); // Generate a unique ID for the callback
+                    this.callbacks[callbackId] = callback;
+                    jsonData['callbackId'] = callbackId; // Append callback ID to jsonData so the native app can refer back
+                }
 
-        buttons.forEach(button => {
-            button.addEventListener("click", () => {
-                numberField.value += button.textContent;
-            });
-        });
-        callButton.addEventListener("click", () => {callButtonClicked()});
-        hangUpButton.addEventListener("click", () => {endCall()});
+                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+                    window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
+                } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
+                    window.AndroidBridge.processAction(JSON.stringify(jsonData));
+                } else {
+                    console.log("Native interface not available");
+                }
 
-        document.querySelector("#accept-call-btn").addEventListener("click", acceptCall)
-        document.querySelector("#reject-call-btn").addEventListener("click", rejectCall)
-        
-class Controller {
-    constructor(ens){
-        this.ens = ens
-    }
-    sendData(data){
-        // define send data to native lang here
-        window.webkit.messageHandlers.buttonPressed.postMessage(JSON.stringify(data));
-    }
-    call(to){
-        const callObject = {
-            action:"call", 
-            body: { to:to }
+                // Setup callback if provided
+                if (callback) {
+                    const callbackId = 'callback_' + Date.now(); // Generate a unique ID for the callback
+                    this.callbacks[callbackId] = callback;
+                    jsonData['callbackId'] = callbackId; // Append callback ID to jsonData so the native app can refer back
+                }
+            }
+
+            call(to) {
+                const callObject = {
+                    action: "call",
+                    body: {to: to}
+                };
+                this.sendMessageToNativeApp(callObject);
+                //this.setPage('ringing'); // Show ringing screen
+            }
+            acceptCall(from) {
+                const request = {
+                    action: "accept-call",
+                    body: { from: from }
+                };
+                this.sendMessageToNativeApp(request);
+                // this.setPage('inCallScreen'); // Show in-call screen
+            }
+            rejectCall(from) {
+                const request = {
+                    action: "reject-call",
+                    body: { from: from }
+                };
+                this.sendMessageToNativeApp(request);
+                // this.setPage('mainScreen'); // Show main screen
+            }
+            store(key, value) {
+                const request = {
+                    action: "store",
+                    body: { key: key, value: value }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            fetch(key, d_value, callback) {
+                const request = {
+                    action: "fetch",
+                    body: { key: key, d_value: d_value }
+                };
+                this.sendMessageToNativeApp(request, callback);
+            }
+            getLogs() {
+                const request = {
+                    action: "get-logs",
+                    body: { range: 10}
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            ring(to) {
+                this.setPage('ringing', {key:"to",value:to}); // Show ringing screen
+            }
+            callStarted(_with) {
+                this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
+            }
+            callEnded() {
+                this.setPage('main'); // End call logic and show main screen
+            }
+            receivingCall(from) {
+                this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
+            }
+            dataFetched(jsonData) {
+                console.log('Received raw data:', JSON.stringify(jsonData));
+                const data = JSON.parse(JSON.stringify(jsonData));
+                try {
+                    // Directly use the JSON object if it's a property of jsonData
+                    if ( data.CallLog) {
+                        const invLogData = data.CallLog;  // Already an object, no need for JSON.parse()
+                        console.log("Inventory Log Data:", invLogData);
+            
+                        const iframe = document.getElementById("screen");
+                        if (iframe) {
+                            // Send the parsed data as an object to iframe
+                            iframe.contentWindow.postMessage(jsonData, "*");
+                        }
+                    } else {
+                        console.log("Unhandled key or missing data structure in:", JSON.stringify(jsonData));
+                    }
+                } catch (error) {
+                    console.error("Error parsing JSON or processing data:", error);
+                }
+            }
+
+            
+            receiveData(_data) {
+                const data = JSON.parse(_data);
+                const action = data.action;
+                const body = data.body;
+                switch (action) {
+                    case 'ringing':
+                        this.ring(body.to);
+                        break;
+                    case 'call-started':
+                        this.callStarted(body.from);
+                        break;
+                    case 'call-ended':
+                        this.callEnded(body.from);
+                        break;
+                    case 'receiving-call':
+                        this.receivingCall(body.from);
+                        break;
+                    case 'data-retrieved':
+                        this.dataFetched(body);
+                        break;
+                    default:
+                        console.log('Unknown action:', action);
+                        break;
+                }
+            }
         }
-        this.sendData(callObject)
-    }
-    acceptCall(from){
-        const request = {
-            action:"accept-call", 
-            body:{from:from}
-        }
-        this.sendData(request)
-    }
-    rejectCall(){
-        const request = {
-            action:"reject-call",
-            body:{from:from}
-        }
-        this.sendData(request)
-    }
-    ring(to){
-        // show ringing screen
-        infoDiv.textContent = `RINGING ${to}`
-    }
-    callStarted(_with){
-        // show in call screen with name of caller
-        infoDiv.textContent = `IN CALL WITH ${_with}`
-    }
-    callEnded(_with){
-        // end call logic
-        infoDiv.textContent = `CALL ENDED WITH ${_with}`
-    }
-    receivingCall(from){
-        //receiving call logic
-        infoDiv.textContent = `RECEIVING CALL FROM ${receiver}`;
-        document.querySelector("#call-buttons").style.display = "inline-block"
-        currentCaller = receiver;
-    }
-    receiveData(_data){
-        const data = JSON.parse(_data)
-        const action = data.action;
-        const body = data.body;
-        if(action === "ringing"){    // show calling screen
-            if(!body.to){
+                const controller = new Controller("test.eth", 
+            "https://htmltest-theta.vercel.app/mainScreen.html",
+            "https://htmltest-theta.vercel.app/ringing.html",
+            "https://htmltest-theta.vercel.app/inCall.html",
+            "https://htmltest-theta.vercel.app/incomingCall.html"
+        );
+        window.addEventListener('message', function (event) {
+            console.log(event)
+            if (event.origin !== "https://htmltest-theta.vercel.app") {
                 return;
             }
-            this.ring(to)
-        }
-        else if(action === "call-started"){
-            const caller = body.from;
-            this.callStarted(caller)
-        }
-        else if(action === "call-ended"){
-            const caller = body.from;
-            this.callEnded(caller)
-        }
-    
-        // ALL ACTIONS FROM NATIVE
-        else if(action === "receiving-call"){
-            if(!body.from){
-                return
+            // Handle the message from the iframe
+            const data = JSON.parse(event.data);
+            console.log(data)
+            switch (data.action) {
+                case 'call':
+                    controller.call(data.to);
+                    break;
+                case 'end-call':
+                    controller.rejectCall(data.to);
+                    break;
+                case 'accept-call':
+                    controller.acceptCall(data.from);
+                    break;
+                case 'reject-call':
+                    controller.rejectCall(data.from);
+                    break;
+                case 'store':
+                    controller.store(data.key, data.value);
+                    break
+                case 'fetch':
+                    controller.fetch(data.key, data.d_value, function(response) {
+                        event.source.postMessage(JSON.stringify({key: data.key, value: response}), event.origin);
+                    });
+                    break;
+                case 'get-logs':
+                    controller.getLogs();
+                    break   
+                default:
+                    console.log('Unknown action');
+                    break;
             }
-            const caller = body.from;
-            this.receivingCall(caller)
-        }
-    }
-}
-
-        
-        
-        const controller = new Controller("test.eth")
-
-        function callButtonClicked() {
-            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.buttonPressed) {
-                controller.call(numberField.value)
-                console.log("Message sent to Swift with value: " + numberField.value);
-            } else {
-                console.log("Message handler not found");
-            }
-        }
-        function acceptCall(){
-            controller.acceptCall(currentCaller)
-            document.querySelector("#call-buttons").style.display = "none"
-        }
-        function rejectCall(){
-            controller.rejectCall(currentCaller)
-            document.querySelector("#call-buttons").style.display = "none"
-        }
-        
-        function endCall(){
-            controller.callEnded()
-        }
-        function updateInfo(data) {
-            try{
-            infoDiv.textContent = data;
             
-            }catch(e){
-                console.log(e)}
-            }
-        // function sendData(data){
-        //     window.webkit.messageHandlers.buttonPressed.postMessage(JSON.stringify(data));
-        // }
-        // function receiveData(_data){
-        //     const data = JSON.parse(_data)
-        //     const action = data.action;
-        //     const body = data.body;
-        //     // ALL ACTIONS FROM HTML
-        //     if(action === "ringing"){    // show calling screen
-        //         if(!(body.to && body.from)){
-        //             return;
-        //         }
-        //         const receiver = body.to;
-        //         //show calling screem with receiver's ens
-        //         infoDiv.textContent = `RINGING ${receiver}`
-        //     }
-        //     else if(action === "call-started"){
-        //         const receiver = body.to;
-        //         // show in call screen with receiever ens
-        //         infoDiv.textContent = `IN CALL WITH ${receiver}`
-        //     }
-            // else if(action === "call-ended"){
-            //     const receiver = body.to;
-            //     // show in call screen with receiever ens
-            //     infoDiv.textContent = `CALL ENDED WITH ${receiver}`
-            // }
-
-            // // ALL ACTIONS FROM NATIVE
-            // else if(action === "receiving-call"){
-            //     if(!body.from){
-            //         return
-            //     }
-            //     const receiver = body.from;
-            //     // show getting call screen
-            //     infoDiv.textContent = `RECEIVING CALL FROM ${receiver}`;
-            //     document.querySelector("#call-buttons").style.display = "inline-block"
-            //     currentCaller = receiver;
-            // }
-        
-            
+        }, false);
     </script>
 </body>
 </html>
