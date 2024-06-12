@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recent Calls</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        .call-log {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .call-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .contact-name, .call-time {
+            font-size: 16px;
+            color: #333;
+        }
+        .call-icon {
+            font-family: 'Material Symbols Outlined';
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <ul id="recent-calls" class="call-log"></ul>
+    <script>
+        window.addEventListener("load", () => {
+            // Assume the parent will send call logs data to this iframe
+            window.parent.postMessage(JSON.stringify({ action: "get-logs" }), "*");
+        });
+    
+        window.addEventListener("message", event => {
+            try {
+                const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        
+                if (data.CallLog) {
+                    const recentCalls = document.getElementById("recent-calls");
+                    recentCalls.innerHTML = ""; // Clear existing logs
+                    data.CallLog.forEach(call => {
+                        const [contact, timestamp, status] = call;
+                        const callDate = new Date(timestamp);
+                        const today = new Date();
+                        const isToday = callDate.toDateString() === today.toDateString();
+                        const timeOrDate = isToday ? callDate.toLocaleTimeString([], { timeStyle: 'short' }) : callDate.toLocaleDateString();
+                        const iconSymbol = status.toLowerCase() === 'incoming' ? 'call_received' :
+                                          status.toLowerCase() === 'outgoing' ? 'call_made' : 'call_missed';
+                        
+                        const li = document.createElement('li');
+                        li.className = "call-entry";
+                        li.innerHTML = `
+                            <div class="call-details">
+                                <div class="contact-name">${contact}</div>
+                                <div class="call-time">${timeOrDate}</div>
+                            </div>
+                            <span class="call-icon material-symbols-outlined">${iconSymbol}</span>`;
+                        recentCalls.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error("Error parsing message data:", error);
+            }
+        });
+    </script>
+</body>
+</html>
