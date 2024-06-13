@@ -125,13 +125,18 @@
                 }
             }
         }
-
-                const controller = new Controller("test.eth", 
-            "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/mainscreen.html",
-            "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/ringing.html",
-            "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/incall.html",
-            "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/incomingcall.html"
+        let controller;
+        const urlParams = new URLSearchParams(window.location.search);
+        // Now you can access individual parameters using methods like get()
+        const ens = urlParams.get('ens'); // Returns 'value1'
+        if(ens){
+            controller = new Controller(ens,
+            `https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/mainscreen.html?ens=${ens}`,
+            `https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/ringing.html?ens=${ens}`,
+            `https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/incall.html?ens=${ens}`,
+            `https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/incomingcall.html?ens=${ens}`
         );
+        }      
         window.addEventListener('message', function (event) {
 
             console.log(event)
