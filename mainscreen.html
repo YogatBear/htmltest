@@ -39,10 +39,16 @@
 </head>
 <body>
     <div class="container">
+        <h1 id="ens"></h1>
         <input type="text" placeholder="Enter number">
         <button>Call</button>
     </div>
     <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const ens = urlParams.get('ens'); 
+        if(ens){
+        document.querySelector("#ens").textContent = ens
+        }
         const input = document.querySelector("input")
         document.querySelector("button").addEventListener("click", ()=>{
             console.log("calling...", input.value)
