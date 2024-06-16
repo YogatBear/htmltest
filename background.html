@@ -137,7 +137,7 @@
         }, false);
 
         window.sendToNative = (data) => {
-            window.parent.postMessage(JSON.stringify(data), "*");
+            controller.handleRequestFromScreens(data);
         };
     </script>
 </body>
