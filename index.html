@@ -169,7 +169,7 @@
             if (event.origin !== "https://htmltest-theta.vercel.app") {
                 return;
             }
-            console.log(JSON.stringify(data));
+            console.log(JSON.stringify(event.data));
             const data = JSON.parse(event.data);
             console.log(data);
             switch (data.action) {
