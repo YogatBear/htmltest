@@ -115,11 +115,13 @@
             }
         }
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const ens = urlParams.get('ens'); // Returns 'value1'
         const controller = new Background(
-            "https://htmltest-theta.vercel.app/mainScreen.html",
-            "https://htmltest-theta.vercel.app/ringingScreen.html",
-            "https://htmltest-theta.vercel.app/inCallScreen.html",
-            "https://htmltest-theta.vercel.app/incomingCallScreen.html"
+            `https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/mainscreen.html?ens=${ens}`,
+            `https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/ringing.html?ens=${ens}`,
+            `https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/incall.html?ens=${ens}`,
+            `https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/incomingcall.html?ens=${ens}`
         );
     </script>
 </body>

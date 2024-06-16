@@ -165,19 +165,14 @@
         }
 
         window.addEventListener('message', function (event) {
-            console.log(JSON.stringify(event.data));  // Added line for debugging
+            console.log(JSON.stringify(event.data));
 
             // Ensure message is from the expected origin
             if (event.origin !== "https://htmltest-theta.vercel.app") {
                 return;
             }
 
-            // Ensure the message is intended for your application
-            if (!event.data || typeof event.data !== 'object' || !event.data.target || event.data.target !== 'my-app') {
-                return;
-            }
-
-            const data = event.data;
+            const data = JSON.parse(event.data);
             console.log(data);
             switch (data.action) {
                 case 'call':
@@ -208,6 +203,14 @@
                     break;
             }
         }, false);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const ens = urlParams.get('ens'); // Returns 'value1'
+        if (ens) {
+            controller = new Controller(
+                `https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/mainscreen.html?ens=${ens}`
+            );
+        }
     </script>
 </body>
 </html>
