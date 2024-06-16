@@ -95,6 +95,11 @@
                         break;
                 }
             }
+
+            receiveData(_data) {
+                const data = JSON.parse(_data);
+                this.postToBackground(data);
+            }
         }
 
         const controller = new Controller();
@@ -102,6 +107,11 @@
         window.addEventListener('message', function (event) {
             controller.handleMessageFromBackground(event);
         }, false);
+
+        // Expose receiveData method for native code to call
+        window.receiveData = (data) => {
+            controller.receiveData(data);
+        };
     </script>
 </body>
 </html>
