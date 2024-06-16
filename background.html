@@ -54,32 +54,34 @@
                     const data = typeof _data === 'string' ? JSON.parse(_data) : _data;
                     const action = data.action;
                     const body = data.body;
-                    if (action === 'get-logs') {
-                        window.parent.postMessage(JSON.stringify({ action: 'get-logs' }), '*');
-                    } else {
-                        switch (action) {
-                            case 'ringing':
-                                this.ring(body.to);
-                                break;
-                            case 'call-started':
-                                this.callStarted(body.from);
-                                break;
-                            case 'call-ended':
-                                this.callEnded();
-                                break;
-                            case 'receiving-call':
-                                this.receivingCall(body.from);
-                                break;
-                            case 'logs-retrieved':
-                                this.dataFetched(body);
-                                break;
-                            default:
-                                console.log('Unknown action:', action);
-                                break;
-                        }
-                    }
+                    window.parent.postMessage(JSON.stringify({ action, body }), '*');
                 } catch (error) {
                     console.error("Error handling data:", error);
+                }
+            }
+
+            handleMessageFromIndex(data) {
+                const action = data.action;
+                const body = data.body;
+                switch (action) {
+                    case 'ringing':
+                        this.ring(body.to);
+                        break;
+                    case 'call-started':
+                        this.callStarted(body.from);
+                        break;
+                    case 'call-ended':
+                        this.callEnded();
+                        break;
+                    case 'receiving-call':
+                        this.receivingCall(body.from);
+                        break;
+                    case 'logs-retrieved':
+                        this.dataFetched(body);
+                        break;
+                    default:
+                        console.log('Unknown action:', action);
+                        break;
                 }
             }
 
@@ -131,8 +133,12 @@
                 return;
             }
 
-            controller.handleRequestFromScreens(event.data);
+            controller.handleMessageFromIndex(JSON.parse(event.data));
         }, false);
+
+        window.sendToNative = (data) => {
+            window.parent.postMessage(JSON.stringify(data), "*");
+        };
     </script>
 </body>
 </html>

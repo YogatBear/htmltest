@@ -30,32 +30,6 @@
                 }
             }
 
-            call(to) {
-                this.sendMessageToNativeApp({ action: "call", body: { to: to } });
-            }
-
-            acceptCall(from) {
-                this.sendMessageToNativeApp({ action: "accept-call", body: { from: from } });
-            }
-
-            rejectCall(from) {
-                this.sendMessageToNativeApp({ action: "reject-call", body: { from: from } });
-            }
-
-            store(key, value) {
-                this.sendMessageToNativeApp({ action: "store", body: { key: key, value: value } });
-            }
-
-            fetch(key, d_value, callback) {
-                this.sendMessageToNativeApp({ action: "fetch", body: { key: key, d_value: d_value } }, callback);
-            }
-
-            getLogs() {
-                this.sendMessageToNativeApp({ action: "get-logs", body: { range: 10 } }, (response) => {
-                    this.postToBackground({ action: "logs-retrieved", body: response });
-                });
-            }
-
             postToBackground(data) {
                 this.backgroundFrame.contentWindow.postMessage(JSON.stringify(data), "*");
             }
@@ -99,6 +73,32 @@
             receiveData(_data) {
                 const data = JSON.parse(_data);
                 this.postToBackground(data);
+            }
+
+            call(to) {
+                this.sendMessageToNativeApp({ action: "call", body: { to: to } });
+            }
+
+            acceptCall(from) {
+                this.sendMessageToNativeApp({ action: "accept-call", body: { from: from } });
+            }
+
+            rejectCall(from) {
+                this.sendMessageToNativeApp({ action: "reject-call", body: { from: from } });
+            }
+
+            store(key, value) {
+                this.sendMessageToNativeApp({ action: "store", body: { key: key, value: value } });
+            }
+
+            fetch(key, d_value, callback) {
+                this.sendMessageToNativeApp({ action: "fetch", body: { key: key, d_value: d_value } }, callback);
+            }
+
+            getLogs() {
+                this.sendMessageToNativeApp({ action: "get-logs", body: { range: 10 } }, (response) => {
+                    this.postToBackground({ action: "logs-retrieved", body: response });
+                });
             }
         }
 
