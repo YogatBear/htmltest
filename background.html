@@ -49,7 +49,7 @@
                 }
             }
 
-            handleData(_data) {
+            handleRequestFromScreens(_data) {
                 try {
                     const data = typeof _data === 'string' ? JSON.parse(_data) : _data;
                     const action = data.action;
@@ -65,7 +65,7 @@
                                 this.callStarted(body.from);
                                 break;
                             case 'call-ended':
-                                this.callEnded(body.from);
+                                this.callEnded();
                                 break;
                             case 'receiving-call':
                                 this.receivingCall(body.from);
@@ -131,7 +131,7 @@
                 return;
             }
 
-            controller.handleData(event.data);
+            controller.handleRequestFromScreens(event.data);
         }, false);
     </script>
 </body>

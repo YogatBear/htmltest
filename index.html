@@ -52,7 +52,7 @@
 
             getLogs() {
                 this.sendMessageToNativeApp({ action: "get-logs", body: { range: 10 } }, (response) => {
-                    this.postToBackground({ action: "data-retrieved", body: response });
+                    this.postToBackground({ action: "logs-retrieved", body: response });
                 });
             }
 
@@ -60,50 +60,47 @@
                 this.backgroundFrame.contentWindow.postMessage(JSON.stringify(data), "*");
             }
 
-            receiveData(_data) {
-                const data = JSON.parse(_data);
-                const action = data.action;
-                const body = data.body;
-                this.postToBackground({ action, body });
+            handleMessageFromBackground(event) {
+                if (event.origin !== window.location.origin) {
+                    return;
+                }
+
+                const data = JSON.parse(event.data);
+                switch (data.action) {
+                    case 'call':
+                        this.call(data.to);
+                        break;
+                    case 'end-call':
+                        this.rejectCall(data.to);
+                        break;
+                    case 'accept-call':
+                        this.acceptCall(data.from);
+                        break;
+                    case 'reject-call':
+                        this.rejectCall(data.from);
+                        break;
+                    case 'store':
+                        this.store(data.key, data.value);
+                        break;
+                    case 'fetch':
+                        this.fetch(data.key, data.d_value, function (response) {
+                            event.source.postMessage(JSON.stringify({ key: data.key, value: response }), event.origin);
+                        });
+                        break;
+                    case 'get-logs':
+                        this.getLogs();
+                        break;
+                    default:
+                        console.log('Unknown action');
+                        break;
+                }
             }
         }
 
         const controller = new Controller();
 
         window.addEventListener('message', function (event) {
-            if (event.origin !== window.location.origin) {
-                return;
-            }
-
-            const data = JSON.parse(event.data);
-            switch (data.action) {
-                case 'call':
-                    controller.call(data.to);
-                    break;
-                case 'end-call':
-                    controller.rejectCall(data.to);
-                    break;
-                case 'accept-call':
-                    controller.acceptCall(data.from);
-                    break;
-                case 'reject-call':
-                    controller.rejectCall(data.from);
-                    break;
-                case 'store':
-                    controller.store(data.key, data.value);
-                    break;
-                case 'fetch':
-                    controller.fetch(data.key, data.d_value, function (response) {
-                        event.source.postMessage(JSON.stringify({ key: data.key, value: response }), event.origin);
-                    });
-                    break;
-                case 'get-logs':
-                    controller.getLogs();
-                    break;
-                default:
-                    console.log('Unknown action');
-                    break;
-            }
+            controller.handleMessageFromBackground(event);
         }, false);
     </script>
 </body>
