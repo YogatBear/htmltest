@@ -51,7 +51,9 @@
             }
 
             getLogs() {
-                this.sendMessageToNativeApp({ action: "get-logs", body: { range: 10 } });
+                this.sendMessageToNativeApp({ action: "get-logs", body: { range: 10 } }, (response) => {
+                    this.postToBackground({ action: "data-retrieved", body: response });
+                });
             }
 
             postToBackground(data) {
