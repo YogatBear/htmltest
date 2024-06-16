@@ -165,12 +165,19 @@
         }
 
         window.addEventListener('message', function (event) {
-            console.log(event);
+            console.log(JSON.stringify(event.data));  // Added line for debugging
+
+            // Ensure message is from the expected origin
             if (event.origin !== "https://htmltest-theta.vercel.app") {
                 return;
             }
-            console.log(JSON.stringify(event.data));
-            const data = JSON.parse(event.data);
+
+            // Ensure the message is intended for your application
+            if (!event.data || typeof event.data !== 'object' || !event.data.target || event.data.target !== 'my-app') {
+                return;
+            }
+
+            const data = event.data;
             console.log(data);
             switch (data.action) {
                 case 'call':
