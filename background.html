@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page</title>
+    <title>Background Page</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,52 +23,45 @@
     </style>
 </head>
 <body>
-    <iframe id="screen" src=""></iframe>
+    <iframe id="main-screen" src="https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/mainscreen.html"></iframe>
     <script>
         class Background {
-            constructor(main, ringing, inCall, incomingCall) {
+            constructor() {
                 this.urls = {
-                    "main": main,
-                    "ringing": ringing,
-                    "inCall": inCall,
-                    "incomingCall": incomingCall
+                    main: "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/mainscreen.html",
+                    ringing: "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/ringing.html",
+                    inCall: "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/incall.html",
+                    incomingCall: "https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/incomingcall.html"
                 };
-                const iframe = document.getElementById("screen");
-                iframe.src = main;
+                this.iframe = document.getElementById("main-screen");
             }
 
             setPage(pageId, param = {}) {
-                console.log("param", param, Object.keys(param).length);
-                const iframe = document.getElementById("screen");
-                if (iframe) {
-                    iframe.src = this.urls[pageId];
+                if (this.iframe) {
+                    let url = this.urls[pageId];
                     if (Object.keys(param).length >= 1) {
-                        iframe.src += `?${param.key}=${param.value}`;
+                        url += `?${param.key}=${param.value}`;
                     }
-                    console.log(iframe.src);
+                    this.iframe.src = url;
                 }
             }
 
             handleData(_data) {
                 try {
                     const data = typeof _data === 'string' ? JSON.parse(_data) : _data;
-                    const action = data.action;
-                    const body = data.body;
+                    const { action, body } = data;
                     switch (action) {
                         case 'ringing':
-                            this.ring(body.to);
+                            this.setPage('ringing', { key: "to", value: body.to });
                             break;
                         case 'call-started':
-                            this.callStarted(body.from);
+                            this.setPage('inCall', { key: "to", value: body.from });
                             break;
                         case 'call-ended':
-                            this.callEnded(body.from);
+                            this.setPage('main');
                             break;
                         case 'receiving-call':
-                            this.receivingCall(body.from);
-                            break;
-                        case 'data-retrieved':
-                            this.dataFetched(body);
+                            this.setPage('incomingCall', { key: "from", value: body.from });
                             break;
                         default:
                             console.log('Unknown action:', action);
@@ -78,51 +71,17 @@
                     console.error("Error handling data:", error);
                 }
             }
-
-            ring(to) {
-                this.setPage('ringing', { key: "to", value: to });
-            }
-
-            callStarted(_with) {
-                this.setPage('inCall', { key: "to", value: _with });
-            }
-
-            callEnded() {
-                this.setPage('main');
-            }
-
-            receivingCall(from) {
-                this.setPage('incomingCall', { key: "from", value: from });
-            }
-
-            dataFetched(jsonData) {
-                console.log('Received raw data:', JSON.stringify(jsonData));
-                try {
-                    if (jsonData.CallLog) {
-                        const invLogData = jsonData.CallLog;
-                        console.log("Inventory Log Data:", invLogData);
-
-                        const iframe = document.getElementById("screen");
-                        if (iframe) {
-                            iframe.contentWindow.postMessage(JSON.stringify(jsonData), "*");
-                        }
-                    } else {
-                        console.log("Unhandled key or missing data structure in:", JSON.stringify(jsonData));
-                    }
-                } catch (error) {
-                    console.error("Error parsing JSON or processing data:", error);
-                }
-            }
         }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const ens = urlParams.get('ens'); // Returns 'value1'
-        const controller = new Background(
-            `https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/mainscreen.html?ens=${ens}`,
-            `https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/ringing.html?ens=${ens}`,
-            `https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/incall.html?ens=${ens}`,
-            `https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/incomingcall.html?ens=${ens}`
-        );
+        const background = new Background();
+
+        window.addEventListener('message', function (event) {
+            if (event.origin !== window.location.origin) {
+                return;
+            }
+
+            background.handleData(event.data);
+        }, false);
     </script>
 </body>
 </html>

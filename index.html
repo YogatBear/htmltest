@@ -6,28 +6,12 @@
     <title>SDK Interface</title>
 </head>
 <body>
-    <iframe id="screen" src=""></iframe>
+    <iframe id="background-frame" src="background.html" style="width:100%; height:100%; border:none;"></iframe>
     <script>
         class Controller {
-            constructor(background) {
-                this.urls = {
-                    "main": background
-                };
-                const iframe = document.getElementById("screen");
-                iframe.src = background;
+            constructor() {
+                this.backgroundFrame = document.getElementById("background-frame");
                 this.callbacks = {};
-            }
-
-            setPage(pageId, param = {}) {
-                console.log("param", param, Object.keys(param).length);
-                const iframe = document.getElementById("screen");
-                if (iframe) {
-                    iframe.src = this.urls[pageId];
-                    if (Object.keys(param).length >= 1) {
-                        iframe.src += `?${param.key}=${param.value}`;
-                    }
-                    console.log(iframe.src);
-                }
             }
 
             sendMessageToNativeApp(jsonData, callback = null) {
@@ -47,133 +31,49 @@
             }
 
             call(to) {
-                const callObject = {
-                    action: "call",
-                    body: { to: to }
-                };
-                this.sendMessageToNativeApp(callObject);
+                this.sendMessageToNativeApp({ action: "call", body: { to: to } });
             }
 
             acceptCall(from) {
-                const request = {
-                    action: "accept-call",
-                    body: { from: from }
-                };
-                this.sendMessageToNativeApp(request);
+                this.sendMessageToNativeApp({ action: "accept-call", body: { from: from } });
             }
 
             rejectCall(from) {
-                const request = {
-                    action: "reject-call",
-                    body: { from: from }
-                };
-                this.sendMessageToNativeApp(request);
+                this.sendMessageToNativeApp({ action: "reject-call", body: { from: from } });
             }
 
             store(key, value) {
-                const request = {
-                    action: "store",
-                    body: { key: key, value: value }
-                };
-                this.sendMessageToNativeApp(request);
+                this.sendMessageToNativeApp({ action: "store", body: { key: key, value: value } });
             }
 
             fetch(key, d_value, callback) {
-                const request = {
-                    action: "fetch",
-                    body: { key: key, d_value: d_value }
-                };
-                this.sendMessageToNativeApp(request, callback);
+                this.sendMessageToNativeApp({ action: "fetch", body: { key: key, d_value: d_value } }, callback);
             }
 
             getLogs() {
-                const request = {
-                    action: "get-logs",
-                    body: { range: 10 }
-                };
-                this.sendMessageToNativeApp(request);
+                this.sendMessageToNativeApp({ action: "get-logs", body: { range: 10 } });
             }
 
-            ring(to) {
-                this.setPage('ringing', { key: "to", value: to });
-            }
-
-            callStarted(_with) {
-                this.setPage('inCall', { key: "to", value: _with });
-            }
-
-            callEnded() {
-                this.setPage('main');
-            }
-
-            receivingCall(from) {
-                this.setPage('incomingCall', { key: "from", value: from });
-            }
-
-            dataFetched(jsonData) {
-                console.log('Received raw data:', JSON.stringify(jsonData));
-                try {
-                    if (jsonData.CallLog) {
-                        const invLogData = jsonData.CallLog;
-                        console.log("Inventory Log Data:", invLogData);
-
-                        const iframe = document.getElementById("screen");
-                        if (iframe) {
-                            iframe.contentWindow.postMessage(JSON.stringify(jsonData), "*");
-                        }
-                    } else {
-                        console.log("Unhandled key or missing data structure in:", JSON.stringify(jsonData));
-                    }
-                } catch (error) {
-                    console.error("Error parsing JSON or processing data:", error);
-                }
+            postToBackground(data) {
+                this.backgroundFrame.contentWindow.postMessage(JSON.stringify(data), "*");
             }
 
             receiveData(_data) {
-                this.handleData(_data);
-            }
-
-            handleData(_data) {
-                try {
-                    const data = typeof _data === 'string' ? JSON.parse(_data) : _data;
-                    const action = data.action;
-                    const body = data.body;
-                    switch (action) {
-                        case 'ringing':
-                            this.ring(body.to);
-                            break;
-                        case 'call-started':
-                            this.callStarted(body.from);
-                            break;
-                        case 'call-ended':
-                            this.callEnded(body.from);
-                            break;
-                        case 'receiving-call':
-                            this.receivingCall(body.from);
-                            break;
-                        case 'data-retrieved':
-                            this.dataFetched(body);
-                            break;
-                        default:
-                            console.log('Unknown action:', action);
-                            break;
-                    }
-                } catch (error) {
-                    console.error("Error handling data:", error);
-                }
+                const data = JSON.parse(_data);
+                const action = data.action;
+                const body = data.body;
+                this.postToBackground({ action, body });
             }
         }
 
-        window.addEventListener('message', function (event) {
-            console.log(JSON.stringify(event.data));
+        const controller = new Controller();
 
-            // Ensure message is from the expected origin
-            if (event.origin !== "https://htmltest-theta.vercel.app") {
+        window.addEventListener('message', function (event) {
+            if (event.origin !== window.location.origin) {
                 return;
             }
 
             const data = JSON.parse(event.data);
-            console.log(data);
             switch (data.action) {
                 case 'call':
                     controller.call(data.to);
@@ -203,14 +103,6 @@
                     break;
             }
         }, false);
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const ens = urlParams.get('ens'); // Returns 'value1'
-        if (ens) {
-            controller = new Controller(
-                `https://proof-files-git-main-matans-projects-4d48d79b.vercel.app/mainscreen.html?ens=${ens}`
-            );
-        }
     </script>
 </body>
 </html>
