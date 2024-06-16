@@ -76,7 +76,7 @@
                     case 'receiving-call':
                         this.receivingCall(body.from);
                         break;
-                    case 'logs-retrieved':
+                    case 'data-retrieved':
                         this.dataFetched(body);
                         break;
                     default:
@@ -84,6 +84,7 @@
                         break;
                 }
             }
+
 
             ring(to) {
                 this.setPage('ringing', { key: "to", value: to });
