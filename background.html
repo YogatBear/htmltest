@@ -54,11 +54,17 @@
                     const data = typeof _data === 'string' ? JSON.parse(_data) : _data;
                     const action = data.action;
                     const body = data.body;
-                    window.parent.postMessage(JSON.stringify({ action, body }), '*');
+
+                    if (action === 'get-logs') {
+                        window.parent.postMessage(JSON.stringify({ action: 'get-logs' }), '*');
+                    } else {
+                        window.parent.postMessage(JSON.stringify({ action, body }), '*');
+                    }
                 } catch (error) {
                     console.error("Error handling data:", error);
                 }
             }
+
 
             handleMessageFromIndex(data) {
                 const action = data.action;
