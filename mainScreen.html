@@ -90,12 +90,12 @@
         document.querySelector("button").addEventListener("click", () => {
             console.log("calling...", input.value);
             if (input.value !== "") {
-                window.parent.sendToNative({ action: "call", to: input.value });
+                window.parent.postMessage(JSON.stringify({ action: "call", to: input.value }), "*");
             }
         });
     
         window.addEventListener("load", () => {
-            window.parent.sendToNative({ action: "get-logs" });
+            window.parent.postMessage(JSON.stringify({ action: "get-logs" }), "*");
         });
     
         window.addEventListener("message", event => {
@@ -123,7 +123,7 @@
                             <span class="call-icon material-symbols-outlined">${iconSymbol}</span>`;
                         li.addEventListener('click', () => {
                             console.log("Re-calling...", contact);
-                            window.parent.sendToNative({ action: "call", to: contact });
+                            window.parent.postMessage(JSON.stringify({ action: "call", to: contact }), "*");
                         });
                         recentCalls.appendChild(li);
                     });

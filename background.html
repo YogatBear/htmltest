@@ -23,44 +23,139 @@
     </style>
 </head>
 <body>
-    <iframe id="screen" src="https://htmltest-theta.vercel.app/mainScreen.html"></iframe>
+    <iframe id="screen" src=""></iframe>
     <script>
-        class Background {
-            constructor(main, ringing, inCall, incomingCall) {
+        class Controller {
+            constructor(ens, main, ringing, inCall, incomingCall) {
+                this.ens = ens;
                 this.urls = {
-                    "main": main,
-                    "ringing": ringing,
-                    "inCall": inCall,
-                    "incomingCall": incomingCall
-                };
+                    "main" : main,
+                    "ringing" : ringing,
+                    "inCall" : inCall,
+                    "incomingCall" : incomingCall
+                }
+                this.callbacks = {}; // Initialize callbacks storage
                 const iframe = document.getElementById("screen");
-                iframe.src = main;
+                iframe.src = main
             }
-
             setPage(pageId, param = {}) {
-                console.log("param", param, Object.keys(param).length);
+                console.log("param", param, Object.keys(param).length)
+                // Show the selected iframe
                 const iframe = document.getElementById("screen");
                 if (iframe) {
-                    iframe.src = this.urls[pageId];
-                    if (Object.keys(param).length >= 1) {
-                        iframe.src += `?${param.key}=${param.value}`;
+                    iframe.src = this.urls[pageId]
+                    if(Object.keys(param).length >= 1){
+                        iframe.src += `?${param.key}=${param.value}`
                     }
-                    console.log(iframe.src);
+                    console.log(iframe.src)
                 }
             }
 
-            handleRequestFromScreens(_data) {
+            sendMessageToNativeApp(jsonData, callback = null) {
+                if (callback) {
+                    const callbackId = 'callback_' + Date.now(); // Generate a unique ID for the callback
+                    this.callbacks[callbackId] = callback;
+                    jsonData['callbackId'] = callbackId; // Append callback ID to jsonData so the native app can refer back
+                }
+
+                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+                    window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
+                } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
+                    window.AndroidBridge.processAction(JSON.stringify(jsonData));
+                } else {
+                    console.log("Native interface not available");
+                }
+
+                // Setup callback if provided
+                if (callback) {
+                    const callbackId = 'callback_' + Date.now(); // Generate a unique ID for the callback
+                    this.callbacks[callbackId] = callback;
+                    jsonData['callbackId'] = callbackId; // Append callback ID to jsonData so the native app can refer back
+                }
+            }
+
+            call(to) {
+                const callObject = {
+                    action: "call",
+                    body: {to: to}
+                };
+                this.sendMessageToNativeApp(callObject);
+                //this.setPage('ringing'); // Show ringing screen
+            }
+            acceptCall(from) {
+                const request = {
+                    action: "accept-call",
+                    body: { from: from }
+                };
+                this.sendMessageToNativeApp(request);
+                // this.setPage('inCallScreen'); // Show in-call screen
+            }
+            rejectCall(from) {
+                const request = {
+                    action: "reject-call",
+                    body: { from: from }
+                };
+                this.sendMessageToNativeApp(request);
+                // this.setPage('mainScreen'); // Show main screen
+            }
+            store(key, value) {
+                const request = {
+                    action: "store",
+                    body: { key: key, value: value }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            fetch(key, d_value, callback) {
+                const request = {
+                    action: "fetch",
+                    body: { key: key, d_value: d_value }
+                };
+                this.sendMessageToNativeApp(request, callback);
+            }
+            getLogs() {
+                const request = {
+                    action: "get-logs",
+                    body: { range: 10}
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            ring(to) {
+                this.setPage('ringing', {key:"to",value:to}); // Show ringing screen
+            }
+            callStarted(_with) {
+                this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
+            }
+            callEnded() {
+                this.setPage('main'); // End call logic and show main screen
+            }
+            receivingCall(from) {
+                this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
+            }
+            dataFetched(jsonData) {
+                console.log('Received raw data:', JSON.stringify(jsonData));
+                const data = JSON.parse(JSON.stringify(jsonData));
                 try {
-                    const data = typeof _data === 'string' ? JSON.parse(_data) : _data;
-                    const action = data.action;
-                    const body = data.body;
-                    window.parent.postMessage(JSON.stringify({ action, body }), '*');
+                    // Directly use the JSON object if it's a property of jsonData
+                    if ( data.CallLog) {
+                        const invLogData = data.CallLog;  // Already an object, no need for JSON.parse()
+                        console.log("Inventory Log Data:", invLogData);
+            
+                        const iframe = document.getElementById("screen");
+                        if (iframe) {
+                            // Send the parsed data as an object to iframe
+                            iframe.contentWindow.postMessage(jsonData, "*");
+                        }
+                    } else {
+                        console.log("Unhandled key or missing data structure in:", JSON.stringify(jsonData));
+                    }
                 } catch (error) {
-                    console.error("Error handling data:", error);
+                    console.error("Error parsing JSON or processing data:", error);
                 }
             }
 
-            handleMessageFromIndex(data) {
+            
+            receiveData(_data) {
+                const data = JSON.parse(_data);
                 const action = data.action;
                 const body = data.body;
                 switch (action) {
@@ -71,7 +166,7 @@
                         this.callStarted(body.from);
                         break;
                     case 'call-ended':
-                        this.callEnded();
+                        this.callEnded(body.from);
                         break;
                     case 'receiving-call':
                         this.receivingCall(body.from);
@@ -84,62 +179,51 @@
                         break;
                 }
             }
-
-
-            ring(to) {
-                this.setPage('ringing', { key: "to", value: to });
-            }
-
-            callStarted(_with) {
-                this.setPage('inCall', { key: "to", value: _with });
-            }
-
-            callEnded() {
-                this.setPage('main');
-            }
-
-            receivingCall(from) {
-                this.setPage('incomingCall', { key: "from", value: from });
-            }
-
-            dataFetched(jsonData) {
-                console.log('Received raw data:', JSON.stringify(jsonData));
-                try {
-                    if (jsonData.CallLog) {
-                        const invLogData = jsonData.CallLog;
-                        console.log("Inventory Log Data:", invLogData);
-
-                        const iframe = document.getElementById("screen");
-                        if (iframe) {
-                            iframe.contentWindow.postMessage(JSON.stringify(jsonData), "*");
-                        }
-                    } else {
-                        console.log("Unhandled key or missing data structure in:", JSON.stringify(jsonData));
-                    }
-                } catch (error) {
-                    console.error("Error parsing JSON or processing data:", error);
-                }
-            }
         }
-
-        const controller = new Background(
+                const controller = new Controller("test.eth", 
             "https://htmltest-theta.vercel.app/mainScreen.html",
-            "https://htmltest-theta.vercel.app/ringingScreen.html",
-            "https://htmltest-theta.vercel.app/inCallScreen.html",
-            "https://htmltest-theta.vercel.app/incomingCallScreen.html"
+            "https://htmltest-theta.vercel.app/ringing.html",
+            "https://htmltest-theta.vercel.app/inCall.html",
+            "https://htmltest-theta.vercel.app/incomingCall.html"
         );
-
         window.addEventListener('message', function (event) {
-            if (event.origin !== window.location.origin) {
+            console.log(event)
+            if (event.origin !== "https://htmltest-theta.vercel.app") {
                 return;
             }
-
-            controller.handleMessageFromIndex(JSON.parse(event.data));
+            // Handle the message from the iframe
+            const data = JSON.parse(event.data);
+            console.log(data)
+            switch (data.action) {
+                case 'call':
+                    controller.call(data.to);
+                    break;
+                case 'end-call':
+                    controller.rejectCall(data.to);
+                    break;
+                case 'accept-call':
+                    controller.acceptCall(data.from);
+                    break;
+                case 'reject-call':
+                    controller.rejectCall(data.from);
+                    break;
+                case 'store':
+                    controller.store(data.key, data.value);
+                    break
+                case 'fetch':
+                    controller.fetch(data.key, data.d_value, function(response) {
+                        event.source.postMessage(JSON.stringify({key: data.key, value: response}), event.origin);
+                    });
+                    break;
+                case 'get-logs':
+                    controller.getLogs();
+                    break   
+                default:
+                    console.log('Unknown action');
+                    break;
+            }
+            
         }, false);
-
-        window.sendToNative = (data) => {
-            controller.handleRequestFromScreens(data);
-        };
     </script>
 </body>
 </html>
