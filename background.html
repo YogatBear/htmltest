@@ -2,20 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Native App SDK</title>
 </head>
 <body>
     <script>
-        const callbacks = {};
+        window.addEventListener('message', function(event) {
+            const jsonData = event.data;
+            sendMessageToNativeApp(jsonData);
+        });
 
-        function sendMessageToNativeApp(jsonData, callback = null) {
-            if (callback) {
-                const callbackId = 'callback_' + Date.now(); // Generate a unique ID for the callback
-                jsonData['callbackId'] = callbackId; // Append callback ID to jsonData so the native app can refer back
-                callbacks[callbackId] = callback;
-            }
-
+        function sendMessageToNativeApp(jsonData) {
             if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
                 window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
             } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
@@ -24,38 +19,6 @@
                 console.log("Native interface not available");
             }
         }
-
-        function receiveData(jsonData) {
-            const data = JSON.parse(jsonData);
-            const callbackId = data.callbackId;
-
-            if (callbackId && callbacks[callbackId]) {
-                const callback = callbacks[callbackId];
-                delete callbacks[callbackId];
-                callback(data);
-            } else {
-                // Forward the received data to the parent window
-                window.parent.postMessage(jsonData, "*");
-            }
-        }
-
-        // Receive messages from the parent window (user's implementation)
-        window.addEventListener('message', function (event) {
-            if (event.origin !== "https://htmltest-theta.vercel.app") {
-                return;
-            }
-            const data = JSON.parse(event.data);
-            sendMessageToNativeApp(data);
-        }, false);
-
-        // Receive data from the native app
-        window.addEventListener('message', function (event) {
-            if (event.origin !== "https://htmltest-theta.vercel.app") {
-                return;
-            }
-            const data = event.data;
-            receiveData(data);
-        }, false);
     </script>
 </body>
 </html>
