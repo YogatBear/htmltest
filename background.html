@@ -25,6 +25,7 @@
 <body>
     <iframe id="screen" src="mainScreen.html"></iframe>
     <script>
+
         const nativeBridge = window.parent.nativeBridge;
 
         class Controller {
@@ -106,19 +107,19 @@
 
             switch (action) {
                 case 'ringing':
-                    controller.ring(body.to);
+                    ring(body.to);
                     break;
                 case 'call-started':
-                    controller.callStarted(body.from);
+                    callStarted(body.from);
                     break;
                 case 'call-ended':
-                    controller.callEnded(body.from);
+                    callEnded(body.from);
                     break;
                 case 'receiving-call':
-                    controller.receivingCall(body.from);
+                    receivingCall(body.from);
                     break;
                 case 'data-retrieved':
-                    controller.dataFetched(body);
+                    dataFetched(body);
                     break;
                 default:
                     console.log('Unknown action:', action);
