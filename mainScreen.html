@@ -84,16 +84,7 @@
         <ul id="recent-calls" class="call-log"></ul>
     </div>
     <script>
-        const controller = window.parent.controller; // Declare controller in a broader scope.
-
-        document.addEventListener('DOMContentLoaded', function () {
-            controller = window.parent.controller;
-            // Use controller to interact with the methods defined in background.html
-            if (!controller) {
-                console.error("Controller is not accessible or not defined.");
-                return;
-            }
-        });
+        const controller = window.parent.controller;
         const input = document.querySelector("input");
         const recentCalls = document.getElementById("recent-calls");
     
