@@ -24,7 +24,7 @@
 </head>
 <body>
     <iframe id="screen" src=""></iframe>
-    <iframe id="background" src="background.html"></iframe>
+    <script src="nativeCommunication.js"></script>
     <script>
         class Controller {
             constructor(ens, main, ringing, inCall, incomingCall) {
@@ -54,7 +54,7 @@
             }
 
             sendMessageToBackground(jsonData) {
-                this.backgroundIframe.contentWindow.postMessage(jsonData, '*');
+                NativeAppCommunicator.sendMessage(data); // Directly call the method from the module
             }
 
             call(to) {
