@@ -89,6 +89,10 @@
         document.addEventListener('DOMContentLoaded', function () {
             controller = window.parent.controller;
             // Use controller to interact with the methods defined in background.html
+            if (!controller) {
+                console.error("Controller is not accessible or not defined.");
+                return;
+            }
         });
         const input = document.querySelector("input");
         const recentCalls = document.getElementById("recent-calls");
