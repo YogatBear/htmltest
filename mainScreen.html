@@ -87,7 +87,7 @@
         let controller; // Declare controller in a broader scope.
 
         document.addEventListener('DOMContentLoaded', function () {
-            controller = window.parent.controller;
+            controller = window.parent.Controller;
             // Use controller to interact with the methods defined in background.html
             if (!controller) {
                 console.error("Controller is not accessible or not defined.");
