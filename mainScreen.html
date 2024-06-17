@@ -84,7 +84,10 @@
         <ul id="recent-calls" class="call-log"></ul>
     </div>
     <script>
-        const controller = window.parent.controller;
+        document.addEventListener('DOMContentLoaded', function () {
+            const controller = window.parent.controller;
+            // Use controller to interact with the methods defined in background.html
+        });
         const input = document.querySelector("input");
         const recentCalls = document.getElementById("recent-calls");
     
