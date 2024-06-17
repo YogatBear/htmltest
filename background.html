@@ -2,23 +2,129 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        iframe {
+            width: 80%;
+            height: 80%;
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
 <body>
+    <iframe id="screen" src=""></iframe>
     <script>
-        window.addEventListener('message', function(event) {
-            const jsonData = event.data;
-            sendMessageToNativeApp(jsonData);
-        });
 
-        function sendMessageToNativeApp(jsonData) {
-            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
-                window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
-            } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
-                window.AndroidBridge.processAction(JSON.stringify(jsonData));
-            } else {
-                console.log("Native interface not available");
+        const NativeBridge = window.parent.nativeBridge;
+
+        class Controller {
+            constructor(ens, main, ringing, inCall, incomingCall) {
+                this.ens = ens;
+                this.urls = {
+                    "main": main,
+                    "ringing": ringing,
+                    "inCall": inCall,
+                    "incomingCall": incomingCall
+                };
+                this.setPage('main'); // Set initial page
+            }
+
+            setPage(pageId, param = {}) {
+                const iframe = document.getElementById("screen");
+                iframe.src = this.urls[pageId];
+                if (Object.keys(param).length > 0) {
+                    iframe.src += `?${param.key}=${param.value}`;
+                }
+            }
+
+            // Functions that interact with the native layer
+            call(to) { nativeBridge.call(to); }
+            acceptCall(from) { nativeBridge.acceptCall(from); }
+            rejectCall(from) { nativeBridge.rejectCall(from); }
+            store(key, value) { nativeBridge.store(key, value); }
+            fetch(key, defaultValue) { nativeBridge.fetch(key, defaultValue); }
+            getLogs() { nativeBridge.getLogs(); }
+
+            ring(to) {
+                this.setPage('ringing', {key:"to",value:to}); // Show ringing screen
+            }
+            callStarted(_with) {
+                this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
+            }
+            callEnded() {
+                this.setPage('main'); // End call logic and show main screen
+            }
+            receivingCall(from) {
+                this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
+            }
+            dataFetched(jsonData) {
+                console.log('Received raw data:', JSON.stringify(jsonData));
+                const data = JSON.parse(JSON.stringify(jsonData));
+                try {
+                    // Directly use the JSON object if it's a property of jsonData
+                    if ( data.CallLog) {
+                        const invLogData = data.CallLog;  // Already an object, no need for JSON.parse()
+                        console.log("Inventory Log Data:", invLogData);
+            
+                        const iframe = document.getElementById("screen");
+                        if (iframe) {
+                            // Send the parsed data as an object to iframe
+                            iframe.contentWindow.postMessage(jsonData, "*");
+                        }
+                    } else {
+                        console.log("Unhandled key or missing data structure in:", JSON.stringify(jsonData));
+                    }
+                } catch (error) {
+                    console.error("Error parsing JSON or processing data:", error);
+                }
             }
         }
+
+        window.controller = new Controller(
+            "test.eth",
+            "https://htmltest-theta.vercel.app/mainScreen.html",
+            "https://htmltest-theta.vercel.app/ringing.html",
+            "https://htmltest-theta.vercel.app/inCall.html",
+            "https://htmltest-theta.vercel.app/incomingCall.html"
+        );
+
+        window.addEventListener('message', (event) => {
+            const data = event.data;
+            const action = data.action;
+            const body = data.body;
+
+            switch (action) {
+                case 'ringing':
+                    ring(body.to);
+                    break;
+                case 'call-started':
+                    callStarted(body.from);
+                    break;
+                case 'call-ended':
+                    callEnded(body.from);
+                    break;
+                case 'receiving-call':
+                    receivingCall(body.from);
+                    break;
+                case 'data-retrieved':
+                    dataFetched(body);
+                    break;
+                default:
+                    console.log('Unknown action:', action);
+                    break;
+            }
+        });
     </script>
 </body>
 </html>

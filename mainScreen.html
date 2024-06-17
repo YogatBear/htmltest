@@ -84,18 +84,19 @@
         <ul id="recent-calls" class="call-log"></ul>
     </div>
     <script>
+        const controller = window.parent.controller;
         const input = document.querySelector("input");
         const recentCalls = document.getElementById("recent-calls");
     
         document.querySelector("button").addEventListener("click", () => {
             console.log("calling...", input.value);
             if (input.value !== "") {
-                window.parent.postMessage(JSON.stringify({ action: "call", to: input.value }), "*");
+                controller.call(input.value);
             }
         });
     
         window.addEventListener("load", () => {
-            window.parent.postMessage(JSON.stringify({ action: "get-logs" }), "*");
+            controller.getLogs();
         });
     
         window.addEventListener("message", event => {
@@ -123,7 +124,7 @@
                             <span class="call-icon material-symbols-outlined">${iconSymbol}</span>`;
                         li.addEventListener('click', () => {
                             console.log("Re-calling...", contact);
-                            window.parent.postMessage(JSON.stringify({ action: "call", to: contact }), "*");
+                            controller.call(contact);
                         });
                         recentCalls.appendChild(li);
                     });
