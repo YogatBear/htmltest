@@ -7,7 +7,6 @@
 <body>
     <script>
         class NativeBridge {
-
             constructor() {
                 this.guiFrame = document.getElementById('guiFrame');
             }
@@ -18,7 +17,6 @@
             }
 
             sendMessageToNativeApp(jsonData) {
-
                 if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
                     window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
                 } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
@@ -28,56 +26,7 @@
                 }
             }
 
-            call(to) {
-                const request = {
-                    action: "call",
-                    body: {to: to}
-                };
-                this.sendMessageToNativeApp(request);
-                //this.setPage('ringing'); // Show ringing screen
-            }
-            acceptCall(from) {
-                const request = {
-                    action: "accept-call",
-                    body: { from: from }
-                };
-                this.sendMessageToNativeApp(request);
-                // this.setPage('inCallScreen'); // Show in-call screen
-            }
-            rejectCall(from) {
-                const request = {
-                    action: "reject-call",
-                    body: { from: from }
-                };
-                this.sendMessageToNativeApp(request);
-                // this.setPage('mainScreen'); // Show main screen
-            }
-            store(key, value) {
-                const request = {
-                    action: "store",
-                    body: { key: key, value: value }
-                };
-                this.sendMessageToNativeApp(request);
-            }
-            fetch(key, d_value) {
-                const request = {
-                    action: "fetch",
-                    body: { key: key, d_value: d_value }
-                };
-                this.sendMessageToNativeApp(request);
-            }
-            getLogs() {
-                const request = {
-                    action: "get-logs",
-                    body: { range: 10}
-                };
-                this.sendMessageToNativeApp(request);
-            }
-
-            receiveMessage(event) {
-                const { action, body} = event.data;
-                this.sendMessage(action, body);
-            }
+            // Other methods...
         }
 
         window.nativeBridge = new NativeBridge();
