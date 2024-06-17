@@ -84,7 +84,7 @@
         <ul id="recent-calls" class="call-log"></ul>
     </div>
     <script>
-        let controller; // Declare controller in a broader scope.
+        const controller = window.parent.controller; // Declare controller in a broader scope.
 
         document.addEventListener('DOMContentLoaded', function () {
             controller = window.parent.controller;
