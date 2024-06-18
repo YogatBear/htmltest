@@ -54,6 +54,7 @@
                 try {
                     const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
                     if (data.CallLog) {
+                        console.log("Received call log data:", data.CallLog);
                         this.updateCallLog(data.CallLog);
                     }
                 } catch (error) {
