@@ -103,7 +103,7 @@
 
         window.addEventListener('message', (event) => {
             console.log('Received message:', event.data);
-            const data = event.data;
+            const data = JSON.parse(event.data);
             const action = data.action;
             const body = data.body;
 
