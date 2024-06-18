@@ -109,19 +109,19 @@
 
             switch (action) {
                 case 'ringing':
-                    ring(body.to);
+                    controller.ring(body.to);
                     break;
                 case 'call-started':
-                    callStarted(body.from);
+                    controller.callStarted(body.from);
                     break;
                 case 'call-ended':
-                    callEnded(body.from);
+                    controller.callEnded(body.from);
                     break;
                 case 'receiving-call':
-                    receivingCall(body.from);
+                    controller.receivingCall(body.from);
                     break;
                 case 'data-retrieved':
-                    dataFetched(body);
+                    controller.dataFetched(body);
                     break;
                 default:
                     console.log('Unknown action:', action);
