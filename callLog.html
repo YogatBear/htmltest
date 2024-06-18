@@ -45,7 +45,7 @@
         class CallLogComponent {
             constructor(containerId) {
                 this.container = document.getElementById(containerId);
-                this.controller = window.top.nativeBridge; // Ensuring it accesses the controller from parent
+                this.controller = window.top.controller; // Ensuring it accesses the controller from parent
                 this.init();
             }
 
