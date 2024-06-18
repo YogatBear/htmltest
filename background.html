@@ -99,7 +99,7 @@
             "https://htmltest-theta.vercel.app/incomingCall.html"
         );
 
-        window.controller = controller;
+        window.top.controller = controller;
 
         window.addEventListener('message', (event) => {
             console.log('Received message:', event.data);
