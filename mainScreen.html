@@ -48,32 +48,10 @@
         button:hover {
             background-color: #0056b3;
         }
-        .call-log {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-        .call-entry {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        .call-details {
-            flex-grow: 1;
-        }
-        .contact-name {
-            font-size: 16px;
-            color: #333;
-        }
-        .call-time {
-            font-size: 12px;
-            color: #999;
-        }
-        .call-icon {
-            font-family: 'Material Symbols Outlined';
-            font-size: 24px; /* Adjust size as needed */
+        iframe {
+            width: 100%;
+            border: none; /* Remove iframe border */
+            height: 300px; /* Set a fixed height or adjust as needed */
         }
     </style>
 </head>
@@ -81,58 +59,20 @@
     <div class="container">
         <input type="text" placeholder="Enter number">
         <button>Call</button>
-        <ul id="recent-calls" class="call-log"></ul>
+        <iframe src="CallLogComponent.html"></iframe>
     </div>
     <script>
         const controller = window.top.nativeBridge;
         const input = document.querySelector("input");
-        const recentCalls = document.getElementById("recent-calls");
-    
+
         document.querySelector("button").addEventListener("click", () => {
-            console.log("calling...", input.value);
+            console.log("Calling...", input.value);
             if (input.value !== "") {
                 controller.call(input.value);
             }
         });
-    
-        window.addEventListener("load", () => {
-            controller.getLogs();
-        });
-    
-        window.addEventListener("message", event => {
-            try {
-                const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-        
-                if (data.CallLog) {
-                    recentCalls.innerHTML = ""; // Clear existing logs
-                    data.CallLog.forEach(call => {
-                        const [contact, timestamp, status] = call;
-                        const callDate = new Date(timestamp);
-                        const today = new Date();
-                        const isToday = callDate.toDateString() === today.toDateString();
-                        const timeOrDate = isToday ? callDate.toLocaleTimeString([], { timeStyle: 'short' }) : callDate.toLocaleDateString();
-                        const iconSymbol = status.toLowerCase() === 'incoming' ? 'call_received' :
-                                          status.toLowerCase() === 'outgoing' ? 'call_made' : 'call_missed';
-                        
-                        const li = document.createElement('li');
-                        li.className = "call-entry";
-                        li.innerHTML = `
-                            <div class="call-details">
-                                <div class="contact-name">${contact}</div>
-                                <div class="call-time">${timeOrDate}</div>
-                            </div>
-                            <span class="call-icon material-symbols-outlined">${iconSymbol}</span>`;
-                        li.addEventListener('click', () => {
-                            console.log("Re-calling...", contact);
-                            controller.call(contact);
-                        });
-                        recentCalls.appendChild(li);
-                    });
-                }
-            } catch (error) {
-                console.error("Error parsing message data:", error);
-            }
-        });
-    </script>    
+
+        // No need to handle call log loading here, as it's handled by the iframe component
+    </script>
 </body>
 </html>

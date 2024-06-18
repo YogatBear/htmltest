@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reusable Call Log Component</title>
+    <style>
+        .call-log {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .call-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .call-details {
+            flex-grow: 1;
+        }
+        .contact-name {
+            font-size: 16px;
+            color: #333;
+        }
+        .call-time {
+            font-size: 12px;
+            color: #999;
+        }
+        .call-icon {
+            font-family: 'Material Symbols Outlined';
+            font-size: 24px; /* Adjust size as needed */
+        }
+    </style>
+</head>
+<body>
+    <ul id="call-log" class="call-log"></ul>
+
+    <script>
+        class CallLogComponent {
+            constructor(containerId, controller) {
+                this.container = document.getElementById(containerId);
+                this.controller = controller;
+                this.init();
+            }
+
+            init() {
+                this.controller.getLogs();
+                window.addEventListener("message", this.handleMessage.bind(this));
+            }
+
+            handleMessage(event) {
+                try {
+                    const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+                    if (data.CallLog) {
+                        this.updateCallLog(data.CallLog);
+                    }
+                } catch (error) {
+                    console.error("Error parsing message data:", error);
+                }
+            }
+
+            updateCallLog(callLogs) {
+                this.container.innerHTML = ""; // Clear existing logs
+                callLogs.forEach(call => {
+                    const [contact, timestamp, status] = call;
+                    const callDate = new Date(timestamp);
+                    const today = new Date();
+                    const isToday = callDate.toDateString() === today.toDateString();
+                    const timeOrDate = isToday ? callDate.toLocaleTimeString([], { timeStyle: 'short' }) : callDate.toLocaleDateString();
+                    const iconSymbol = status.toLowerCase() === 'incoming' ? 'call_received' :
+                                      status.toLowerCase() === 'outgoing' ? 'call_made' : 'call_missed';
+                    
+                    const li = document.createElement('li');
+                    li.className = "call-entry";
+                    li.innerHTML = `
+                        <div class="call-details">
+                            <div class="contact-name">${contact}</div>
+                            <div class="call-time">${timeOrDate}</div>
+                        </div>
+                        <span class="call-icon material-symbols-outlined">${iconSymbol}</span>`;
+                    li.addEventListener('click', () => {
+                        console.log("Re-calling...", contact);
+                        this.controller.call(contact);
+                    });
+                    this.container.appendChild(li);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
