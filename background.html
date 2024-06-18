@@ -75,7 +75,7 @@
                     // Directly use the JSON object if it's a property of jsonData
                     if ( data.CallLog) {
                         const invLogData = data.CallLog;  // Already an object, no need for JSON.parse()
-                        console.log("Inventory Log Data:", invLogData);
+                        console.log("Call Log Data:", invLogData);
             
                         const iframe = document.getElementById("screen");
                         if (iframe) {
@@ -99,7 +99,7 @@
             "https://htmltest-theta.vercel.app/incomingCall.html"
         );
 
-        window.top.controller = controller;
+        window.controller = controller;
 
         window.addEventListener('message', (event) => {
             console.log('Received message:', event.data);
