@@ -39,9 +39,9 @@
 
     <script>
         class CallLogComponent {
-            constructor(containerId, controller) {
+            constructor(containerId) {
                 this.container = document.getElementById(containerId);
-                this.controller = controller;
+                this.controller = window.top.nativeBridge; // Ensuring it accesses the controller from parent
                 this.init();
             }
 
@@ -88,6 +88,8 @@
                 });
             }
         }
+
+        new CallLogComponent('call-log');
     </script>
 </body>
 </html>
