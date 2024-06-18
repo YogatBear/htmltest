@@ -28,7 +28,7 @@
 
         const channel = new BroadcastChannel('myChannel');
 
-        class Controller {
+        class App {
             constructor(ens, main, ringing, inCall, incomingCall) {
                 this.ens = ens;
                 this.urls = {
@@ -71,7 +71,7 @@
             }
         }
 
-        const controller = new Controller(
+        const app = new App(
             "test.eth",
             "https://htmltest-theta.vercel.app/mainScreen.html",
             "https://htmltest-theta.vercel.app/ringing.html",
@@ -79,7 +79,7 @@
             "https://htmltest-theta.vercel.app/incomingCall.html"
         );
 
-        window.controller = controller;
+        window.app = app;
 
         window.addEventListener('message', (event) => {
             console.log('Received message:', event.data);
@@ -89,19 +89,19 @@
 
             switch (action) {
                 case 'ringing':
-                    controller.ring(body.to);
+                    app.ring(body.to);
                     break;
                 case 'call-started':
-                    controller.callStarted(body.from);
+                    app.callStarted(body.from);
                     break;
                 case 'call-ended':
-                    controller.callEnded(body.from);
+                    app.callEnded(body.from);
                     break;
                 case 'receiving-call':
-                    controller.receivingCall(body.from);
+                    app.receivingCall(body.from);
                     break;
                 case 'data-retrieved':
-                    controller.dataFetched(body);
+                    app.dataFetched(body);
                     break;
                 default:
                     console.log('Unknown action:', action);

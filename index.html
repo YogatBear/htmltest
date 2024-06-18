@@ -6,7 +6,7 @@
 </head>
 <body>
     <script>
-        class NativeBridge {
+        class controller {
 
             constructor() {
                 this.guiFrame = document.getElementById('guiFrame');
@@ -81,7 +81,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            window.top.nativeBridge = new NativeBridge();
+            window.top.controller = new controller();
         });
 
     </script>
