@@ -57,6 +57,7 @@
         </div>
     </div>
     <script>
+        const controller = window.top.nativeBridge;
                     // Get the search parameters from the current URL
         const urlParams = new URLSearchParams(window.location.search);
         // Now you can access individual parameters using methods like get()
@@ -68,10 +69,10 @@
         const rejectButton = document.querySelector(".reject")
 
         acceptButton.addEventListener("click", ()=>{
-            window.parent.postMessage(JSON.stringify({action:"accept-call", from:from}), "https://htmltest-theta.vercel.app/background.html")
+            controller.acceptCall(from);
         })
         rejectButton.addEventListener("click", ()=>{
-            window.parent.postMessage(JSON.stringify({action:"reject-call", from:from}), "https://htmltest-theta.vercel.app/background.html")
+            controller.rejectCall(from);
         })
     </script>
 </body>

@@ -39,6 +39,8 @@
         <button>Hang Up</button>
     </div>
     <script>
+        const controller = window.top.nativeBridge;
+
                     // Get the search parameters from the current URL
         const urlParams = new URLSearchParams(window.location.search);
         
@@ -49,7 +51,7 @@
         }
         const hangUp = document.querySelector("button")
         hangUp.addEventListener("click", ()=>{
-            window.parent.postMessage(JSON.stringify({action:"end-call", to:to}), "https://htmltest-theta.vercel.app/background.html")
+            controller.rejectCall(to);
         })
     </script>
 </body>
