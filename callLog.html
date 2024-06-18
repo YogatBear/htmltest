@@ -31,7 +31,7 @@
         }
         .call-icon {
             font-family: 'Material Symbols Outlined';
-            font-size: 24px; /* Adjust size as needed */
+            font-size: 24px;
         }
     </style>
 </head>
@@ -45,7 +45,7 @@
         class CallLogComponent {
             constructor(containerId) {
                 this.container = document.getElementById(containerId);
-                this.controller = window.top.controller; // Ensuring it accesses the controller from parent
+                this.controller = window.top.controller;
                 this.init();
             }
 

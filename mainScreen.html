@@ -49,8 +49,8 @@
         }
         iframe {
             width: 100%;
-            border: none; /* Remove iframe border */
-            height: 300px; /* Set a fixed height or adjust as needed */
+            border: none;
+            height: 300px;
         }
     </style>
 </head>
@@ -61,7 +61,7 @@
         <iframe src="callLog.html"></iframe>
     </div>
     <script>
-        const controller = window.top.nativeBridge;
+        const controller = window.top.controller;
         const input = document.querySelector("input");
 
         document.querySelector("button").addEventListener("click", () => {
@@ -70,8 +70,6 @@
                 controller.call(input.value);
             }
         });
-
-        // No need to handle call log loading here, as it's handled by the iframe component
     </script>
 </body>
 </html>

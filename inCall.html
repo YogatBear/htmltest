@@ -39,13 +39,9 @@
         <button>Hang Up</button>
     </div>
     <script>
-        const controller = window.top.nativeBridge;
-
-                    // Get the search parameters from the current URL
+        const controller = window.top.controller;
         const urlParams = new URLSearchParams(window.location.search);
-        
-        // Now you can access individual parameters using methods like get()
-        const to = urlParams.get('to'); // Returns 'value1'
+        const to = urlParams.get('to');
         if(to){
             document.querySelector("#name").textContent = to;
         }
