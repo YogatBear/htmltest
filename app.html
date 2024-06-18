@@ -26,6 +26,8 @@
     <iframe id="screen" src="mainScreen.html"></iframe>
     <script>
 
+        const channel = new BroadcastChannel('myChannel');
+
         class Controller {
             constructor(ens, main, ringing, inCall, incomingCall) {
                 this.ens = ens;
@@ -62,10 +64,7 @@
                 console.log('Received raw data:', JSON.stringify(jsonData));
                 const data = JSON.parse(JSON.stringify(jsonData));
                 try {
-                    Array.from(document.querySelectorAll('iframe')).forEach(iframe => {
-                        console.log('Sending data to iframe:', iframe.toString());
-                        iframe.contentWindow.postMessage(data, "*");
-                    });
+                    channel.postMessage(data);
                 } catch (error) {
                     console.error("Error parsing JSON or processing data:", error);
                 }

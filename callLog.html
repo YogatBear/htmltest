@@ -38,6 +38,9 @@
     <ul id="call-log" class="call-log"></ul>
 
     <script>
+
+        const channel = new BroadcastChannel('myChannel');
+
         class CallLogComponent {
             constructor(containerId) {
                 this.container = document.getElementById(containerId);
@@ -47,7 +50,7 @@
 
             init() {
                 this.controller.getLogs();
-                window.addEventListener("message", this.handleMessage.bind(this));
+                channel.addEventListener("message", this.handleMessage.bind(this));
             }
 
             handleMessage(event) {
