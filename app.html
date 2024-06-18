@@ -63,6 +63,7 @@
                 const data = JSON.parse(JSON.stringify(jsonData));
                 try {
                     Array.from(document.querySelectorAll('iframe')).forEach(iframe => {
+                        console.log('Sending data to iframe:', iframe);
                         iframe.contentWindow.postMessage(data, "*");
                     });
                 } catch (error) {
