@@ -57,12 +57,11 @@
         </div>
     </div>
     <script>
-        const controller = window.top.nativeBridge;
-                    // Get the search parameters from the current URL
+        const controller = window.top.controller;
         const urlParams = new URLSearchParams(window.location.search);
-        // Now you can access individual parameters using methods like get()
-        const from = urlParams.get('from'); // Returns 'value1'
+        const from = urlParams.get('from');
         if(from){
+            console.log(from);
             document.querySelector("#name").textContent = from;
         }
         const acceptButton = document.querySelector(".accept")
