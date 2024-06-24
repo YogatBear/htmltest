@@ -61,7 +61,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         const from = urlParams.get('from');
         if(from){
-            console.log(from);
             document.querySelector("#name").textContent = from;
         }
         const acceptButton = document.querySelector(".accept")
