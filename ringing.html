@@ -35,22 +35,20 @@
 </head>
 <body>
     <div class="container">
-        <h2>Ringing </h2><h2 id="name"></h2> <!-- Replace 'John Doe' with the actual name dynamically if needed -->
+        <h2>Ringing </h2><h2 id="name"></h2>
         <button>Hang Up</button>
     </div>
     <script>
-            // Get the search parameters from the current URL
         const controller = window.top.controller;
 
         const urlParams = new URLSearchParams(window.location.search);
         
-        // Now you can access individual parameters using methods like get()
-        const to = urlParams.get('to'); // Returns 'value1'
+        const to = urlParams.get('to');
         if(to){
             document.querySelector("#name").textContent = to;
         }
         document.querySelector("button").addEventListener("click", ()=>{
-            controller.endCall(to);
+            controller.rejectCall(to);
         })
         
     </script>
