@@ -50,7 +50,7 @@
             }
 
             init() {
-                this.controller.getRecentCalls();
+                this.controller.getRecent();
                 channel.addEventListener("message", this.handleMessage.bind(this));
             }
 
