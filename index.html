@@ -73,6 +73,13 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+            getRecent() {
+                const request = {
+                    action: "get-recent",
+                    body: { range: 10}
+                };
+                this.sendMessageToNativeApp(request);
+            }
 
             receiveMessage(event) {
                 const { action, body} = event.data;
