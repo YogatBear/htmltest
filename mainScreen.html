@@ -68,7 +68,7 @@
             if (input.value !== "") {
                 const connectRequest = {
                     action: "connecting",
-                    body: {to: to}
+                    body: {to: input.value}
                 };
                 this.guiFrame.contentWindow.postMessage(connectRequest, '*');
                 controller.call(input.value);
