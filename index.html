@@ -29,11 +29,11 @@
             }
 
             call(to) {
-                const request = {
+                const callRequest = {
                     action: "call",
                     body: {to: to}
                 };
-                this.sendMessage("connecting-call", body);
+                this.sendMessage("connecting", {to: to});
                 this.sendMessageToNativeApp(request);
                 //this.setPage('ringing'); // Show ringing screen
             }
