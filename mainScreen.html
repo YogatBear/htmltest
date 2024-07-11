@@ -66,6 +66,11 @@
         button.addEventListener("click", function() {
             console.log("Calling...", input.value);
             if (input.value !== "") {
+                const connectRequest = {
+                    action: "connecting",
+                    body: {to: to}
+                };
+                this.guiFrame.contentWindow.postMessage(connectRequest, '*');
                 controller.call(input.value);
             }
         });
