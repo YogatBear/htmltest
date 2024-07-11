@@ -29,12 +29,16 @@
             }
 
             call(to) {
+                const connectRequest = {
+                    action: "connecting",
+                    body: {to: to}
+                };
                 const callRequest = {
                     action: "call",
                     body: {to: to}
                 };
-                this.sendMessage("connecting", {to: to});
-                this.sendMessageToNativeApp(request);
+                this.guiFrame.contentWindow.postMessage(connectRequest, '*');
+                this.sendMessageToNativeApp(callRequest);
                 //this.setPage('ringing'); // Show ringing screen
             }
             acceptCall(from) {
