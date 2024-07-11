@@ -51,6 +51,9 @@
             ring(to) {
                 this.setPage('ringing', {key:"to",value:to}); // Show ringing screen
             }
+            connecting(to) {
+                this.setPage('connecting', {key:"to",value:to}); // Show connecting screen
+            }
             callStarted(_with) {
                 this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
             }
@@ -90,6 +93,9 @@
             switch (action) {
                 case 'ringing':
                     app.ring(body.to);
+                    break;
+                case 'connecting':
+                    app.connecting(body.to);
                     break;
                 case 'call-started':
                     app.callStarted(body.from);
