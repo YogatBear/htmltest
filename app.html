@@ -64,6 +64,11 @@
             receivingCall(from) {
                 this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
             }
+            showError(message) {
+                const errorFrame = document.getElementById('error-frame');
+                errorFrame.style.display = 'block';
+                errorFrame.contentWindow.postMessage({action: 'showError', message: message}, '*');
+            }
             dataFetched(jsonData) {
                 console.log('Received raw data:', JSON.stringify(jsonData));
                 const data = JSON.parse(JSON.stringify(jsonData));
@@ -108,6 +113,9 @@
                 case 'receiving-call':
                     app.receivingCall(body.from);
                     break;
+                case 'error':
+                    app.showError(body.e);
+                    break;
                 case 'data-retrieved':
                     app.dataFetched(body);
                     break;
@@ -117,5 +125,6 @@
             }
         });
     </script>
+    <iframe id="error-frame" src="errorWindow.html" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;"></iframe>
 </body>
 </html>
