@@ -62,7 +62,6 @@
         const controller = window.top.controller;
         const input = document.querySelector("input");
         const button = document.querySelector("button");
-        const guiFrame = document.querySelector("#guiFrame");
         
         button.addEventListener("click", function() {
             console.log("Calling...", input.value);
@@ -71,7 +70,7 @@
                     action: "connecting",
                     body: {to: input.value}
                 };
-                this.guiFrame.contentWindow.postMessage(connectRequest, '*');
+                window.parent.postMessage(connectRequest, '*');
                 controller.call(input.value);
             }
         });
