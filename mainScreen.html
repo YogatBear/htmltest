@@ -67,7 +67,7 @@
             console.log("Calling...", input.value);
             if (input.value !== "") {
                 const connectRequest = {
-                    action: "connecting",
+                    action: "call-attempt",
                     body: {to: input.value}
                 };
                 window.parent.postMessage(connectRequest, '*');
