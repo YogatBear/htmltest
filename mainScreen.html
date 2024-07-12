@@ -69,17 +69,15 @@
 
         window.addEventListener('message', (event) => {
             if (event.data.action === 'call') {
-                console.log(event);
-                makeCall(event.data.body.to);
+                makeCall(event.data.body);
             }
         });
 
-        function makeCall(target) {
-            console.log("Calling... ", target);
+        function makeCall(jsonData) {
             if (to !== "") {
                 const connectRequest = {
                     action: "call-attempt",
-                    body: {to: target}
+                    body: jsonData
                 };
                 window.parent.postMessage(connectRequest, '*');
             }
