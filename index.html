@@ -8,6 +8,9 @@
     <div id="displayId" style="text-align:center; margin-top:20px; font-size:24px;"></div> <!-- Element to display the 'id' -->
 
     <script>
+
+        const identity = urlParams.get('id'); // Get 'id' parameter from URL
+
         class Controller {
 
             constructor() {
@@ -67,14 +70,14 @@
             getLogs() {
                 const request = {
                     action: "get-logs",
-                    body: { range: 10}
+                    body: {from: identity, range: 10}
                 };
                 this.sendMessageToNativeApp(request);
             }
             getRecent() {
                 const request = {
                     action: "get-recent",
-                    body: { range: 10}
+                    body: { from: identity, range: 10 }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -88,8 +91,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             window.top.controller = new Controller();
             const urlParams = new URLSearchParams(window.location.search);
-            const id = urlParams.get('id'); // Get 'id' parameter from URL
-            document.getElementById('displayId').textContent = id ? `ID: ${id}` : 'ID not provided'; // Display the 'id' or a fallback message
+            document.getElementById('displayId').textContent = identity ? `ID: ${identity}` : 'ID not provided'; // Display the 'id' or a fallback message
         });
 
     </script>
