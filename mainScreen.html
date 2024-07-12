@@ -68,7 +68,7 @@
         });
 
         window.addEventListener('message', (event) => {
-            if (JSON.parse(event.data.actio) === 'call') {
+            if (JSON.parse(event.data.action) === 'call') {
                 makeCall(event.data.body);
             }
         });
