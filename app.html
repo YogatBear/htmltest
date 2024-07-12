@@ -100,7 +100,7 @@
         window.app = app;
 
         window.addEventListener('message', (event) => {
-            console.log('Received message:', event.data);
+            console.log('Received message:', JSON.stringify(event.data));
             const data = event.data;
             const action = data.action;
             const body = data.body;
