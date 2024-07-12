@@ -69,6 +69,7 @@
 
         window.addEventListener('message', (event) => {
             if (event.data.action === 'call') {
+                console.log(event);
                 makeCall(event.data.body.to);
             }
         });
