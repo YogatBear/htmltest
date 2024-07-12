@@ -86,7 +86,7 @@
                         </div>
                         <span class="call-icon material-symbols-outlined">${iconSymbol}</span>`;
                     li.addEventListener('click', () => {
-                        window.parent.postMessage({action: 'call', body: {to: input.value}}, '*');
+                        window.parent.postMessage({action: 'call', body: {to: contact}}, '*');
                     });
                     this.container.appendChild(li);
                 });
