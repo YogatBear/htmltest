@@ -64,7 +64,7 @@
         const button = document.querySelector("button");
         
         button.addEventListener("click", function() {
-            makeCall(input.value);
+            makeCall({to: input.value});
         });
 
         window.addEventListener('message', (event) => {
@@ -74,7 +74,7 @@
         });
 
         function makeCall(jsonData) {
-            if (to !== "") {
+            if (jsonData != null) {
                 const connectRequest = {
                     action: "call-attempt",
                     body: jsonData
