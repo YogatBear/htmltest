@@ -8,7 +8,8 @@
     <div id="displayId" style="text-align:center; margin-top:20px; font-size:24px;"></div> <!-- Element to display the 'id' -->
 
     <script>
-
+        
+        const urlParams = new URLSearchParams(window.location.search);
         const identity = urlParams.get('id'); // Get 'id' parameter from URL
 
         class Controller {
