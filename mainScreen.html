@@ -64,16 +64,25 @@
         const button = document.querySelector("button");
         
         button.addEventListener("click", function() {
-            console.log("Calling...", input.value);
-            if (input.value !== "") {
-                const connectRequest = {
-                    action: "call-attempt",
-                    body: {to: input.value}
-                };
-                window.parent.postMessage(connectRequest, '*');
-                controller.call(input.value);
+            makeCall(input.value);
+        });
+
+        window.addEventListener('message', (event) => {
+            if (event.data.action === 'call') {
+                makeCall(event.data.body.to);
             }
         });
+
+        function makeCall(target) {
+            console.log("Calling... ", target);
+            if (to !== "") {
+                const connectRequest = {
+                    action: "call-attempt",
+                    body: {to: target}
+                };
+                window.parent.postMessage(connectRequest, '*');
+            }
+        }
     </script>
 </body>
 </html>

@@ -26,6 +26,7 @@
     <iframe id="screen" src="mainScreen.html"></iframe>
     <script>
 
+        const controller = window.top.controller;
         const channel = new BroadcastChannel('myChannel');
 
         class App {
@@ -54,6 +55,7 @@
             }
             callAttempt(to) {
                 this.setPage('callAttempt', {key:"to",value:to}); // Show call attempt screen
+                controller.call(to);
             }
             callStarted(_with) {
                 this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
