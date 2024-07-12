@@ -38,10 +38,6 @@
                 document.getElementById('error-message').textContent = event.data.message;
             }
         });
-
-        function closeWindow() {
-            window.parent.postMessage({action: 'closeError'}, '*');
-        }
     </script>
 </body>
 </html>

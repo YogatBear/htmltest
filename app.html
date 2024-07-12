@@ -64,11 +64,17 @@
             receivingCall(from) {
                 this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
             }
+
             showError(message) {
                 const errorFrame = document.getElementById('error-frame');
                 errorFrame.style.display = 'block';
                 errorFrame.contentWindow.postMessage({action: 'showError', message: message}, '*');
             }
+            hideError() {
+                const errorFrame = document.getElementById('error-frame');
+                errorFrame.style.display = 'none';
+            }
+            
             dataFetched(jsonData) {
                 console.log('Received raw data:', JSON.stringify(jsonData));
                 const data = JSON.parse(JSON.stringify(jsonData));
@@ -115,6 +121,9 @@
                     break;
                 case 'error':
                     app.showError(body.e);
+                    break;
+                case 'closeError':
+                    app.hideError();
                     break;
                 case 'data-retrieved':
                     app.dataFetched(body);
