@@ -5,13 +5,7 @@
     <title>Native Communication</title>
 </head>
 <body>
-    <div id="displayId" style="text-align:center; margin-top:20px; font-size:24px;"></div> <!-- Element to display the 'id' -->
-
     <script>
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const identity = urlParams.get('id'); // Get 'id' parameter from URL
-
         class Controller {
 
             constructor() {
@@ -24,10 +18,10 @@
             }
 
             sendMessageToNativeApp(jsonData) {
+
                 if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
                     window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
                 } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
-                    console.log(JSON.stringify(jsonData));
                     window.AndroidBridge.processAction(JSON.stringify(jsonData));
                 } else {
                     console.log("Native interface not available");
@@ -40,6 +34,7 @@
                     body: {to: to}
                 };
                 this.sendMessageToNativeApp(callRequest);
+                //this.setPage('ringing'); // Show ringing screen
             }
             acceptCall(from) {
                 const request = {
@@ -47,6 +42,7 @@
                     body: { from: from }
                 };
                 this.sendMessageToNativeApp(request);
+                // this.setPage('inCallScreen'); // Show in-call screen
             }
             rejectCall(from) {
                 const request = {
@@ -54,6 +50,7 @@
                     body: { from: from }
                 };
                 this.sendMessageToNativeApp(request);
+                // this.setPage('mainScreen'); // Show main screen
             }
             store(key, value) {
                 const request = {
@@ -72,14 +69,14 @@
             getLogs() {
                 const request = {
                     action: "get-logs",
-                    body: {from: identity, range: 10}
+                    body: { range: 10}
                 };
                 this.sendMessageToNativeApp(request);
             }
             getRecent() {
                 const request = {
                     action: "get-recent",
-                    body: { from: "test", range: 10 }
+                    body: { range: 10}
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -92,7 +89,6 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             window.top.controller = new Controller();
-            document.getElementById('displayId').textContent = identity ? `ID: ${identity}` : 'ID not provided'; // Display the 'id' or a fallback message
         });
 
     </script>
