@@ -19,16 +19,16 @@
         .container {
             width: 100%;
             max-width: 360px;
-            height: 100vh; /* Adjusted to fill the view height */
+            height: 100vh;
             background: white;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             display: flex;
-            flex-direction: column; /* Stacks children vertically */
+            flex-direction: column;
         }
         input[type="text"], button {
             padding: 10px;
-            margin: 10px 10px 0 10px; /* Updated margin */
+            margin: 10px 10px 0 10px;
             border-radius: 5px;
             width: calc(100% - 20px);
             box-sizing: border-box;
@@ -47,24 +47,44 @@
             background-color: #0056b3;
         }
         iframe {
-            flex-grow: 1; /* Allows iframe to fill the remaining space */
+            flex-grow: 1;
             border: none;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px;
+        }
+        .button-container button {
+            width: calc(50% - 5px);
+            margin: 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <input type="text" placeholder="Enter number">
+        <div class="button-container">
+            <button class="domain-button">.cellact</button>
+            <button class="domain-button">.eth</button>
+        </div>
         <button>Call</button>
         <iframe src="recentCalls.html"></iframe>
     </div>
     <script>
         const controller = window.top.controller;
         const input = document.querySelector("input");
-        const button = document.querySelector("button");
+        const callButton = document.querySelector("button:not(.domain-button)");
+        const domainButtons = document.querySelectorAll(".domain-button");
         
-        button.addEventListener("click", function() {
+        callButton.addEventListener("click", function() {
             makeCall({to: input.value});
+        });
+
+        domainButtons.forEach(button => {
+            button.addEventListener("click", function() {
+                input.value += this.textContent;
+            });
         });
 
         window.addEventListener('message', (event) => {
