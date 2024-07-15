@@ -63,7 +63,7 @@
 </head>
 <body>
     <div class="container">
-        <input type="text" placeholder="Enter number">
+        <input type="text" placeholder="Enter number" id="numberInput">
         <div class="button-container">
             <button class="domain-button">.cellact</button>
             <button class="domain-button">.eth</button>
@@ -73,17 +73,22 @@
     </div>
     <script>
         const controller = window.top.controller;
-        const input = document.querySelector("input");
+        const input = document.querySelector("#numberInput");
         const callButton = document.querySelector("button:not(.domain-button)");
         const domainButtons = document.querySelectorAll(".domain-button");
         
+        // Convert input to lowercase
+        input.addEventListener('input', function(e) {
+            this.value = this.value.toLowerCase();
+        });
+
         callButton.addEventListener("click", function() {
             makeCall({to: input.value});
         });
 
         domainButtons.forEach(button => {
             button.addEventListener("click", function() {
-                input.value += this.textContent;
+                input.value += this.textContent.toLowerCase();
             });
         });
 
