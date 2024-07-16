@@ -88,6 +88,7 @@
     <script>
         const controller = window.top.controller;
         const urlParams = new URLSearchParams(window.location.search);
+        const channel = new BroadcastChannel('myChannel');
         const to = urlParams.get('to');
         if(to){
             document.querySelector("#name").textContent = to;
@@ -119,11 +120,20 @@
             }
         }
 
-        window.addEventListener('message', (event) => {
-            if (event.data.action === 'mute-state') {
-                toggleMute(event.data.body.isMuted);
+        channel.addEventListener('message', this.handleMessage.bind(this));
+
+        handleMessage(event) {
+                try {
+                    const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+                    if (data.isMuted !== undefined) {
+                        console.log("Received mute status:", data.isMuted);
+                        this.toggleMute(data.isMuted);
+                    }
+                } catch (error) {
+                    console.error("Error parsing message data:", error);
+                }
             }
-        });
+       
         
     </script>
 </body>
