@@ -120,20 +120,19 @@
             }
         }
 
-        channel.addEventListener('message', this.handleMessage.bind(this));
+        channel.addEventListener('message', handleMessage.bind(this));
 
-        handleMessage(event) {
-                try {
-                    const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-                    if (data.isMuted !== undefined) {
-                        console.log("Received mute status:", data.isMuted);
-                        this.toggleMute(data.isMuted);
-                    }
-                } catch (error) {
-                    console.error("Error parsing message data:", error);
+        function handleMessage(event) {
+            try {
+                const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+                if (data.isMuted !== undefined) {
+                    console.log("Received mute status:", data.isMuted);
+                    toggleMute(data.isMuted);
                 }
+            } catch (error) {
+                console.error("Error parsing message data:", error);
             }
-       
+        }
         
     </script>
 </body>
