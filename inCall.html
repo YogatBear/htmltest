@@ -102,7 +102,7 @@
 
         const muteButton = document.querySelector("#muteAudio");
         muteButton.addEventListener("click", () => {
-            controller.muteButton(!isMuted);
+            controller.setMute(!isMuted);
         });
         
         function toggleMute(bool) {
