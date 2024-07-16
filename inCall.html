@@ -16,19 +16,37 @@
         }
         .container {
             text-align: center;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         h2 {
+            margin-bottom: 20px;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
             margin-bottom: 20px;
         }
         button {
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
-            background-color: #dc3545;
+            background-color: #007bff;
             color: white;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
         button:hover {
+            background-color: #0056b3;
+        }
+        #hangUp {
+            background-color: #dc3545;
+        }
+        #hangUp:hover {
             background-color: #c82333;
         }
     </style>
@@ -36,7 +54,13 @@
 <body>
     <div class="container">
         <h2>In a call with <span id="name"></span></h2>
-        <button>Hang Up</button>
+        <div class="button-group">
+            <button id="muteAudio">Mute Audio</button>
+            <button id="muteVideo">Mute Video</button>
+            <button id="addParticipant">Add Participant</button>
+            <button id="recordCall">Record Call</button>
+        </div>
+        <button id="hangUp">Hang Up</button>
     </div>
     <script>
         const controller = window.top.controller;
@@ -45,10 +69,19 @@
         if(to){
             document.querySelector("#name").textContent = to;
         }
-        const hangUp = document.querySelector("button")
+        const hangUp = document.querySelector("#hangUp")
         hangUp.addEventListener("click", ()=>{
             controller.rejectCall(to);
         })
+
+        // Placeholder functions for other buttons
+        const buttons = document.querySelectorAll('button:not(#hangUp)');
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                console.log(`${button.textContent} clicked`);
+                // Here you can add actual functionality for each button
+            });
+        });
     </script>
 </body>
 </html>
