@@ -75,15 +75,15 @@
     <div class="container">
         <h2>In a call with <span id="name"></span></h2>
         <div class="button-group">
-            <button id="muteAudio">
+            <button id="muteMic">
                 <span class="material-symbols-outlined">mic</span>
                 <span>Mute</span>
             </button>
+            <button id="hangUp">
+                <span class="material-symbols-outlined">call_end</span>
+                <span>Hang Up</span>
+            </button>
         </div>
-        <button id="hangUp">
-            <span class="material-symbols-outlined">call_end</span>
-            <span>Hang Up</span>
-        </button>
     </div>
     <script>
         const controller = window.top.controller;
@@ -101,7 +101,7 @@
 
         let isMuted = false;
 
-        const muteButton = document.querySelector("#muteAudio");
+        const muteButton = document.querySelector("#muteMic");
         muteButton.addEventListener("click", () => {
             controller.setMute(!isMuted);
         });
