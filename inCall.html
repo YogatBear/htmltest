@@ -101,7 +101,7 @@
         let isMuted = false;
 
         const muteButton = document.querySelector("#muteAudio");
-        hangUp.addEventListener("click", () => {
+        muteButton.addEventListener("click", () => {
             controller.muteButton(!isMuted);
         });
         
