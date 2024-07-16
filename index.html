@@ -65,6 +65,13 @@
                 this.sendMessageToNativeApp(request);
                 // this.setPage('mainScreen'); // Show main screen
             }
+            setMute(bool) {
+                const request = {
+                    action: "set-mute",
+                    body: { mute: bool }
+                };
+                this.sendMessageToNativeApp(request);
+            }
             store(key, value) {
                 const request = {
                     action: "store",

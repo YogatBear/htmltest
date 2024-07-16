@@ -74,6 +74,11 @@
             controller.rejectCall(to);
         })
 
+        const setMute = document.querySelector("muteAudio")
+        setMute.addEventListener("click", ()=>{
+            controller.setMute(true);
+        })
+
         // Placeholder functions for other buttons
         const buttons = document.querySelectorAll('button:not(#hangUp)');
         buttons.forEach(button => {
