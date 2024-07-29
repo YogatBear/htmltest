@@ -85,7 +85,7 @@
             box-sizing: border-box;
             font-size: 16px;
         }
-        input[type="tel"] {
+        input[type="text"] {
             border: 1px solid #ccc;
             flex-grow: 1;
         }
@@ -148,7 +148,7 @@
         const buttonContainer = document.querySelector(".button-container");
 
         // Set initial input type
-        input.inputMode = "numeric";
+        input.inputMode = "tel";
 
         // Convert input to lowercase
         input.addEventListener('input', function(e) {
