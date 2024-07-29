@@ -9,7 +9,7 @@
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: transparent; /* Set the background color to transparent */
+            background-color: transparent;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -23,15 +23,59 @@
             display: flex;
             flex-direction: column;
         }
+        .input-container {
+            display: flex;
+            align-items: center;
+            margin: 10px;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-right: 10px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
         input[type="text"], button {
             padding: 10px;
-            margin: 10px 10px 0 10px;
             border-radius: 5px;
-            width: calc(100% - 20px);
             box-sizing: border-box;
         }
         input[type="text"] {
             border: 1px solid #ccc;
+            flex-grow: 1;
         }
         button {
             border: none;
@@ -39,6 +83,8 @@
             color: white;
             font-size: 16px;
             cursor: pointer;
+            margin: 10px;
+            width: calc(100% - 20px);
         }
         button:hover {
             background-color: #0056b3;
@@ -60,7 +106,13 @@
 </head>
 <body>
     <div class="container">
-        <input type="text" placeholder="Enter number" id="numberInput">
+        <div class="input-container">
+            <label class="toggle-switch">
+                <input type="checkbox" id="keyboardToggle">
+                <span class="slider"></span>
+            </label>
+            <input type="text" placeholder="Enter number" id="numberInput">
+        </div>
         <div class="button-container">
             <button class="domain-button">.cellact</button>
             <button class="domain-button">.eth</button>
@@ -73,7 +125,12 @@
         const input = document.querySelector("#numberInput");
         const callButton = document.querySelector("button:not(.domain-button)");
         const domainButtons = document.querySelectorAll(".domain-button");
-        
+        const keyboardToggle = document.querySelector("#keyboardToggle");
+        const buttonContainer = document.querySelector(".button-container");
+
+        // Set initial input type
+        input.inputMode = "numeric";
+
         // Convert input to lowercase
         input.addEventListener('input', function(e) {
             this.value = this.value.toLowerCase();
@@ -87,6 +144,16 @@
             button.addEventListener("click", function() {
                 input.value += this.textContent.toLowerCase();
             });
+        });
+
+        keyboardToggle.addEventListener("change", function() {
+            if (this.checked) {
+                input.inputMode = "text";
+                buttonContainer.style.display = "flex";
+            } else {
+                input.inputMode = "numeric";
+                buttonContainer.style.display = "none";
+            }
         });
 
         window.addEventListener('message', (event) => {
