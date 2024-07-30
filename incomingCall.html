@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incoming Call</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .accept {
+            background-color: #28a745;
+            color: white;
+        }
+        .accept:hover {
+            background-color: #218838;
+        }
+        .reject {
+            background-color: #dc3545;
+            color: white;
+        }
+        .reject:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Incoming call</h2>
+        <h2 id="name"></h2>
+        <div class="buttons">
+            <button class="accept">Accept</button>
+            <button class="reject">Reject</button>
+        </div>
+    </div>
+    <script>
+        const controller = window.top.controller;
+        const urlParams = new URLSearchParams(window.location.search);
+        const from = urlParams.get('from');
+        if(from){
+            document.querySelector("#name").textContent = from;
+        }
+        const acceptButton = document.querySelector(".accept")
+        const rejectButton = document.querySelector(".reject")
+
+        acceptButton.addEventListener("click", ()=>{
+            controller.acceptCall(from);
+        })
+        rejectButton.addEventListener("click", ()=>{
+            controller.rejectCall(from);
+        })
+    </script>
+</body>
+</html>

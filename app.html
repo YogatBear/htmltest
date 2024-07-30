@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background-color: #ffffff;
+            margin: 0;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <iframe id="screen" src="mainScreen.html" frameBorder="0" style="width:100%; height:100vh;"></iframe>
+    <script>
+
+        const controller = window.top.controller;
+        const channel = new BroadcastChannel('myChannel');
+
+        class App {
+            constructor(ens, main, ringing, callAttempt, inCall, incomingCall) {
+                this.ens = ens;
+                this.urls = {
+                    "main": main,
+                    "ringing": ringing,
+                    "callAttempt": callAttempt,
+                    "inCall": inCall,
+                    "incomingCall": incomingCall
+                };
+                this.setPage('main'); // Set initial page
+            }
+
+            setPage(pageId, param = {}) {
+                const iframe = document.getElementById("screen");
+                iframe.src = this.urls[pageId];
+                if (Object.keys(param).length > 0) {
+                    iframe.src += `?${param.key}=${param.value}`;
+                }
+            }
+
+            ring(to) {
+                this.setPage('ringing', {key:"to",value:to}); // Show ringing screen
+            }
+            callAttempt(to) {
+                this.setPage('callAttempt', {key:"to",value:to}); // Show call attempt screen
+                controller.call(to);
+            }
+            callStarted(_with) {
+                this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
+            }
+            callEnded() {
+                this.setPage('main'); // End call logic and show main screen
+            }
+            receivingCall(from) {
+                this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
+            }
+
+            showError(message) {
+                const errorFrame = document.getElementById('error-frame');
+                errorFrame.style.display = 'block';
+                errorFrame.contentWindow.postMessage({action: 'showError', message: message}, '*');
+            }
+            hideError() {
+                const errorFrame = document.getElementById('error-frame');
+                errorFrame.style.display = 'none';
+            }
+            
+            dataFetched(jsonData) {
+                console.log('Received raw data:', JSON.stringify(jsonData));
+                const data = JSON.parse(JSON.stringify(jsonData));
+                try {
+                    channel.postMessage(data);
+                } catch (error) {
+                    console.error("Error parsing JSON or processing data:", error);
+                }
+            }
+
+            muteState(jsonData) {
+                console.log('Received mute state data:', JSON.stringify(jsonData));
+                const data = JSON.parse(JSON.stringify(jsonData));
+                try {
+                    channel.postMessage(data);
+                } catch (error) {
+                    console.error("Error parsing JSON or processing data:", error);
+                }
+            }
+        }
+
+        const app = new App(
+            "test.eth",
+            "https://htmltest-theta.vercel.app/mainScreen.html",
+            "https://htmltest-theta.vercel.app/ringing.html",
+            "https://htmltest-theta.vercel.app/callattempt.html",
+            "https://htmltest-theta.vercel.app/inCall.html",
+            "https://htmltest-theta.vercel.app/incomingCall.html"
+        );
+
+        window.app = app;
+
+        window.addEventListener('message', (event) => {
+            console.log('Received message:', event.data);
+            const data = event.data;
+            const action = data.action;
+            const body = data.body;
+
+            switch (action) {
+                case 'ringing':
+                    app.ring(body.to);
+                    break;
+                case 'call-attempt':
+                    app.callAttempt(body.to);
+                    break;
+                case 'call-started':
+                    app.callStarted(body.from);
+                    break;
+                case 'call-ended':
+                    app.callEnded(body.from);
+                    break;
+                case 'receiving-call':
+                    app.receivingCall(body.from);
+                    break;
+                case 'error':
+                    app.showError(body.e);
+                    break;
+                case 'close-error':
+                    app.hideError();
+                    break;
+                case 'data-retrieved':
+                    app.dataFetched(body);
+                    break;
+                case 'mute-state':
+                    app.muteState(body)
+                default:
+                    console.log('Unknown action:', action);
+                    break;
+            }
+        });
+    </script>
+    <iframe id="error-frame" src="errorWindow.html" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;"></iframe>
+</body>
+</html>

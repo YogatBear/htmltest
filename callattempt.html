@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CallAttempt</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #dc3545;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Attempting to call <span id="name"></span></h2>
+        <button>Hang Up</button>
+    </div>
+    <script>
+        const controller = window.top.controller;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const to = urlParams.get('to');
+        if(to){
+            document.querySelector("#name").textContent = to;
+        }
+        document.querySelector("button").addEventListener("click", ()=>{
+            controller.rejectCall(to);
+        })      
+    </script>
+</body>
+</html>
