@@ -138,9 +138,9 @@
         }
 
         function toggleSpeaker(bool) {
-            isToggled = bool;
+            speakerOn = bool;
 
-            if (isToggled) {
+            if (speakerOn) {
                 speakerButton.classList.add('toggled');
                 speakerButton.querySelector('.material-symbols-outlined').textContent = 'volume_off';
             } else {
