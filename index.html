@@ -71,6 +71,13 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+            toggleSpeaker(bool) {
+                const request = {
+                    action: "toggle-speaker",
+                    body: { speaker: bool }
+                };
+                this.sendMessageToNativeApp(request);
+            }
             store(key, value) {
                 const request = {
                     action: "store",

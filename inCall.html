@@ -68,7 +68,11 @@
         #hangUp:hover {
             background-color: #c82333;
         }
-        .muted {
+        .toggled {
+            background-color: #007bff !important;
+            color: white !important;
+        }
+        .disabled {
             background-color: #dc3545 !important;
             color: white !important;
         }
@@ -82,9 +86,13 @@
                 <span class="material-symbols-outlined">mic</span>
                 <span>Mute</span>
             </button>
+            <button id="toggleSpeaker">
+                <span class="material-symbols-outlined">volume_off</span>
+                <span>Mute</span>
+            </button>
             <button id="hangUp">
                 <span class="material-symbols-outlined">call_end</span>
-                <span>Hang Up</span>
+                <span>Toggle Speaker</span>
             </button>
         </div>
     </div>
@@ -103,23 +111,43 @@
         });
 
         let isMuted = false;
+        let speakerOn = false;
 
         const muteButton = document.querySelector("#muteMic");
         muteButton.addEventListener("click", () => {
             controller.setMute(!isMuted);
+        });
+
+        const speakerButton = document.querySelector("#toggleSpeaker");
+        speakerButton.addEventListener("click", () => {
+            controller.toggleSpeaker(!speakerOn);
         });
         
         function toggleMute(bool) {
             isMuted = bool;
 
             if (isMuted) {
-                muteButton.classList.add('muted');
+                muteButton.classList.add('disabled');
                 muteButton.querySelector('.material-symbols-outlined').textContent = 'mic_off';
                 muteButton.querySelector('span:not(.material-symbols-outlined)').textContent = 'Unmute';
             } else {
-                muteButton.classList.remove('muted');
+                muteButton.classList.remove('disabled');
                 muteButton.querySelector('.material-symbols-outlined').textContent = 'mic';
                 muteButton.querySelector('span:not(.material-symbols-outlined)').textContent = 'Mute';
+            }
+        }
+
+        function toggleSpeaker(bool) {
+            isToggled = bool;
+
+            if (isToggled) {
+                speakerButton.classList.add('toggled');
+                speakerButton.querySelector('.material-symbols-outlined').textContent = 'volume_off';
+                speakerButton.querySelector('span:not(.material-symbols-outlined)').textContent = 'Enable';
+            } else {
+                speakerButton.classList.remove('toggled');
+                speakerButton.querySelector('.material-symbols-outlined').textContent = 'volume_up';
+                speakerButton.querySelector('span:not(.material-symbols-outlined)').textContent = 'Disable';
             }
         }
 
@@ -128,12 +156,17 @@
         function handleMessage(event) {
             try {
                 const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-                if (data.isMuted !== undefined) {
-                    console.log("Received mute status:", data.isMuted);
+                if (data.mute !== undefined) {
+                    console.log("Received mute status:", data.mute);
                     toggleMute(data.isMuted);
                 }
+
+                if (data.speaker !== undefined) {
+                    console.log("Received speaker status:", data.speaker);
+                    toggleSpeaker(data.isSpeakerOn);
+                }
             } catch (error) {
-                console.error("Error parsing message data:", error);
+                console.error("Error parsing message data:", error)
             }
         }
         
