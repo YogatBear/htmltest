@@ -88,11 +88,11 @@
             </button>
             <button id="toggleSpeaker">
                 <span class="material-symbols-outlined">volume_off</span>
-                <span>Mute</span>
+                <span>Toggle Speaker</span>
             </button>
             <button id="hangUp">
                 <span class="material-symbols-outlined">call_end</span>
-                <span>Toggle Speaker</span>
+                <span>Hang Up</span>
             </button>
         </div>
     </div>
@@ -143,11 +143,9 @@
             if (isToggled) {
                 speakerButton.classList.add('toggled');
                 speakerButton.querySelector('.material-symbols-outlined').textContent = 'volume_off';
-                speakerButton.querySelector('span:not(.material-symbols-outlined)').textContent = 'Enable';
             } else {
                 speakerButton.classList.remove('toggled');
                 speakerButton.querySelector('.material-symbols-outlined').textContent = 'volume_up';
-                speakerButton.querySelector('span:not(.material-symbols-outlined)').textContent = 'Disable';
             }
         }
 
@@ -158,12 +156,12 @@
                 const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
                 if (data.mute !== undefined) {
                     console.log("Received mute status:", data.mute);
-                    toggleMute(data.isMuted);
+                    toggleMute(data.mute);
                 }
 
                 if (data.speaker !== undefined) {
                     console.log("Received speaker status:", data.speaker);
-                    toggleSpeaker(data.isSpeakerOn);
+                    toggleSpeaker(data.speaker);
                 }
             } catch (error) {
                 console.error("Error parsing message data:", error)
