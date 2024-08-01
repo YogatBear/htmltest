@@ -106,6 +106,12 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+            getAudioDevices() {
+                const request = {
+                    action: "get-audio-devices",
+                };
+                this.sendMessageToNativeApp(request);
+            }
 
             receiveMessage(event) {
                 const { action, body} = event.data;
