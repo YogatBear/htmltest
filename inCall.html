@@ -220,11 +220,11 @@
             holdStatus = bool;
 
             if (holdStatus) {
-                muteButton.classList.add('toggled');
-                muteButton.querySelector('span:not(.material-symbols-outlined)').textContent = 'Unhold';
+                holdButton.classList.add('toggled');
+                holdButton.querySelector('span:not(.material-symbols-outlined)').textContent = 'Unhold';
             } else {
-                muteButton.classList.remove('disabled');
-                muteButton.querySelector('span:not(.material-symbols-outlined)').textContent = 'Hold';
+                holdButton.classList.remove('toggled');
+                holdButton.querySelector('span:not(.material-symbols-outlined)').textContent = 'Hold';
             }
         }
        
