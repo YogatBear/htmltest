@@ -122,6 +122,9 @@
             <div id="audioDevicesDropdown" style="display: none;">
                 <ul id="deviceList"></ul>
             </div>
+            <button id="toggleHold">
+                <span class="material-symbols-outlined">pause</span>
+                <span>Hold</span>
             <button id="hangUp">
                 <span class="material-symbols-outlined">call_end</span>
                 <span>Hang Up</span>
@@ -204,6 +207,27 @@
             }
         }
 
+        let holdStatus = false;
+
+        const holdButton = document.querySelector("#toggleHold");
+        speakerButton.addEventListener("click", () => {
+            controller.setHold(!holdStatus);
+        });
+
+        function togglHold(bool) {
+
+            holdStatus = bool;
+
+            if (holdStatus) {
+                muteButton.classList.add('toggled');
+                muteButton.querySelector('span:not(.material-symbols-outlined)').textContent = 'Unhold';
+            } else {
+                muteButton.classList.remove('disabled');
+                muteButton.querySelector('span:not(.material-symbols-outlined)').textContent = 'Hold';
+            }
+        }
+       
+
         channel.addEventListener('message', handleMessage.bind(this));
 
         function handleMessage(event) {
@@ -213,6 +237,12 @@
                     console.log("Received mute status:", data.mute);
                     toggleMute(data.mute);
                 }
+
+                if (data.hold !== undefined) {
+                    console.log("Received hold status:", data.hold);
+                    toggleHold(data.hold);
+                }
+
 
                 if (data.audioDevices !== undefined) {
                     console.log("Received audio devices:", data.audioDevices);
