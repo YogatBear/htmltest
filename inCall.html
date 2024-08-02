@@ -211,11 +211,11 @@
         let holdStatus = false;
 
         const holdButton = document.querySelector("#toggleHold");
-        speakerButton.addEventListener("click", () => {
+        holdButton.addEventListener("click", () => {
             controller.setHold(!holdStatus);
         });
 
-        function togglHold(bool) {
+        function toggleHold(bool) {
 
             holdStatus = bool;
 
