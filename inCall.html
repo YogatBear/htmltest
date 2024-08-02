@@ -76,6 +76,35 @@
             background-color: #dc3545 !important;
             color: white !important;
         }
+        #audioDevicesDropdown {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        #deviceList {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #deviceList li {
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        #deviceList li:hover {
+            background-color: #f0f0f0;
+        }
+
+        #deviceList .material-symbols-outlined {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -86,10 +115,13 @@
                 <span class="material-symbols-outlined">mic</span>
                 <span>Mute</span>
             </button>
-            <button id="toggleSpeaker">
-                <span class="material-symbols-outlined">volume_off</span>
-                <span>Toggle Speaker</span>
+            <button id="audioDevices">
+                <span class="material-symbols-outlined">speaker</span>
+                <span>Audio Devices</span>
             </button>
+            <div id="audioDevicesDropdown" style="display: none;">
+                <ul id="deviceList"></ul>
+            </div>
             <button id="hangUp">
                 <span class="material-symbols-outlined">call_end</span>
                 <span>Hang Up</span>
@@ -111,18 +143,12 @@
         });
 
         let isMuted = false;
-        let speakerOn = false;
 
         const muteButton = document.querySelector("#muteMic");
         muteButton.addEventListener("click", () => {
             controller.setMute(!isMuted);
         });
 
-        const speakerButton = document.querySelector("#toggleSpeaker");
-        speakerButton.addEventListener("click", () => {
-            controller.toggleSpeaker(!speakerOn);
-        });
-        
         function toggleMute(bool) {
             isMuted = bool;
 
@@ -137,15 +163,44 @@
             }
         }
 
-        function toggleSpeaker(bool) {
-            speakerOn = bool;
+        let audioDevices = {};
+        const audioDevicesButton = document.querySelector("#audioDevices");
+        const audioDevicesDropdown = document.querySelector("#audioDevicesDropdown");
+        const deviceList = document.querySelector("#deviceList");
 
-            if (speakerOn) {
-                speakerButton.classList.add('toggled');
-                speakerButton.querySelector('.material-symbols-outlined').textContent = 'volume_off';
-            } else {
-                speakerButton.classList.remove('toggled');
-                speakerButton.querySelector('.material-symbols-outlined').textContent = 'volume_up';
+        controller.getAudioDevices();
+
+        audioDevicesButton.addEventListener("click", () => {
+            audioDevicesDropdown.style.display = audioDevicesDropdown.style.display === "none" ? "block" : "none";
+        });
+
+        function updateAudioDevices(devices) {
+            audioDevices = devices;
+            deviceList.innerHTML = "";
+            for (const [key, value] of Object.entries(devices)) {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <span class="material-symbols-outlined">${getIconForDevice(value)}</span>
+                    <span>${value}</span>
+                `;
+                li.addEventListener("click", () => {
+                    controller.changeAudioDevice(parseInt(key));
+                    audioDevicesDropdown.style.display = "none";
+                });
+                deviceList.appendChild(li);
+            }
+        }
+
+        function getIconForDevice(deviceName) {
+            switch(deviceName.toUpperCase()) {
+                case "EARPIECE":
+                    return "hearing";
+                case "SPEAKER":
+                    return "volume_up";
+                case "BLUETOOTH":
+                    return "bluetooth";
+                default:
+                    return "speaker";
             }
         }
 
@@ -159,9 +214,9 @@
                     toggleMute(data.mute);
                 }
 
-                if (data.speaker !== undefined) {
-                    console.log("Received speaker status:", data.speaker);
-                    toggleSpeaker(data.speaker);
+                if (data.audioDevices !== undefined) {
+                    console.log("Received audio devices:", data.audioDevices);
+                    updateAudioDevices(data.audioDevices);
                 }
             } catch (error) {
                 console.error("Error parsing message data:", error)
