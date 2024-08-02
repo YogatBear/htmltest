@@ -115,7 +115,7 @@
             }
             changeAudioDevice(deviceId) {
                 const request = {
-                    action: "change-audio-device",
+                    action: "set-audio-device",
                     body: { deviceId: deviceId }
                 };
                 this.sendMessageToNativeApp(request);
