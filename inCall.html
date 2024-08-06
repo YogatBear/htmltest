@@ -110,6 +110,7 @@
 <body>
     <div class="container">
         <h2>In a call with <span id="name"></span></h2>
+        <p id="remoteHoldText" style="display: none; color: #595353;">On Hold</p>
         <div class="button-group">
             <button id="muteMic">
                 <span class="material-symbols-outlined">mic</span>
@@ -215,7 +216,7 @@
             controller.setHold(!holdStatus);
         });
 
-        function toggleHold(bool) {
+        function toggleLocalHold(bool) {
 
             holdStatus = bool;
 
@@ -227,8 +228,17 @@
                 holdButton.querySelector('span:not(.material-symbols-outlined)').textContent = 'Hold';
             }
         }
-       
 
+        function toggleRemoteHold(bool) {
+            remoteHoldStatus = bool;
+            
+            if (remoteHoldStatus) {
+                remoteHoldText.style.display = "block";
+            } else {
+                remoteHoldText.style.display = "none";
+            }
+        }
+       
         channel.addEventListener('message', handleMessage.bind(this));
 
         function handleMessage(event) {
@@ -239,11 +249,15 @@
                     toggleMute(data.mute);
                 }
 
-                if (data.hold !== undefined) {
-                    console.log("Received hold status:", data.hold);
-                    toggleHold(data.hold);
+                if (data.localHold !== undefined) {
+                    console.log("Received hold status:", data.localHold);
+                    toggleLocalHold(data.localHold);
                 }
 
+                if (data.remoteHold !== undefined) {
+                    console.log("Received hold status:", data.remoteHold);
+                    toggleRemoteHold(data.localHold);
+                }
 
                 if (data.audioDevices !== undefined) {
                     console.log("Received audio devices:", data.audioDevices);

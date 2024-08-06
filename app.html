@@ -133,7 +133,10 @@
                 case 'mute-state':
                     app.dataFetched(body);
                     break;
-                 case 'hold-state':
+                case 'local-hold-state':
+                    app.dataFetched(body);
+                    break;
+                case 'remote-hold-state':
                     app.dataFetched(body);
                     break;
                 case 'speaker-state':
