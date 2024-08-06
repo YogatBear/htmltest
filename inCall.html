@@ -256,7 +256,7 @@
 
                 if (data.remoteHold !== undefined) {
                     console.log("Received hold status:", data.remoteHold);
-                    toggleRemoteHold(data.localHold);
+                    toggleRemoteHold(data.remoteHold);
                 }
 
                 if (data.audioDevices !== undefined) {
