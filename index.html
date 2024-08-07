@@ -127,6 +127,13 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+            sendDtmf(digit) {
+                const request = {
+                    action: "send-dtmf",
+                    body: { digit: digit }
+                };
+                this.sendMessageToNativeApp(request);
+            }
 
             receiveMessage(event) {
                 const { action, body} = event.data;
