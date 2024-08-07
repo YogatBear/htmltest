@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In-Call Dialer</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .dialer-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        #dialerGrid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .dialerButton {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            border: none;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .dialerButton:hover {
+            background-color: #e0e0e0;
+        }
+        #closeDialer {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #closeDialer:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="dialer-container">
+        <h3>In-Call Dialer</h3>
+        <div id="dialerGrid">
+            <button class="dialerButton">1</button>
+            <button class="dialerButton">2</button>
+            <button class="dialerButton">3</button>
+            <button class="dialerButton">4</button>
+            <button class="dialerButton">5</button>
+            <button class="dialerButton">6</button>
+            <button class="dialerButton">7</button>
+            <button class="dialerButton">8</button>
+            <button class="dialerButton">9</button>
+            <button class="dialerButton">*</button>
+            <button class="dialerButton">0</button>
+            <button class="dialerButton">#</button>
+        </div>
+        <button id="closeDialer">Close</button>
+    </div>
+
+    <script>
+        const dialerButtons = document.querySelectorAll(".dialerButton");
+        const closeDialer = document.getElementById("closeDialer");
+        const controller = window.top.controller;
+
+        dialerButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                const digit = button.textContent;
+                controller.sendDtmf(digit);
+            });
+        });
+
+        closeDialer.addEventListener("click", () => {
+            window.parent.postMessage('closeDialer', '*');
+        });
+    </script>
+</body>
+</html>

@@ -127,10 +127,17 @@
                 <span class="material-symbols-outlined">pause</span>
                 <span>Hold</span>
             </button>
+            <button id="dialerButton">
+                <span class="material-symbols-outlined">dialpad</span>
+                <span>Dialer</span>
+            </button>
             <button id="hangUp">
                 <span class="material-symbols-outlined">call_end</span>
                 <span>Hang Up</span>
             </button>
+        </div>
+        <div id="dialerContainer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
+            <iframe id="dialerFrame" src="" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; height: 400px; border: none; border-radius: 10px;"></iframe>
         </div>
     </div>
     <script>
@@ -267,6 +274,22 @@
                 console.error("Error parsing message data:", error)
             }
         }
+
+        const dialerButton = document.getElementById('dialerButton');
+        const dialerContainer = document.getElementById('dialerContainer');
+        const dialerFrame = document.getElementById('dialerFrame');
+
+        dialerButton.addEventListener('click', () => {
+            dialerFrame.src = 'dialer.html';  // Make sure this path is correct
+            dialerContainer.style.display = 'block';
+        });
+
+        window.addEventListener('message', (event) => {
+            if (event.data === 'closeDialer') {
+                dialerContainer.style.display = 'none';
+                dialerFrame.src = '';
+            }
+        });
         
     </script>
 </body>
