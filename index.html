@@ -92,10 +92,10 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
-            setActiveCall(call) {
+            setActiveCall(contact) {
                 const request = {
                     action: "set-active-call",
-                    body: {call: call}
+                    body: {contact: contact}
                 };
                 this.sendMessageToNativeApp(request);
             }
