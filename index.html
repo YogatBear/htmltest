@@ -85,6 +85,20 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+            getHeldCalls() {
+                const request = {
+                    action: "get-held-calls",
+                    body: {}
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            setActiveCall(call) {
+                const request = {
+                    action: "set-active-call",
+                    body: {call: call}
+                };
+                this.sendMessageToNativeApp(request);
+            }
             store(key, value) {
                 const request = {
                     action: "store",

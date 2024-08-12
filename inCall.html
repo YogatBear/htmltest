@@ -105,12 +105,39 @@
         #deviceList .material-symbols-outlined {
             margin-right: 10px;
         }
+
+        #heldCallsContainer {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        #heldCallsList {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #heldCallsList li {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #heldCallsList li:hover {
+            background-color: #e0e0e0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>In a call with <span id="name"></span></h2>
         <p id="remoteHoldText" style="display: none; color: #595353;">On Hold</p>
+        <div id="heldCallsContainer" style="display: none;">
+            <h3>Held Calls</h3>
+            <ul id="heldCallsList"></ul>
+        </div>
         <div class="button-group">
             <button id="muteMic">
                 <span class="material-symbols-outlined">mic</span>
@@ -148,6 +175,31 @@
         if(to){
             document.querySelector("#name").textContent = to;
         }
+
+
+        const heldCallsContainer = document.getElementById('heldCallsContainer');
+        const heldCallsList = document.getElementById('heldCallsList');
+
+        controller.getHeldCalls();
+
+        function updateHeldCallsList(heldCalls) {
+            heldCallsList.innerHTML = '';
+            
+            if (heldCalls.length > 0) {
+                heldCallsContainer.style.display = 'block';
+                heldCalls.forEach(call => {
+                    const li = document.createElement('li');
+                    li.textContent = call;
+                    li.addEventListener('click', () => {
+                        controller.setActiveCall(call);
+                    });
+                    heldCallsList.appendChild(li);
+                });
+            } else {
+                heldCallsContainer.style.display = 'none';
+            }
+        }
+
         
         const hangUp = document.querySelector("#hangUp");
         hangUp.addEventListener("click", () => {
@@ -270,6 +322,12 @@
                     console.log("Received audio devices:", data.audioDevices);
                     updateAudioDevices(data.audioDevices);
                 }
+
+                if (data.heldCalls !== undefined) {
+                    console.log("Received held calls:", data.heldCalls);
+                    updateHeldCallsList(data.heldCalls);
+                }
+
             } catch (error) {
                 console.error("Error parsing message data:", error)
             }
