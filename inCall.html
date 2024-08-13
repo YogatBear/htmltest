@@ -272,7 +272,7 @@
 
         const holdButton = document.querySelector("#toggleHold");
         holdButton.addEventListener("click", () => {
-            controller.setHold(!holdStatus);
+            controller.setHold(to, !holdStatus);
         });
 
         function toggleLocalHold(bool) {
