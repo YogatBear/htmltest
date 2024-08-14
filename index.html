@@ -71,13 +71,10 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
-            setHold(to, bool) {
+            setHold(bool) {
                 const request = {
                     action: "set-hold",
-                    body: { 
-                        contact: to,
-                        hold: bool 
-                    }
+                    body: { hold: bool }
                 };
                 this.sendMessageToNativeApp(request);
             }
