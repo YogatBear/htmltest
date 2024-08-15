@@ -172,8 +172,8 @@
         const urlParams = new URLSearchParams(window.location.search);
         const channel = new BroadcastChannel('myChannel');
         const callId = urlParams.get('to');
-        if(to){
-            document.querySelector("#name").textContent = to;
+        if(callId){
+            document.querySelector("#name").textContent = callId;
         }
 
 
