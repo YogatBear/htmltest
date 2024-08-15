@@ -180,20 +180,22 @@
         const heldCallsContainer = document.getElementById('heldCallsContainer');
         const heldCallsList = document.getElementById('heldCallsList');
 
-        controller.getHeldCalls();
+        controller.getActiveCalls();
 
-        function updateHeldCallsList(heldCalls) {
+        function updateHeldCallsList(activeCalls) {
             heldCallsList.innerHTML = '';
             
-            if (heldCalls.length > 0) {
+            if (activeCalls.length > 0) {
                 heldCallsContainer.style.display = 'block';
-                heldCalls.forEach(call => {
-                    const li = document.createElement('li');
-                    li.textContent = call;
-                    li.addEventListener('click', () => {
-                        controller.setActiveCall(call);
-                    });
-                    heldCallsList.appendChild(li);
+                activeCalls.forEach(call => {
+                    if (call != callId) {
+                        const li = document.createElement('li');
+                        li.textContent = call;
+                        li.addEventListener('click', () => {
+                            controller.setActiveCall(call);
+                        });
+                        heldCallsList.appendChild(li);
+                    }
                 });
             } else {
                 heldCallsContainer.style.display = 'none';
@@ -323,9 +325,9 @@
                     updateAudioDevices(data.audioDevices);
                 }
 
-                if (data.heldCalls !== undefined) {
-                    console.log("Received held calls:", data.heldCalls);
-                    updateHeldCallsList(data.heldCalls);
+                if (data.activeCalls !== undefined) {
+                    console.log("Received held calls:", data.activeCalls);
+                    updateHeldCallsList(data.activeCalls);
                 }
 
             } catch (error) {
