@@ -250,7 +250,7 @@
                     <span>${value}</span>
                 `;
                 li.addEventListener("click", () => {
-                    controller.changeAudioDevice(parseInt(key));
+                    controller.changeAudioDevice(callId, parseInt(key));
                     audioDevicesDropdown.style.display = "none";
                 });
                 deviceList.appendChild(li);

@@ -133,10 +133,13 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
-            changeAudioDevice(deviceId) {
+            changeAudioDevice(callId, deviceId) {
                 const request = {
                     action: "set-audio-device",
-                    body: { deviceId: deviceId }
+                    body: { 
+                        callId: callId,
+                        deviceId: deviceId 
+                    }
                 };
                 this.sendMessageToNativeApp(request);
             }
