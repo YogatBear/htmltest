@@ -91,10 +91,10 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
-            setActiveCall(contact) {
+            setActiveCall(callId) {
                 const request = {
                     action: "set-active-call",
-                    body: {contact: contact}
+                    body: {callId: callId}
                 };
                 this.sendMessageToNativeApp(request);
             }
