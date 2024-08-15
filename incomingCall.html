@@ -59,7 +59,7 @@
     <script>
         const controller = window.top.controller;
         const urlParams = new URLSearchParams(window.location.search);
-        const from = urlParams.get('from');
+        const callId = urlParams.get('from');
         if(from){
             document.querySelector("#name").textContent = from;
         }
@@ -67,10 +67,10 @@
         const rejectButton = document.querySelector(".reject")
 
         acceptButton.addEventListener("click", ()=>{
-            controller.acceptCall(from);
+            controller.acceptCall(callId);
         })
         rejectButton.addEventListener("click", ()=>{
-            controller.rejectCall(from);
+            controller.rejectCall(callId);
         })
     </script>
 </body>

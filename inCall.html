@@ -171,7 +171,7 @@
         const controller = window.top.controller;
         const urlParams = new URLSearchParams(window.location.search);
         const channel = new BroadcastChannel('myChannel');
-        const to = urlParams.get('to');
+        const callId = urlParams.get('to');
         if(to){
             document.querySelector("#name").textContent = to;
         }
@@ -203,14 +203,14 @@
         
         const hangUp = document.querySelector("#hangUp");
         hangUp.addEventListener("click", () => {
-            controller.rejectCall(to);
+            controller.rejectCall(callId);
         });
 
         let isMuted = false;
 
         const muteButton = document.querySelector("#muteMic");
         muteButton.addEventListener("click", () => {
-            controller.setMute(!isMuted);
+            controller.setMute(callId, !isMuted);
         });
 
         function toggleMute(bool) {
@@ -272,7 +272,7 @@
 
         const holdButton = document.querySelector("#toggleHold");
         holdButton.addEventListener("click", () => {
-            controller.setHold(!holdStatus);
+            controller.setHold(callId, !holdStatus);
         });
 
         function toggleLocalHold(bool) {

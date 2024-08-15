@@ -48,40 +48,39 @@
                 this.sendMessageToNativeApp(callRequest);
                 //this.setPage('ringing'); // Show ringing screen
             }
-            acceptCall(from) {
+            acceptCall(callId) {
                 const request = {
                     action: "accept-call",
-                    body: { from: from }
+                    body: { callId: callId }
                 };
                 this.sendMessageToNativeApp(request);
                 // this.setPage('inCallScreen'); // Show in-call screen
             }
-            rejectCall(from) {
+            rejectCall(callId) {
                 const request = {
                     action: "reject-call",
-                    body: { from: from }
+                    body: { callId: callId }
                 };
                 this.sendMessageToNativeApp(request);
                 // this.setPage('mainScreen'); // Show main screen
             }
-            setMute(bool) {
+            setMute(callId, bool) {
                 const request = {
                     action: "set-mute",
-                    body: { mute: bool }
+                    body: { 
+                        callId: callId,
+                        mute: bool
+                     }
                 };
                 this.sendMessageToNativeApp(request);
             }
-            setHold(bool) {
+            setHold(callId, bool) {
                 const request = {
                     action: "set-hold",
-                    body: { hold: bool }
-                };
-                this.sendMessageToNativeApp(request);
-            }
-            toggleSpeaker(bool) {
-                const request = {
-                    action: "toggle-speaker",
-                    body: { speaker: bool }
+                    body: { 
+                        callId: callId,
+                        hold: bool 
+                    }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -141,10 +140,13 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
-            sendDtmf(digit) {
+            sendDtmf(callId, digit) {
                 const request = {
                     action: "send-dtmf",
-                    body: { digit: digit }
+                    body: { 
+                        callId: callId,
+                        digit: digit 
+                    }
                 };
                 this.sendMessageToNativeApp(request);
             }
