@@ -66,10 +66,13 @@
         const dialerButtons = document.querySelectorAll(".dialerButton");
         const controller = window.top.controller;
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const callId = urlParams.get('callId');
+
         dialerButtons.forEach(button => {
             button.addEventListener("click", () => {
                 const digit = button.textContent;
-                controller.sendDtmf(digit);
+                controller.sendDtmf(callId, digit);
             });
         });
     </script>
