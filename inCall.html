@@ -151,7 +151,7 @@
                 </button>
             </div>
             <div id="dialerContainer">
-                <iframe id="dialerFrame" src="dialer.html?callId=${callId}"></iframe>
+                <iframe id="dialerFrame"></iframe>
             </div>
             <div class="button-row">
                 <button class="call-button" id="dialerButton">
@@ -182,6 +182,12 @@
         const urlParams = new URLSearchParams(window.location.search);
         const channel = new BroadcastChannel('myChannel');
         const callId = urlParams.get('to');
+
+        if (callId) {
+            const encodedCallId = encodeURIComponent(callId);
+            const iframeUrl = `dialer.html?callId=${encodedCallId}`;
+            document.getElementById('dialerFrame').src = iframeUrl;
+        }
 
         const phoneNumberElement = document.getElementById('phoneNumber');
         const callDurationElement = document.getElementById('callDuration');
