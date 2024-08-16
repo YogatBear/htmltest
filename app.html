@@ -86,25 +86,15 @@
                     console.error("Error parsing JSON or processing data:", error);
                 }
             }
-
-            muteState(jsonData) {
-                console.log('Received mute state data:', JSON.stringify(jsonData));
-                const data = JSON.parse(JSON.stringify(jsonData));
-                try {
-                    channel.postMessage(data);
-                } catch (error) {
-                    console.error("Error parsing JSON or processing data:", error);
-                }
-            }
         }
 
         const app = new App(
             "test.eth",
-            "https://htmltest-thetb.vercel.app/mainScreen.html",
-            "https://htmltest-thetb.vercel.app/ringing.html",
-            "https://htmltest-thetb.vercel.app/callattempt.html",
-            "https://htmltest-thetb.vercel.app/inCall.html",
-            "https://htmltest-thetb.vercel.app/incomingCall.html"
+            "https://htmltest-theta.vercel.app/mainScreen.html",
+            "https://htmltest-theta.vercel.app/ringing.html",
+            "https://htmltest-theta.vercel.app/callattempt.html",
+            "https://htmltest-theta.vercel.app/inCall.html",
+            "https://htmltest-theta.vercel.app/incomingCall.html"
         );
 
         window.app = app;
@@ -141,7 +131,20 @@
                     app.dataFetched(body);
                     break;
                 case 'mute-state':
-                    app.muteState(body)
+                    app.dataFetched(body);
+                    break;
+                case 'local-hold-state':
+                    app.dataFetched(body);
+                    break;
+                case 'remote-hold-state':
+                    app.dataFetched(body);
+                    break;
+                case 'active-calls':
+                    app.dataFetched(body);
+                    break;
+                case 'speaker-state':
+                    app.dataFetched(body);
+                    break;
                 default:
                     console.log('Unknown action:', action);
                     break;

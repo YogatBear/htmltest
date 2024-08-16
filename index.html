@@ -46,28 +46,52 @@
                     body: {to: to}
                 };
                 this.sendMessageToNativeApp(callRequest);
-                //this.setPage('ringing'); // Show ringing screen
             }
-            acceptCall(from) {
+            acceptCall(callId) {
                 const request = {
                     action: "accept-call",
-                    body: { from: from }
+                    body: { callId: callId }
                 };
                 this.sendMessageToNativeApp(request);
-                // this.setPage('inCallScreen'); // Show in-call screen
             }
-            rejectCall(from) {
+            rejectCall(callId) {
                 const request = {
                     action: "reject-call",
-                    body: { from: from }
+                    body: { callId: callId }
                 };
                 this.sendMessageToNativeApp(request);
-                // this.setPage('mainScreen'); // Show main screen
             }
-            setMute(bool) {
+            setMute(callId, bool) {
                 const request = {
                     action: "set-mute",
-                    body: { mute: bool }
+                    body: { 
+                        callId: callId,
+                        mute: bool
+                     }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            setHold(callId, bool) {
+                const request = {
+                    action: "set-hold",
+                    body: { 
+                        callId: callId,
+                        hold: bool 
+                    }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            getActiveCalls() {
+                const request = {
+                    action: "get-active-calls",
+                    body: {}
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            setActiveCall(callId) {
+                const request = {
+                    action: "set-active-call",
+                    body: {callId: callId}
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -96,6 +120,33 @@
                 const request = {
                     action: "get-recent",
                     body: { range: 10}
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            getAudioDevices() {
+                const request = {
+                    action: "get-audio-devices",
+                    body: {}
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            changeAudioDevice(callId, deviceId) {
+                const request = {
+                    action: "set-audio-device",
+                    body: { 
+                        callId: callId,
+                        deviceId: deviceId 
+                    }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            sendDtmf(callId, digit) {
+                const request = {
+                    action: "send-dtmf",
+                    body: { 
+                        callId: callId,
+                        digit: digit 
+                    }
                 };
                 this.sendMessageToNativeApp(request);
             }

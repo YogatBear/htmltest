@@ -10,6 +10,8 @@
             margin: 0;
             padding: 0;
             list-style: none;
+            webkit-user-select: none; 
+            user-select: none;
         }
         .call-entry {
             display: flex;
@@ -58,7 +60,7 @@
                 try {
                     const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
                     if (data.RecentCalls) {
-                        console.log("Received recet calls data:", data.RecentCalls);
+                        console.log("Received recent calls data:", data.RecentCalls);
                         this.updateRecentCalls(data.RecentCalls);
                     }
                 } catch (error) {
