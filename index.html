@@ -46,7 +46,6 @@
                     body: {to: to}
                 };
                 this.sendMessageToNativeApp(callRequest);
-                //this.setPage('ringing'); // Show ringing screen
             }
             acceptCall(callId) {
                 const request = {
@@ -54,7 +53,6 @@
                     body: { callId: callId }
                 };
                 this.sendMessageToNativeApp(request);
-                // this.setPage('inCallScreen'); // Show in-call screen
             }
             rejectCall(callId) {
                 const request = {
@@ -62,7 +60,6 @@
                     body: { callId: callId }
                 };
                 this.sendMessageToNativeApp(request);
-                // this.setPage('mainScreen'); // Show main screen
             }
             setMute(callId, bool) {
                 const request = {
