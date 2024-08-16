@@ -133,6 +133,35 @@
             opacity: 1;
             pointer-events: auto;
         }
+        #audioDevicesDropdown {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        #deviceList {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #deviceList li {
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        #deviceList li:hover {
+            background-color: #f0f0f0;
+        }
+
+        #deviceList .material-symbols-outlined {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -258,39 +287,42 @@
             }
         }
 
-        let currentAudioDevice = 'earpiece';
-        speakerButton.addEventListener('click', () => {
-            if (audioDevices.hasOwnProperty('2')) { // Bluetooth available
-                if (currentAudioDevice === 'bluetooth') {
-                    controller.changeAudioDevice(callId, 1); // Switch to speaker
-                    currentAudioDevice = 'speaker';
-                } else {
-                    controller.changeAudioDevice(callId, 2); // Switch to bluetooth
-                    currentAudioDevice = 'bluetooth';
-                }
-            } else {
-                if (currentAudioDevice === 'speaker') {
-                    controller.changeAudioDevice(callId, 0); // Switch to earpiece
-                    currentAudioDevice = 'earpiece';
-                } else {
-                    controller.changeAudioDevice(callId, 1); // Switch to speaker
-                    currentAudioDevice = 'speaker';
-                }
-            }
-            updateSpeakerButton();
+        const audioDevicesDropdown = document.querySelector("#audioDevicesDropdown");
+        const deviceList = document.querySelector("#deviceList");
+
+        controller.getAudioDevices();
+
+        speakerButton.addEventListener("click", () => {
+            audioDevicesDropdown.style.display = audioDevicesDropdown.style.display === "none" ? "block" : "none";
         });
 
-        function updateSpeakerButton() {
-            const icon = speakerButton.querySelector('.material-icons');
-            if (currentAudioDevice === 'bluetooth') {
-                icon.textContent = 'bluetooth';
-                speakerButton.style.color = 'blue';
-            } else if (currentAudioDevice === 'speaker') {
-                icon.textContent = 'volume_up';
-                speakerButton.style.color = 'blue';
-            } else {
-                icon.textContent = 'volume_up';
-                speakerButton.style.color = '#333';
+        function updateAudioDevices(devices) {
+            audioDevices = devices;
+            deviceList.innerHTML = "";
+            for (const [key, value] of Object.entries(devices)) {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <span class="material-symbols-outlined">${getIconForDevice(value)}</span>
+                    <span>${value}</span>
+                `;
+                li.addEventListener("click", () => {
+                    controller.changeAudioDevice(callId, parseInt(key));
+                    audioDevicesDropdown.style.display = "none";
+                });
+                deviceList.appendChild(li);
+            }
+        }
+
+        function getIconForDevice(deviceName) {
+            switch(deviceName.toUpperCase()) {
+                case "EARPIECE":
+                    return "hearing";
+                case "SPEAKER":
+                    return "volume_up";
+                case "BLUETOOTH":
+                    return "bluetooth";
+                default:
+                    return "speaker";
             }
         }
 
@@ -341,8 +373,7 @@
                 if (data.localHold !== undefined) toggleHold(data.localHold);
                 if (data.activeCalls !== undefined) updateHeldCallsList(data.activeCalls);
                 if (data.audioDevices !== undefined) {
-                    audioDevices = data.audioDevices;
-                    updateSpeakerButton();
+                    updateAudioDevices(data.audioDevices);
                 }
             } catch (error) {
                 console.error("Error parsing message data:", error);
