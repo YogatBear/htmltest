@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>In a Call</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         body, html {
             margin: 0;
@@ -305,7 +305,7 @@
             for (const [key, value] of Object.entries(devices)) {
                 const li = document.createElement("li");
                 li.innerHTML = `
-                    <span class="material-symbols-outlined">${getIconForDevice(value)}</span>
+                    <span class="material-icons">${getIconForDevice(value)}</span>
                     <span>${value}</span>
                 `;
                 li.addEventListener("click", () => {
