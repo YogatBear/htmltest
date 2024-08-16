@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Full-width Dialer Grid</title>
+    <title>Adjusted Dialer Grid</title>
     <style>
         body, html {
             margin: 0;
@@ -14,18 +14,22 @@
         .dialer-container {
             height: 100%;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             background-color: white;
         }
         #dialerGrid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1vw;
-            flex-grow: 1;
-            padding: 1vw;
+            gap: 10px;
+            padding: 10px;
+            max-width: 240px; /* Adjust based on desired overall width */
+            width: 100%;
         }
         .dialerButton {
-            font-size: 4vw;
+            width: 60px; /* Fixed width to match bottom buttons */
+            height: 60px; /* Fixed height to match bottom buttons */
+            font-size: 24px;
             border: none;
             border-radius: 50%;
             background-color: #f0f0f0;
@@ -34,7 +38,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            aspect-ratio: 1 / 1;
         }
         .dialerButton:hover {
             background-color: #e0e0e0;
