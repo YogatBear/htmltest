@@ -60,8 +60,8 @@
         const controller = window.top.controller;
         const urlParams = new URLSearchParams(window.location.search);
         const callId = urlParams.get('from');
-        if(from){
-            document.querySelector("#name").textContent = from;
+        if(callId){
+            document.querySelector("#name").textContent = callId;
         }
         const acceptButton = document.querySelector(".accept")
         const rejectButton = document.querySelector(".reject")
