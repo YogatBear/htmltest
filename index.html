@@ -95,6 +95,13 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+            sendMessage(to, message) {
+                const request = {
+                    action: "send-message",
+                    body: {to: to, content: message}
+                };
+                this.sendMessageToNativeApp(request);
+            }
             store(key, value) {
                 const request = {
                     action: "store",

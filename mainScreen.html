@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Call Page</title>
     <style>
         html, body {
@@ -100,9 +100,19 @@
         button:hover {
             background-color: #0056b3;
         }
-        .call-button {
-            width: 100%;
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
             margin-top: 20px;
+        }
+        .call-button, .message-button {
+            width: calc(50% - 5px);
+        }
+        .message-button {
+            background-color: #28a745;
+        }
+        .message-button:hover {
+            background-color: #218838;
         }
         iframe {
             flex: 1;
@@ -137,13 +147,17 @@
             <button class="domain-button">.cellact</button>
             <button class="domain-button">.eth</button>
         </div>
-        <button class="call-button">Call</button>
+        <div class="action-buttons">
+            <button class="call-button">Call</button>
+            <button class="message-button">Message</button>
+        </div>
         <iframe src="recentCalls.html"></iframe>
     </div>
     <script>
         const controller = window.top.controller;
         const input = document.querySelector("#numberInput");
         const callButton = document.querySelector(".call-button");
+        const messageButton = document.querySelector(".message-button");
         const domainButtons = document.querySelectorAll(".domain-button");
         const keyboardToggle = document.querySelector("#keyboardToggle");
         const buttonContainer = document.querySelector(".button-container");
@@ -160,6 +174,10 @@
 
         callButton.addEventListener("click", function() {
             makeCall({to: input.value});
+        });
+
+        messageButton.addEventListener("click", function() {
+            sendMessage({to: input.value});
         });
 
         domainButtons.forEach(button => {
@@ -192,6 +210,10 @@
                 };
                 window.parent.postMessage(connectRequest, '*');
             }
+        }
+
+        function sendMessage(jsonData) {
+            controller.sendMessage(jsonData.to, "test");
         }
     </script>
 </body>
