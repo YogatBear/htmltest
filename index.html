@@ -20,10 +20,14 @@
     <script>
         class Controller {
 
-            asdasd;
-
             constructor() {
                 this.guiFrame = document.getElementById('guiFrame');
+                this.localId = this.getUrlParameter('param');
+            }
+
+            getUrlParameter(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
             }
 
             receiveData(_data) {
@@ -46,7 +50,7 @@
             call(to) {
                 const callRequest = {
                     action: "call",
-                    body: {to: to}
+                    body: {localId: this.localId, to: to}
                 };
                 this.sendMessageToNativeApp(callRequest);
             }
@@ -101,7 +105,7 @@
             sendMessage(to, message) {
                 const request = {
                     action: "send-message",
-                    body: {to: to, content: message}
+                    body: {localId: this.localId, to: to, content: message}
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -122,14 +126,14 @@
             getLogs() {
                 const request = {
                     action: "get-logs",
-                    body: { range: 10}
+                    body: { localId: this.localId, range: 10 }
                 };
                 this.sendMessageToNativeApp(request);
             }
             getRecent() {
                 const request = {
                     action: "get-recent",
-                    body: { range: 10}
+                    body: { localId: this.localId, range: 10 }
                 };
                 this.sendMessageToNativeApp(request);
             }
