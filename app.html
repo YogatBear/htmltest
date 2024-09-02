@@ -56,7 +56,7 @@
                 const iframe = document.getElementById("screen");
                 iframe.src = this.urls[pageId];
                 if (Object.keys(param).length > 0) {
-                    iframe.src += `?${param.key}=${param.value}`;
+                    iframe.src += `?${param.key}=${encodeURIComponent(param.value)}`;
                 }
             }
 
