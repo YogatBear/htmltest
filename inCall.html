@@ -215,7 +215,7 @@
         const controller = window.top.controller;
         const urlParams = new URLSearchParams(window.location.search);
         const channel = new BroadcastChannel('myChannel');
-        const callId = urlParams.get('to');
+        const callId = decodeURIComponent(urlParams.get('to'));
 
         if (callId) {
             const encodedCallId = encodeURIComponent(callId);

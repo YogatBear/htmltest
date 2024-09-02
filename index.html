@@ -27,7 +27,7 @@
 
             getUrlParameter(name) {
                 const urlParams = new URLSearchParams(window.location.search);
-                return urlParams.get(name);
+                return decodeURIComponent(urlParams.get(name));
             }
 
             receiveData(_data) {

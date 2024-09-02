@@ -45,7 +45,7 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         
-        const to = urlParams.get('to');
+        const to = decodeURIComponent(urlParams.get('to'));
         if(to){
             document.querySelector("#name").textContent = to;
         }
