@@ -10,16 +10,20 @@
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Adjust to move content higher */
+            align-items: center;
+            flex-direction: column;
             height: 100vh;
             background-color: white;
             margin: 0;
-            padding-top: 50px; /* Add padding to push the content up */
+            padding: 0;
         }
         .container {
             text-align: center;
             width: 100%;
             max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            flex: 1; /* Makes the container grow and fill the space */
         }
         h2 {
             margin: 10px 0;
@@ -34,7 +38,7 @@
         .buttons {
             display: flex;
             justify-content: space-around;
-            margin-bottom: 50px; /* Increase space to push buttons lower */
+            margin-top: auto; /* Pushes the buttons to the bottom */
         }
         .call-button {
             display: flex;
@@ -44,7 +48,6 @@
             border: none;
             color: #333;
             font-size: 12px;
-            margin: 0 20px; /* Increase spacing between buttons */
         }
         .material-icons {
             font-size: 24px;
@@ -54,10 +57,10 @@
             margin-bottom: 5px;
         }
         .call-button#acceptButton .material-icons {
-            background-color: #34c759; /* Make accept button green */
+            background-color: #34c759; /* Accept button green */
         }
         .call-button#declineButton .material-icons {
-            background-color: #ff3b30; /* Make decline button red */
+            background-color: #ff3b30; /* Decline button red */
         }
     </style>
 </head>
