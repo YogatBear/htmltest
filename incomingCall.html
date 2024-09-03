@@ -45,6 +45,22 @@
             flex-direction: column;
             align-items: center;
         }
+        .call-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            color: #333;
+            font-size: 12px;
+        }
+        .call-button .material-icons {
+            font-size: 24px;
+            background-color: #f0f0f0;
+            border-radius: 50%;
+            padding: 12px;
+            margin-bottom: 5px;
+        }
         .circle {
             width: 60px;
             height: 60px;
@@ -72,14 +88,12 @@
         <h2>Call from</h2>
         <div class="identity">Caller ID</div>
         <div class="buttons">
-            <div class="button">
-                <div class="circle decline">&#x2715;</div>
-                <i class="material-icons">close</i>
-            </div>
-            <div class="button">
-                <div class="circle accept">&#x260E;</div>
+            <button class="call-button" id="acceptButton">
                 <i class="material-icons">check</i>
-            </div>
+            </button>
+            <button class="call-button" id="declineButton">
+                <i class="material-icons">close</i>
+            </button>
         </div>
     </div>
     <script>
@@ -89,13 +103,13 @@
         if(callId){
             document.querySelector(".identity").textContent = callId;
         }
-        const acceptButton = document.querySelector(".answer")
-        const rejectButton = document.querySelector(".decline")
+        const acceptButton = document.getElementById("acceptButton");
+        const declineButton = document.getElementById(".declineButton");
 
         acceptButton.addEventListener("click", ()=>{
             controller.acceptCall(callId);
         })
-        rejectButton.addEventListener("click", ()=>{
+        declineButton.addEventListener("click", ()=>{
             controller.rejectCall(callId);
         })
     </script>
