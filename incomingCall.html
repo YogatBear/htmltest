@@ -11,49 +11,74 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f0f0;
+            background-color: white;
             margin: 0;
         }
         .container {
             text-align: center;
+            width: 100%;
+            max-width: 300px;
         }
         h2 {
-            margin-bottom: 20px;
+            margin: 10px 0;
+            font-size: 24px;
+            font-weight: normal;
+        }
+        .identity {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .location {
+            font-size: 18px;
+            color: #666;
+            margin: 10px 0 30px 0;
         }
         .buttons {
             display: flex;
+            justify-content: space-around;
+            margin-top: 50px;
+        }
+        .button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
             justify-content: center;
-            gap: 20px;
-        }
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .accept {
-            background-color: #28a745;
+            align-items: center;
             color: white;
+            font-size: 24px;
         }
-        .accept:hover {
-            background-color: #218838;
+        .decline {
+            background-color: #ff3b30;
         }
-        .reject {
-            background-color: #dc3545;
-            color: white;
+        .answer {
+            background-color: #34c759;
         }
-        .reject:hover {
-            background-color: #c82333;
+        .button-text {
+            margin-top: 10px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Incoming call</h2>
-        <h2 id="name"></h2>
+        <h2>Call from</h2>
+        <div class="identity">Caller ID</div>
         <div class="buttons">
-            <button class="accept">Accept</button>
-            <button class="reject">Reject</button>
+            <div class="button">
+                <div class="circle decline">&#x2715;</div>
+                <span class="button-text">Decline</span>
+            </div>
+            <div class="button">
+                <div class="circle answer">&#x260E;</div>
+                <span class="button-text">Answer</span>
+            </div>
         </div>
     </div>
     <script>
@@ -61,10 +86,10 @@
         const urlParams = new URLSearchParams(window.location.search);
         const callId = decodeURIComponent(urlParams.get('from'));
         if(callId){
-            document.querySelector("#name").textContent = callId;
+            document.querySelector(".identity").textContent = callId;
         }
-        const acceptButton = document.querySelector(".accept")
-        const rejectButton = document.querySelector(".reject")
+        const acceptButton = document.querySelector(".answer")
+        const rejectButton = document.querySelector(".decline")
 
         acceptButton.addEventListener("click", ()=>{
             controller.acceptCall(callId);
