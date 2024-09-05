@@ -127,8 +127,8 @@
                 if (data.messages !== undefined) {
                     messages.forEach(msg => {
                         addMessage(msg.text, msg.sender, msg.type);
+                        controller.sendMessage(callId, msg.text);
                     });
-                    toggleHold(data.localHold);
                 }
             } catch (error) {
                 console.error("Error parsing message data:", error);
