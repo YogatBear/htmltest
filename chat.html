@@ -110,8 +110,8 @@
             const message = messageText.value.trim();
             if (message) {
                 addMessage(message, currentUser);
-                console.log("Sending message:", msg.text);
-                controller.sendMessage(callId, msg.text);
+                console.log("Sending message:", message);
+                controller.sendMessage(callId, message);
                 messageText.value = '';
             }
         });
