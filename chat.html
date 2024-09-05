@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        #chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 70%;
+        }
+        .message.sent {
+            background-color: #dcf8c6;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        .message.received {
+            background-color: #fff;
+        }
+        .message-input {
+            display: flex;
+            padding: 10px;
+            background-color: #fff;
+            border-top: 1px solid #ccc;
+        }
+        #message-text {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            margin-right: 10px;
+        }
+        #send-button {
+            background-color: #075e54;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .date-separator {
+            text-align: center;
+            margin: 20px 0;
+            color: #888;
+        }
+        .image-message img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container"></div>
+    <div class="message-input">
+        <input type="text" id="message-text" placeholder="Type a message...">
+        <button id="send-button">Send</button>
+    </div>
+
+    <script>
+        const controller = window.top.controller;
+        const urlParams = new URLSearchParams(window.location.search);
+        const channel = new BroadcastChannel('myChannel');
+        const callId = decodeURIComponent(urlParams.get('to'));
+
+        const chatContainer = document.getElementById('chat-container');
+        const messageText = document.getElementById('message-text');
+        const sendButton = document.getElementById('send-button');
+
+        let currentUser = 'Me'; // This would typically come from authentication
+
+        function addMessage(text, sender, type = 'text') {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender === currentUser ? 'sent' : 'received');
+
+            if (type === 'text') {
+                messageElement.textContent = text;
+            } else if (type === 'image') {
+                messageElement.classList.add('image-message');
+                const img = document.createElement('img');
+                img.src = text; // In this case, 'text' is the image URL
+                messageElement.appendChild(img);
+            }
+
+            const dateElement = document.createElement('div');
+            dateElement.classList.add('date-separator');
+            dateElement.textContent = new Date().toLocaleDateString();
+
+            chatContainer.appendChild(dateElement);
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        sendButton.addEventListener('click', () => {
+            const message = messageText.value.trim();
+            if (message) {
+                addMessage(message, currentUser);
+                messageText.value = '';
+            }
+        });
+
+        messageText.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+
+        channel.addEventListener('message', (event) => {
+            try {
+                const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+                if (data.message !== undefined) addMessage(data.message.body, data.message.from, "text");
+                if (data.messages !== undefined) {
+                    messages.forEach(msg => {
+                        addMessage(msg.text, msg.sender, msg.type);
+                    });
+                    toggleHold(data.localHold);
+                }
+            } catch (error) {
+                console.error("Error parsing message data:", error);
+            }
+        });
+
+        // Simulating received messages
+        setTimeout(() => addMessage('Hello!', 'Other User'), 1000);
+        setTimeout(() => addMessage('How are you?', 'Other User'), 2000);
+    </script>
+</body>
+</html>

@@ -155,6 +155,12 @@
                 case 'speaker-state':
                     app.dataFetched(body);
                     break;
+                case 'recent-messages':
+                    app.dataFetched(body);
+                    break;
+                case 'new-message':
+                    app.dataFetched(body);
+                    break;
                 default:
                     console.log('Unknown action:', action);
                     break;
