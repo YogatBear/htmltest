@@ -127,6 +127,7 @@
                 if (data.messages !== undefined) {
                     messages.forEach(msg => {
                         addMessage(msg.text, msg.sender, msg.type);
+                        console.log("Sending message:", msg.text);
                         controller.sendMessage(callId, msg.text);
                     });
                 }
@@ -134,10 +135,6 @@
                 console.error("Error parsing message data:", error);
             }
         });
-
-        // Simulating received messages
-        setTimeout(() => addMessage('Hello!', 'Other User'), 1000);
-        setTimeout(() => addMessage('How are you?', 'Other User'), 2000);
     </script>
 </body>
 </html>
