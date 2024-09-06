@@ -143,8 +143,8 @@
         const backButton = document.getElementById('back-button');
         const titleHeader = document.getElementById('title-header');
 
-        titleHeader.textContent = `Chat Room (${sessionId})`;
-        
+        titleHeader.textContent = sessionId;
+
         controller.getMessages(sessionId, 10);
 
         function formatTime(timestamp) {
