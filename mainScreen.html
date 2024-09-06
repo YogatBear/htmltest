@@ -114,12 +114,18 @@
         .message-button:hover {
             background-color: #218838;
         }
+        .iframe-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            margin-top: 20px;
+        }
         iframe {
             flex: 1;
             width: 100%;
             border: none;
-            margin-top: 20px;
             border-radius: 5px;
+            margin-bottom: 10px;
         }
         .button-container {
             display: none;
@@ -151,7 +157,10 @@
             <button class="call-button">Call</button>
             <button class="message-button">Message</button>
         </div>
-        <iframe src="recentCalls.html"></iframe>
+        <div class="iframe-container">
+            <iframe src="recentCalls.html"></iframe>
+            <iframe src="recentMessages.html"></iframe>
+        </div>
     </div>
     <script>
         const controller = window.top.controller;

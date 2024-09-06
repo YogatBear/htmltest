@@ -3,48 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reusable Call Log Component</title>
+    <title>Reusable Recent Message Session Component</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
-        .recent-calls {
+        .recent-messages {
             margin: 0;
             padding: 0;
             list-style: none;
             webkit-user-select: none; 
             user-select: none;
         }
-        .call-entry {
+        .message-entry {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 10px;
             border-bottom: 1px solid #eee;
         }
-        .call-details {
+        .message-details {
             flex-grow: 1;
         }
         .contact-name {
             font-size: 16px;
             color: #333;
         }
-        .call-time {
+        .message-text {
             font-size: 12px;
             color: #999;
         }
-        .call-icon {
+        .message-time {
+            font-size: 12px;
+            color: #999;
+        }
+        .message-icon {
             font-family: 'Material Symbols Outlined';
             font-size: 24px;
         }
     </style>
 </head>
 <body>
-    <ul id="recent-calls" class="recent-calls"></ul>
+    <ul id="recent-messages" class="recent-messages"></ul>
 
     <script>
 
         const channel = new BroadcastChannel('myChannel');
 
-        class RecentCallsComponent {
+        class RecentMessagesComponent {
             constructor(containerId) {
                 this.container = document.getElementById(containerId);
                 this.controller = window.top.controller;
@@ -52,50 +56,50 @@
             }
 
             init() {
-                this.controller.getRecentCalls();
+                this.controller.getRecentMessages();
                 channel.addEventListener("message", this.handleMessage.bind(this));
             }
 
             handleMessage(event) {
                 try {
                     const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-                    if (data.RecentCalls) {
-                        console.log("Received recent calls data:", data.RecentCalls);
-                        this.updateRecentCalls(data.RecentCalls);
+                    if (data.RecentMessages) {
+                        console.log("Received recent messages data:", data.RecentMessages);
+                        this.updateRecentMessages(data.RecentMessages);
                     }
                 } catch (error) {
                     console.error("Error parsing message data:", error);
                 }
             }
 
-            updateRecentCalls(recentCalls) {
+            updateRecentMessages(recentMessages) {
                 this.container.innerHTML = ""; // Clear existing logs
-                recentCalls.forEach(call => {
-                    const [contact, timestamp, status] = call;
-                    const callDate = new Date(timestamp);
+                recentMessages.forEach(msg => {
+                    const [messageId, time, author, content, msgSessionId] = msg;
+                    const messageDate = new Date(time);
                     const today = new Date();
-                    const isToday = callDate.toDateString() === today.toDateString();
-                    const timeOrDate = isToday ? callDate.toLocaleTimeString([], { timeStyle: 'short' }) : callDate.toLocaleDateString();
-                    const iconSymbol = status.toLowerCase() === 'incoming' ? 'call_received' :
-                                      status.toLowerCase() === 'outgoing' ? 'call_made' : 'call_missed';
+                    const isToday = messageDate.toDateString() === today.toDateString();
+                    const timeOrDate = isToday ? messageDate.toLocaleTimeString([], { timeStyle: 'short' }) : messageDate.toLocaleDateString();
+                    const iconSymbol = 'chat';
+                    const messageinfo = author + ': ' + content + ': ' + timeOrDate;
                     
                     const li = document.createElement('li');
-                    li.className = "call-entry";
+                    li.className = "message-entry";
                     li.innerHTML = `
-                        <div class="call-details">
-                            <div class="contact-name">${contact}</div>
-                            <div class="call-time">${timeOrDate}</div>
+                        <div class="message-details">
+                            <div class="contact-name">${msgSessionId}</div>
+                            <div class="message-text">${messageinfo}</div>
                         </div>
-                        <span class="call-icon material-symbols-outlined">${iconSymbol}</span>`;
+                        <span class="message-icon material-symbols-outlined">${iconSymbol}</span>`;
                     li.addEventListener('click', () => {
-                        window.parent.postMessage({action: 'call', body: {to: contact}}, '*');
+                        window.location.href = 'chat.html?sessionId=' + msgSessionId;
                     });
                     this.container.appendChild(li);
                 });
             }
         }
 
-        new RecentCallsComponent('recent-calls');
+        new RecentMessagesComponent('recent-messages');
     </script>
 </body>
 </html>

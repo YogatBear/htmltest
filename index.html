@@ -109,13 +109,6 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
-            getMessages(sessionId, range) {
-                const request = {
-                    action: "get-messages",
-                    body: {localId: this.localId, sessionId: sessionId, range: range}
-                };
-                this.sendMessageToNativeApp(request);
-            }
             store(key, value) {
                 const request = {
                     action: "store",
@@ -137,10 +130,24 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
-            getRecent() {
+            getRecentCalls() {
                 const request = {
-                    action: "get-recent",
+                    action: "get-recent-calls",
                     body: { localId: this.localId, range: 10 }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            getMessages(sessionId, range) {
+                const request = {
+                    action: "get-messages",
+                    body: {localId: this.localId, sessionId: sessionId, range: range}
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            getRecentMessages(range) {
+                const request = {
+                    action: "get-recent-messages",
+                    body: {localId: this.localId, range: range}
                 };
                 this.sendMessageToNativeApp(request);
             }
