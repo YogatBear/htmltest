@@ -56,7 +56,7 @@
             }
 
             init() {
-                this.controller.getRecentMessages();
+                this.controller.getRecentMessages(10);
                 channel.addEventListener("message", this.handleMessage.bind(this));
             }
 
