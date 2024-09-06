@@ -81,7 +81,7 @@
                     const isToday = messageDate.toDateString() === today.toDateString();
                     const timeOrDate = isToday ? messageDate.toLocaleTimeString([], { timeStyle: 'short' }) : messageDate.toLocaleDateString();
                     const iconSymbol = 'chat';
-                    const messageinfo = author + ': ' + content + ': ' + timeOrDate;
+                    const messageinfo = author + ': ' + content + ' ' + timeOrDate;
                     
                     const li = document.createElement('li');
                     li.className = "message-entry";
