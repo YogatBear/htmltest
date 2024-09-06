@@ -146,6 +146,7 @@
                 
                 if (data.message) {
                     // Handle single message
+                    console.log("Received message data:", data.message);
                     const [messageId, time, author, content, msgSessionId] = data.message;
                     if (msgSessionId === sessionId) {
                         addMessage(content, author, time, "text");
