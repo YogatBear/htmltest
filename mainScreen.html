@@ -204,9 +204,16 @@
         });
 
         window.addEventListener('message', (event) => {
-            if (event.data.action === 'call') {
-                makeCall(event.data.body);
+            switch (event.data.action) {
+                case 'call':
+                    makeCall(event.data.body);
+                    break;
+                    
+                case 'chat':
+                    window.location.href = 'chat.html?sessionId=' + event.data.body.sessionId;
+                    break;
             }
+
         });
 
         function makeCall(jsonData) {

@@ -92,7 +92,7 @@
                         </div>
                         <span class="message-icon material-symbols-outlined">${iconSymbol}</span>`;
                     li.addEventListener('click', () => {
-                        window.location.href = 'chat.html?sessionId=' + msgSessionId;
+                        window.parent.postMessage({action: 'chat', body: {sessionId: msgSessionId}}, '*');
                     });
                     this.container.appendChild(li);
                 });
