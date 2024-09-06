@@ -63,9 +63,9 @@
             handleMessage(event) {
                 try {
                     const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-                    if (data.RecentMessages) {
-                        console.log("Received recent messages data:", data.RecentMessages);
-                        this.updateRecentMessages(data.RecentMessages);
+                    if (data.recentMessages) {
+                        console.log("Received recent messages data:", data.recentMessages);
+                        this.updateRecentMessages(data.recentMessages);
                     }
                 } catch (error) {
                     console.error("Error parsing message data:", error);
