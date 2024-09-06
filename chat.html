@@ -98,7 +98,7 @@
 
         function addMessage(content, author, time, type = 'text') {
             const messageElement = document.createElement('div');
-            messageElement.classList.add('message', author === sessionId ? 'sent' : 'received');
+            messageElement.classList.add('message', author === sessionId ? 'received' : 'sent');
 
             const currentDate = formatDate(time);
             if (currentDate !== lastDisplayedDate) {
