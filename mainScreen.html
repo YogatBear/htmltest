@@ -175,7 +175,7 @@
         });
 
         messageButton.addEventListener("click", function() {
-            window.location.href = 'chat.html?to=' + input.value;
+            window.location.href = 'chat.html?sessionId=' + input.value;
         });
 
         domainButtons.forEach(button => {
@@ -210,9 +210,6 @@
             }
         }
 
-        function sendMessage(jsonData) {
-            controller.sendMessage(jsonData.to, "This is a test message");
-        }
     </script>
 </body>
 </html>
