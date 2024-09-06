@@ -237,6 +237,11 @@
         const dialerContainer = document.getElementById('dialerContainer');
         const dialerFrame = document.getElementById('dialerFrame');
 
+        const audioDevicesDropdown = document.querySelector("#audioDevicesDropdown");
+        const deviceList = document.querySelector("#deviceList");
+
+        controller.getAudioDevices();
+
         let callDuration = 0;
         let callInterval;
         let audioDevices = {};
@@ -288,11 +293,6 @@
                 startCallTimer();
             }
         }
-
-        const audioDevicesDropdown = document.querySelector("#audioDevicesDropdown");
-        const deviceList = document.querySelector("#deviceList");
-
-        controller.getAudioDevices();
 
         speakerButton.addEventListener("click", () => {
             audioDevicesDropdown.style.display = audioDevicesDropdown.style.display === "none" ? "block" : "none";

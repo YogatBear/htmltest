@@ -76,32 +76,51 @@
         const controller = window.top.controller;
         const urlParams = new URLSearchParams(window.location.search);
         const channel = new BroadcastChannel('myChannel');
-        const callId = decodeURIComponent(urlParams.get('to'));
+        const sessionId = decodeURIComponent(urlParams.get('sessionId'));
 
         const chatContainer = document.getElementById('chat-container');
         const messageText = document.getElementById('message-text');
         const sendButton = document.getElementById('send-button');
 
-        let currentUser = 'Me'; // This would typically come from authentication
+        controller.getMessages(sessionId, 10);
 
-        function addMessage(text, sender, type = 'text') {
+        function formatTime(timestamp) {
+            const date = new Date(parseInt(timestamp));
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function formatDate(timestamp) {
+            const date = new Date(parseInt(timestamp));
+            return date.toLocaleDateString();
+        }
+
+        let lastDisplayedDate = null;
+
+        function addMessage(content, author, time, type = 'text') {
             const messageElement = document.createElement('div');
-            messageElement.classList.add('message', sender === currentUser ? 'sent' : 'received');
+            messageElement.classList.add('message', author === sessionId ? 'sent' : 'received');
+
+            const currentDate = formatDate(time);
+            if (currentDate !== lastDisplayedDate) {
+                const dateElement = document.createElement('div');
+                dateElement.classList.add('date-separator');
+                dateElement.textContent = currentDate;
+                chatContainer.appendChild(dateElement);
+                lastDisplayedDate = currentDate;
+            }
 
             if (type === 'text') {
-                messageElement.textContent = text;
+                messageElement.textContent = `${content} (${formatTime(time)})`;
             } else if (type === 'image') {
                 messageElement.classList.add('image-message');
                 const img = document.createElement('img');
-                img.src = text; // In this case, 'text' is the image URL
+                img.src = content; // In this case, 'content' is the image URL
                 messageElement.appendChild(img);
+                const timeElement = document.createElement('div');
+                timeElement.textContent = formatTime(time);
+                messageElement.appendChild(timeElement);
             }
 
-            const dateElement = document.createElement('div');
-            dateElement.classList.add('date-separator');
-            dateElement.textContent = new Date().toLocaleDateString();
-
-            chatContainer.appendChild(dateElement);
             chatContainer.appendChild(messageElement);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
@@ -109,9 +128,8 @@
         sendButton.addEventListener('click', () => {
             const message = messageText.value.trim();
             if (message) {
-                addMessage(message, currentUser);
                 console.log("Sending message:", message);
-                controller.sendMessage(callId, message);
+                controller.sendMessage(sessionId, message);
                 messageText.value = '';
             }
         });
@@ -125,16 +143,27 @@
         channel.addEventListener('message', (event) => {
             try {
                 const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-                if (data.message !== undefined) addMessage(data.message.body, data.message.from, "text");
-                if (data.messages !== undefined) {
-                    messages.forEach(msg => {
-                        addMessage(msg.text, msg.sender, msg.type);
+                
+                if (data.message) {
+                    // Handle single message
+                    const [messageId, time, author, content, msgSessionId] = data.message;
+                    if (msgSessionId === sessionId) {
+                        addMessage(content, author, time, "text");
+                    }
+                } else if (data.messages) {
+                    // Handle multiple messages
+                    data.messages.forEach(msg => {
+                        const [messageId, time, author, content, msgSessionId] = msg;
+                        if (msgSessionId === sessionId) {
+                            addMessage(content, author, time, "text");
+                        }
                     });
                 }
             } catch (error) {
-                console.error("Error parsing message data:", error);
+                console.error("Error processing message data:", error);
             }
         });
+
     </script>
 </body>
 </html>

@@ -109,6 +109,13 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+            getMessages(sessionId, range) {
+                const request = {
+                    action: "get-messages",
+                    body: {localId: this.localId, sessionId: sessionId, range: range}
+                };
+                this.sendMessageToNativeApp(request);
+            }
             store(key, value) {
                 const request = {
                     action: "store",
