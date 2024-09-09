@@ -70,8 +70,8 @@
             callStarted(_with) {
                 this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
             }
-            callEnded(localId) {
-                this.setPage('main', {key: "localId", value: localId}); // End call logic and show main screen
+            callEnded() {
+                this.setPage('main'); // End call logic and show main screen
             }
             receivingCall(from) {
                 this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
