@@ -67,6 +67,9 @@
                         console.log("Received recent messages data:", data.recentMessages);
                         this.updateRecentMessages(data.recentMessages);
                     }
+                    else if (data.message) {
+                        this.controller.getRecentMessages(10);
+                    }
                 } catch (error) {
                     console.error("Error parsing message data:", error);
                 }
