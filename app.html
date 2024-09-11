@@ -33,11 +33,25 @@
     </style>
 </head>
 <body>
-    <iframe id="screen" src="mainScreen.html" frameBorder="0" style="width:100%; height:100vh;"></iframe>
+    <iframe id="screenFrame" frameBorder="0" style="width:100%; height:100vh;"></iframe>
     <script>
 
         const controller = window.top.controller;
         const channel = new BroadcastChannel('myChannel');
+        const screenFrame = document.getElementById('screenFrame');
+        const urlParams = new URLSearchParams(window.location.search);
+        const screen = decodeURIComponent(urlParams.get('screen'));
+        const localId = decodeURIComponent(urlParams.get('localId'));
+        const remoteId = decodeURIComponent(urlParams.get('remoteId'));
+
+        switch (screen) {
+            case 'MAIN':
+                screenFrame.src = "mainScreen.html";
+                break;
+            case 'CALL':
+                screenFrame.src = "inCall.html?to=" + remoteId;
+                break;
+        }
 
         class App {
             constructor(ens, main, ringing, callAttempt, inCall, incomingCall) {
@@ -53,7 +67,7 @@
             }
 
             setPage(pageId, param = {}) {
-                const iframe = document.getElementById("screen");
+                const iframe = document.getElementById("screenFrame");
                 iframe.src = this.urls[pageId];
                 if (Object.keys(param).length > 0) {
                     iframe.src += `?${param.key}=${encodeURIComponent(param.value)}`;
