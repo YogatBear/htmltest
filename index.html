@@ -17,31 +17,17 @@
     </style>
 </head>
 <body>
-    <iframe id="guiFrame" frameBorder="0" style="width:100%; height:100vh;"></iframe>
     <script>
-
-        guiFrame = document.getElementById('guiFrame');
-        screen = getUrlParameter('screen');
-        localId = getUrlParameter('localId');
-        remoteId = getUrlParameter('remoteId');
-
-        guiFrame.src = "app.html?screen=" + screen + "&localId=" + localId + "&remoteId=" + remoteId;
-
-        function getUrlParameter(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return decodeURIComponent(urlParams.get(name));
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            window.top.controller = new Controller();
-        });
-                
         class Controller {
 
             constructor() {
-                this.guiFrame = guiFrame;
-                this.localId = localId;
-                this.remoteId = remoteId;
+                this.guiFrame = document.getElementById('guiFrame');
+                this.localId = this.getUrlParameter('localId');
+            }
+
+            getUrlParameter(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return decodeURIComponent(urlParams.get(name));
             }
 
             receiveData(_data) {
@@ -199,6 +185,11 @@
             }
         }
 
+        document.addEventListener('DOMContentLoaded', function() {
+            window.top.controller = new Controller();
+        });
+
     </script>
+    <iframe id="guiFrame" src="app.html" frameBorder="0" style="width:100%; height:100vh;"></iframe>
 </body>
 </html>
