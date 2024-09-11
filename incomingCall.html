@@ -82,18 +82,19 @@
     <script>
         const controller = window.top.controller;
         const urlParams = new URLSearchParams(window.location.search);
-        const callId = decodeURIComponent(urlParams.get('from'));
-        if(callId){
-            document.querySelector(".identity").textContent = callId;
+        const remoteId = decodeURIComponent(urlParams.get('from'));
+        if(remoteId){
+            document.querySelector(".identity").textContent = remoteId;
         }
         const acceptButton = document.getElementById("acceptButton");
         const declineButton = document.getElementById("declineButton");
 
         acceptButton.addEventListener("click", ()=>{
-            controller.acceptCall(callId);
+            controller.acceptCall(remoteId);
+            window.location.href = 'inCall.html?to=' + remoteId;
         })
         declineButton.addEventListener("click", ()=>{
-            controller.rejectCall(callId);
+            controller.rejectCall(remoteId);
         })
     </script>
 </body>
