@@ -80,7 +80,10 @@
             }
 
             ring(to) {
-                this.setPage('ringing', {key:"to",value:to}); // Show ringing screen
+                //this.setPage('ringing', {key:"to",value:to});
+                if (screen === 'MAIN') {
+                    this.setPage('main')
+                }
             }
             callAttempt(to) {
                 this.setPage('callAttempt', {key:"to",value:to}); // Show call attempt screen
