@@ -51,6 +51,12 @@
             case 'CALL':
                 screenFrame.src = "inCall.html?to=" + remoteId;
                 break;
+            case 'RING':
+                screenFrame.src = "ringing.html?to=" + remoteId;
+                break;
+            case 'INCOMING':
+                screenFrame.src = "incomingCall.html?from=" + remoteId;
+                break;
         }
 
         class App {
