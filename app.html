@@ -39,6 +39,7 @@
         const controller = window.top.controller;
         const channel = new BroadcastChannel('myChannel');
         const screenFrame = document.getElementById('screenFrame');
+        const urlParams = new URLSearchParams(window.location.search);
         const screen = decodeURIComponent(urlParams.get('screen'));
         const localId = decodeURIComponent(urlParams.get('localId'));
         const remoteId = decodeURIComponent(urlParams.get('remoteId'));
