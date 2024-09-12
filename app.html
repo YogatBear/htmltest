@@ -48,6 +48,9 @@
             case 'MAIN':
                 screenFrame.src = "mainScreen.html";
                 break;
+            case 'CHAT':
+                screenFrame.src = "chat.html?sessionId=" + remoteId;
+                break;
             case 'CALL':
                 screenFrame.src = "inCall.html?to=" + remoteId;
                 break;
