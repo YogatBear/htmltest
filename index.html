@@ -61,6 +61,8 @@
                 }
             }
 
+            // Native actions
+
             call(to) {
                 const callRequest = {
                     action: "call",
@@ -68,6 +70,7 @@
                 };
                 this.sendMessageToNativeApp(callRequest);
             }
+
             acceptCall(callId) {
                 const request = {
                     action: "accept-call",
@@ -75,6 +78,7 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+            
             rejectCall(callId) {
                 const request = {
                     action: "reject-call",
@@ -82,6 +86,7 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+
             setMute(callId, bool) {
                 const request = {
                     action: "set-mute",
@@ -92,6 +97,7 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+            
             setHold(callId, bool) {
                 const request = {
                     action: "set-hold",
@@ -102,13 +108,7 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
-            getActiveCalls() {
-                const request = {
-                    action: "get-active-calls",
-                    body: {}
-                };
-                this.sendMessageToNativeApp(request);
-            }
+            
             setActiveCall(callId) {
                 const request = {
                     action: "set-active-call",
@@ -116,6 +116,7 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+
             sendMessage(to, message) {
                 const request = {
                     action: "send-message",
@@ -123,6 +124,7 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+
             store(key, value) {
                 const request = {
                     action: "store",
@@ -130,48 +132,7 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
-            fetch(key, d_value) {
-                const request = {
-                    action: "fetch",
-                    body: { key: key, d_value: d_value }
-                };
-                this.sendMessageToNativeApp(request);
-            }
-            getLogs() {
-                const request = {
-                    action: "get-logs",
-                    body: { localId: this.localId, range: 10 }
-                };
-                this.sendMessageToNativeApp(request);
-            }
-            getRecentCalls() {
-                const request = {
-                    action: "get-recent-calls",
-                    body: { localId: this.localId, range: 10 }
-                };
-                this.sendMessageToNativeApp(request);
-            }
-            getMessages(sessionId, range) {
-                const request = {
-                    action: "get-messages",
-                    body: {localId: this.localId, sessionId: sessionId, range: range}
-                };
-                this.sendMessageToNativeApp(request);
-            }
-            getRecentMessages(range) {
-                const request = {
-                    action: "get-recent-messages",
-                    body: {localId: this.localId, range: range}
-                };
-                this.sendMessageToNativeApp(request);
-            }
-            getAudioDevices() {
-                const request = {
-                    action: "get-audio-devices",
-                    body: {}
-                };
-                this.sendMessageToNativeApp(request);
-            }
+        
             changeAudioDevice(callId, deviceId) {
                 const request = {
                     action: "set-audio-device",
@@ -189,6 +150,66 @@
                         callId: callId,
                         digit: digit 
                     }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            // Fetch data
+
+            getActiveCalls() {
+                const request = {
+                    action: "get-active-calls",
+                    body: {}
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getLogs() {
+                const request = {
+                    action: "get-logs",
+                    body: { localId: this.localId, range: 10 }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getRecentCalls() {
+                const request = {
+                    action: "get-recent-calls",
+                    body: { localId: this.localId, range: 10 }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getMessages(sessionId, range) {
+                const request = {
+                    action: "get-messages",
+                    body: {localId: this.localId, sessionId: sessionId, range: range}
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getRecentMessages(range) {
+                const request = {
+                    action: "get-recent-messages",
+                    body: {localId: this.localId, range: range}
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getAudioDevices() {
+                const request = {
+                    action: "get-audio-devices",
+                    body: {}
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            // Webview capabilities
+
+            displayBackButton(bool) {
+                const request = {
+                    action: "display-back-button",
+                    body: { display: bool }
                 };
                 this.sendMessageToNativeApp(request);
             }

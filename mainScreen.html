@@ -192,6 +192,8 @@
         // Set initial input type
         input.inputMode = "tel";
 
+        controller.displayBackButton(false);
+
         // Convert input to lowercase
         input.addEventListener('input', function(e) {
             this.value = this.value.toLowerCase();
