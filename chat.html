@@ -182,14 +182,17 @@
         });
 
         window.addEventListener('popstate', function(event) {
-            window.parent.postMessage('closeChat', '*');
+            document.body.classList.add('slide-out');
         });
-        
+
         // Prevent default back behavior and trigger custom animation
         history.pushState(null, null, location.href);
         window.onpopstate = function(event) {
             history.pushState(null, null, location.href);
-            window.parent.postMessage('closeChat', '*');
+            document.body.classList.add('slide-out');
+            setTimeout(() => {
+                window.parent.postMessage('closeChat', '*');
+            }, 300);
         };
 
         channel.addEventListener('message', (event) => {
