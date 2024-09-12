@@ -178,6 +178,7 @@
             <iframe src="recentMessages.html"></iframe>
         </div>
     </div>
+    <div id="chat-container"></div>
     <script>
         const controller = window.top.controller;
         const input = document.querySelector("#numberInput");
@@ -254,7 +255,6 @@
                 chatContainer.innerHTML = '';
             }, 300); // Clear chat container after animation
         }
-
 
         function makeCall(jsonData) {
             if (jsonData != null) {
