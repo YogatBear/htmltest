@@ -110,10 +110,6 @@
         const chatContainer = document.getElementById('chat-container');
         const messageText = document.getElementById('message-text');
         const sendButton = document.getElementById('send-button');
-        const backButton = document.getElementById('back-button');
-        const titleHeader = document.getElementById('title-header');
-
-        titleHeader.textContent = sessionId;
 
         controller.getMessages(sessionId, 10);
 
@@ -171,10 +167,6 @@
             if (e.key === 'Enter') {
                 sendButton.click();
             }
-        });
-
-        backButton.addEventListener('click', () => {
-            window.history.back();
         });
 
         channel.addEventListener('message', (event) => {
