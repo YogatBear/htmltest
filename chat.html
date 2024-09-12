@@ -182,15 +182,16 @@
         });
 
         window.addEventListener('popstate', function(event) {
-            window.parent.postMessage('closeChat', '*');
+            closeChat();
         });
         
-        // Prevent default back behavior and trigger custom animation
-        history.pushState(null, null, location.href);
         window.onpopstate = function(event) {
-            history.pushState(null, null, location.href);
-            window.parent.postMessage('closeChat', '*');
+            closeChat();
         };
+
+        function closeChat() {
+            window.parent.postMessage({action: 'closeChat'}, '*');
+        }
 
         channel.addEventListener('message', (event) => {
             try {
