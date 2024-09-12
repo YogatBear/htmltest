@@ -192,8 +192,6 @@
         // Set initial input type
         input.inputMode = "tel";
 
-        controller.displayBackButton(false);
-
         // Convert input to lowercase
         input.addEventListener('input', function(e) {
             this.value = this.value.toLowerCase();
@@ -248,6 +246,7 @@
             document.querySelector('.container').classList.add('slide-left');
             chatContainer.classList.add('slide-left');
             history.pushState({page: 'chat'}, '', 'chat');
+            controller.displayBackButton(true);
         }
 
         function closeChat() {
@@ -256,6 +255,7 @@
             setTimeout(() => {
                 chatContainer.innerHTML = '';
             }, 300); // Clear chat container after animation
+            controller.displayBackButton(false);
         }
 
         function makeCall(jsonData) {
