@@ -13,6 +13,7 @@
             flex-direction: column;
             height: 100vh;
             background-color: #f0f0f0;
+            overflow-x: hidden;
         }
         #chat-container {
             flex: 1;
@@ -92,6 +93,17 @@
                 max-width: 90%;
             }
         }
+        .slide-out {
+            animation: slideOut 0.3s ease-in-out forwards;
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(100%);
+            }
+        }
     </style>
 </head>
 <body>
@@ -168,6 +180,20 @@
                 sendButton.click();
             }
         });
+
+        window.addEventListener('popstate', function(event) {
+            document.body.classList.add('slide-out');
+        });
+
+        // Prevent default back behavior and trigger custom animation
+        history.pushState(null, null, location.href);
+        window.onpopstate = function(event) {
+            history.pushState(null, null, location.href);
+            document.body.classList.add('slide-out');
+            setTimeout(() => {
+                window.parent.postMessage('closeChat', '*');
+            }, 300);
+        };
 
         channel.addEventListener('message', (event) => {
             try {
