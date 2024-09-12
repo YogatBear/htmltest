@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Call Page</title>
+    <title>Main Page</title>
     <style>
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
         }
         body {
             font-family: 'Arial', sans-serif;
@@ -26,7 +25,22 @@
             background: white;
             padding: 20px;
             box-sizing: border-box;
+        }
+        .container, #chat-container {
             transition: transform 0.3s ease-in-out;
+        }
+
+        #chat-container {
+            position: fixed;
+            top: 0;
+            left: 100%;
+            width: 100%;
+            height: 100%;
+            background: white;
+        }
+
+        .slide-left {
+            transform: translateX(-100%);
         }
         .input-container {
             display: flex;
@@ -137,18 +151,6 @@
         .button-container button {
             width: calc(50% - 5px);
         }
-        #chat-container {
-            position: fixed;
-            top: 0;
-            left: 100%;
-            width: 100%;
-            height: 100%;
-            background: white;
-            transition: transform 0.3s ease-in-out;
-        }
-        .slide-left {
-            transform: translateX(-100%);
-        }
     </style>
 </head>
 <body>
@@ -176,7 +178,6 @@
             <iframe src="recentMessages.html"></iframe>
         </div>
     </div>
-    <div id="chat-container"></div>
     <script>
         const controller = window.top.controller;
         const input = document.querySelector("#numberInput");
@@ -185,7 +186,6 @@
         const domainButtons = document.querySelectorAll(".domain-button");
         const keyboardToggle = document.querySelector("#keyboardToggle");
         const buttonContainer = document.querySelector(".button-container");
-        const chatContainer = document.querySelector("#chat-container");
 
         // Set initial input type
         input.inputMode = "tel";
@@ -223,29 +223,33 @@
         });
 
         window.addEventListener('message', (event) => {
-            if (event.data === 'closeChat') {
-                document.querySelector('.container').classList.remove('slide-left');
-                chatContainer.classList.remove('slide-left');
-                history.back();
-            } else {
-                switch (event.data.action) {
-                    case 'call':
-                        makeCall(event.data.body);
-                        break;
+            switch (event.data.action) {
+                case 'call':
+                    makeCall(event.data.body);
+                    break;
                     
-                    case 'chat':
-                        chatContainer.innerHTML = `<iframe src="chat.html?sessionId=${encodeURIComponent(event.data.body.sessionId)}" style="width:100%;height:100%;border:none;"></iframe>`;
-                        document.querySelector('.container').classList.add('slide-left');
-                        chatContainer.classList.add('slide-left');
-                        history.pushState(null, null, 'chat');
-                        break;
-                }
-            }
-        });
+                case 'chat':
+                    window.location.href = 'chat.html?sessionId=' + event.data.body.sessionId;
+                    break;
 
+                case 'closeChat':
+                    document.querySelector('.container').classList.remove('slide-left');
+                    chatContainer.classList.remove('slide-left');
+                    setTimeout(() => {
+                        chatContainer.innerHTML = '';
+                    }, 300); // Clear chat container after animation
+                    history.back();
+                    break;
+            }
+
+        });
+        
         window.addEventListener('popstate', function(event) {
             document.querySelector('.container').classList.remove('slide-left');
             chatContainer.classList.remove('slide-left');
+            setTimeout(() => {
+                chatContainer.innerHTML = '';
+            }, 300); // Clear chat container after animation
         });
 
         function makeCall(jsonData) {
@@ -257,6 +261,7 @@
                 window.parent.postMessage(connectRequest, '*');
             }
         }
+
     </script>
 </body>
 </html>
