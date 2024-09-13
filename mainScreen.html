@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Main Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call Page</title>
     <style>
         html, body {
             height: 100%;
@@ -25,22 +25,6 @@
             background: white;
             padding: 20px;
             box-sizing: border-box;
-        }
-        .container, #chat-container {
-            transition: transform 0.3s ease-in-out;
-        }
-
-        #chat-container {
-            position: fixed;
-            top: 0;
-            left: 100%;
-            width: 100%;
-            height: 100%;
-            background: white;
-        }
-
-        .slide-left {
-            transform: translateX(-100%);
         }
         .input-container {
             display: flex;
@@ -116,32 +100,16 @@
         button:hover {
             background-color: #0056b3;
         }
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        .call-button, .message-button {
-            width: calc(50% - 5px);
-        }
-        .message-button {
-            background-color: #28a745;
-        }
-        .message-button:hover {
-            background-color: #218838;
-        }
-        .iframe-container {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
+        .call-button {
+            width: 100%;
             margin-top: 20px;
         }
         iframe {
             flex: 1;
             width: 100%;
             border: none;
+            margin-top: 20px;
             border-radius: 5px;
-            margin-bottom: 10px;
         }
         .button-container {
             display: none;
@@ -169,25 +137,18 @@
             <button class="domain-button">.cellact</button>
             <button class="domain-button">.eth</button>
         </div>
-        <div class="action-buttons">
-            <button class="call-button">Call</button>
-            <button class="message-button">Message</button>
-        </div>
-        <div class="iframe-container">
-            <iframe src="recentCalls.html"></iframe>
-            <iframe src="recentMessages.html"></iframe>
-        </div>
+        <button class="call-button">Call</button>
+        <iframe src="recentCalls.html"></iframe>
     </div>
-    <div id="chat-container"></div>
     <script>
         const controller = window.top.controller;
         const input = document.querySelector("#numberInput");
         const callButton = document.querySelector(".call-button");
-        const messageButton = document.querySelector(".message-button");
         const domainButtons = document.querySelectorAll(".domain-button");
         const keyboardToggle = document.querySelector("#keyboardToggle");
         const buttonContainer = document.querySelector(".button-container");
-        const chatContainer = document.getElementById('chat-container');
+
+        controller.getAudioDevices();
 
         // Set initial input type
         input.inputMode = "tel";
@@ -200,10 +161,6 @@
         callButton.addEventListener("click", function() {
             makeCall({to: input.value});
         });
-
-        messageButton.addEventListener("click", function() {
-            openChat(input.value);
-        })
 
         domainButtons.forEach(button => {
             button.addEventListener("click", function() {
@@ -222,41 +179,10 @@
         });
 
         window.addEventListener('message', (event) => {
-            switch (event.data.action) {
-                case 'call':
-                    makeCall(event.data.body);
-                    break;
-                    
-                case 'chat':
-                    openChat(event.data.body.sessionId);
-                    break;
-
-                case 'closeChat':
-                    closeChat();
-                    break;
+            if (event.data.action === 'call') {
+                makeCall(event.data.body);
             }
         });
-        
-        window.addEventListener('popstate', function(event) {
-            closeChat();
-        });
-
-        function openChat(sessionId) {
-            chatContainer.innerHTML = `<iframe src="chat.html?sessionId=${encodeURIComponent(sessionId)}" style="width:100%;height:100%;border:none;"></iframe>`;
-            document.querySelector('.container').classList.add('slide-left');
-            chatContainer.classList.add('slide-left');
-            history.pushState({page: 'chat'}, '', 'chat');
-            controller.displayBackButton(true);
-        }
-
-        function closeChat() {
-            document.querySelector('.container').classList.remove('slide-left');
-            chatContainer.classList.remove('slide-left');
-            setTimeout(() => {
-                chatContainer.innerHTML = '';
-            }, 300); // Clear chat container after animation
-            controller.displayBackButton(false);
-        }
 
         function makeCall(jsonData) {
             if (jsonData != null) {
@@ -267,7 +193,6 @@
                 window.parent.postMessage(connectRequest, '*');
             }
         }
-
     </script>
 </body>
 </html>
