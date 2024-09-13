@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Room</title>
+    <title>WhatsApp-style Chat Room</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,7 +12,7 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            background-color: #f0f0f0;
+            background-color: #e5ddd5;
             overflow-x: hidden;
         }
         #chat-container {
@@ -22,15 +22,19 @@
             margin-top: 60px;
             margin-bottom: 60px;
         }
-        .message {
+        .message-group {
             margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 10px;
-            max-width: 80%;
+        }
+        .message {
+            padding: 8px 12px;
+            border-radius: 7.5px;
+            max-width: 70%;
             word-wrap: break-word;
+            position: relative;
+            margin-bottom: 2px;
         }
         .message.sent {
-            background-color: #bbdefb;
+            background-color: #dcf8c6;
             align-self: flex-end;
             margin-left: auto;
         }
@@ -40,7 +44,7 @@
         .message-input {
             display: flex;
             padding: 10px;
-            background-color: #fff;
+            background-color: #f0f0f0;
             border-top: 1px solid #ccc;
             position: fixed;
             bottom: 0;
@@ -57,7 +61,7 @@
             font-size: 16px;
         }
         #send-button {
-            background-color: #1565c0;
+            background-color: #128C7E;
             color: white;
             border: none;
             padding: 5px 15px;
@@ -73,24 +77,28 @@
         }
         .image-message img {
             max-width: 100%;
-            border-radius: 10px;
+            border-radius: 7.5px;
         }
         .message-author {
             font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 14px;
+            font-size: 13px;
+            margin-bottom: 2px;
+            color: #128C7E;
         }
         .message-content {
-            margin-bottom: 5px;
+            margin-bottom: 15px;
             font-size: 14px;
         }
         .message-time {
-            font-size: 12px;
+            font-size: 11px;
             color: #888;
+            position: absolute;
+            bottom: 3px;
+            right: 7px;
         }
         @media (max-width: 600px) {
             .message {
-                max-width: 90%;
+                max-width: 80%;
             }
         }
         .slide-out {
@@ -136,11 +144,9 @@
         }
 
         let lastDisplayedDate = null;
+        let lastAuthor = null;
 
         function addMessage(content, author, time, type = 'text') {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', author === sessionId ? 'received' : 'sent');
-
             const currentDate = formatDate(time);
             if (currentDate !== lastDisplayedDate) {
                 const dateElement = document.createElement('div');
@@ -150,19 +156,44 @@
                 lastDisplayedDate = currentDate;
             }
 
+            let messageGroup;
+            if (author !== lastAuthor) {
+                messageGroup = document.createElement('div');
+                messageGroup.classList.add('message-group');
+                chatContainer.appendChild(messageGroup);
+                lastAuthor = author;
+            } else {
+                messageGroup = chatContainer.lastElementChild;
+            }
+
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', author === sessionId ? 'sent' : 'received');
+
+            if (author !== sessionId && author !== lastAuthor) {
+                const authorElement = document.createElement('div');
+                authorElement.classList.add('message-author');
+                authorElement.textContent = author;
+                messageElement.appendChild(authorElement);
+            }
+
             if (type === 'text') {
-                messageElement.textContent = `${content} (${formatTime(time)})`;
+                const contentElement = document.createElement('div');
+                contentElement.classList.add('message-content');
+                contentElement.textContent = content;
+                messageElement.appendChild(contentElement);
             } else if (type === 'image') {
                 messageElement.classList.add('image-message');
                 const img = document.createElement('img');
-                img.src = content; // In this case, 'content' is the image URL
+                img.src = content;
                 messageElement.appendChild(img);
-                const timeElement = document.createElement('div');
-                timeElement.textContent = formatTime(time);
-                messageElement.appendChild(timeElement);
             }
 
-            chatContainer.appendChild(messageElement);
+            const timeElement = document.createElement('div');
+            timeElement.classList.add('message-time');
+            timeElement.textContent = formatTime(time);
+            messageElement.appendChild(timeElement);
+
+            messageGroup.appendChild(messageElement);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
