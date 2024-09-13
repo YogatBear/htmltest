@@ -24,6 +24,8 @@
         }
         .message-group {
             margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
         }
         .message {
             padding: 8px 12px;
@@ -36,10 +38,10 @@
         .message.sent {
             background-color: #dcf8c6;
             align-self: flex-end;
-            margin-left: auto;
         }
         .message.received {
             background-color: #fff;
+            align-self: flex-start;
         }
         .message-input {
             display: flex;
@@ -169,7 +171,7 @@
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', author === sessionId ? 'sent' : 'received');
 
-            if (author !== sessionId && author !== lastAuthor) {
+            if (author !== sessionId) {
                 const authorElement = document.createElement('div');
                 authorElement.classList.add('message-author');
                 authorElement.textContent = author;
