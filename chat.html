@@ -22,11 +22,6 @@
             margin-top: 60px;
             margin-bottom: 60px;
         }
-        .message-group {
-            margin-bottom: 10px;
-            display: flex;
-            flex-direction: column;
-        }
         .message {
             padding: 8px 12px;
             border-radius: 7.5px;
@@ -34,12 +29,13 @@
             word-wrap: break-word;
             position: relative;
             margin-bottom: 2px;
-            min-width: 100px; /* Minimum width for short messages */
+            min-width: 100px;
         }
         .message.sent {
             background-color: #dcf8c6;
             align-self: flex-end;
-            padding-right: 60px; /* Extra padding for time */
+            margin-left: auto;
+            padding-right: 60px;
         }
         .message.received {
             background-color: #fff;
@@ -79,10 +75,6 @@
             color: #888;
             font-size: 12px;
         }
-        .image-message img {
-            max-width: 100%;
-            border-radius: 7.5px;
-        }
         .message-author {
             font-weight: bold;
             font-size: 13px;
@@ -99,22 +91,11 @@
             position: absolute;
             bottom: 3px;
             right: 7px;
-            white-space: nowrap; /* Prevent time from wrapping */
+            white-space: nowrap;
         }
         @media (max-width: 600px) {
             .message {
                 max-width: 80%;
-            }
-        }
-        .slide-out {
-            animation: slideOut 0.3s ease-in-out forwards;
-        }
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-            }
-            to {
-                transform: translateX(100%);
             }
         }
     </style>
@@ -161,20 +142,10 @@
                 lastDisplayedDate = currentDate;
             }
 
-            let messageGroup;
-            if (author !== lastAuthor) {
-                messageGroup = document.createElement('div');
-                messageGroup.classList.add('message-group');
-                chatContainer.appendChild(messageGroup);
-                lastAuthor = author;
-            } else {
-                messageGroup = chatContainer.lastElementChild;
-            }
-
             const messageElement = document.createElement('div');
-            messageElement.classList.add('message', author === sessionId ? 'received' : 'sent');
+            messageElement.classList.add('message', author === sessionId ? 'sent' : 'received');
 
-            if (author === sessionId) {
+            if (author !== sessionId && author !== lastAuthor) {
                 const authorElement = document.createElement('div');
                 authorElement.classList.add('message-author');
                 authorElement.textContent = author;
@@ -198,8 +169,10 @@
             timeElement.textContent = formatTime(time);
             messageElement.appendChild(timeElement);
 
-            messageGroup.appendChild(messageElement);
+            chatContainer.appendChild(messageElement);
             chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            lastAuthor = author;
         }
 
         sendButton.addEventListener('click', () => {
