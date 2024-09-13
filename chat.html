@@ -34,10 +34,12 @@
             word-wrap: break-word;
             position: relative;
             margin-bottom: 2px;
+            min-width: 100px; /* Minimum width for short messages */
         }
         .message.sent {
             background-color: #dcf8c6;
             align-self: flex-end;
+            padding-right: 60px; /* Extra padding for time */
         }
         .message.received {
             background-color: #fff;
@@ -97,6 +99,7 @@
             position: absolute;
             bottom: 3px;
             right: 7px;
+            white-space: nowrap; /* Prevent time from wrapping */
         }
         @media (max-width: 600px) {
             .message {
