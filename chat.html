@@ -172,7 +172,7 @@
             }
 
             const messageElement = document.createElement('div');
-            messageElement.classList.add('message', author === sessionId ? 'sent' : 'received');
+            messageElement.classList.add('message', author === sessionId ? 'received' : 'sent');
 
             if (author !== sessionId) {
                 const authorElement = document.createElement('div');
