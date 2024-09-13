@@ -143,9 +143,9 @@
             }
 
             const messageElement = document.createElement('div');
-            messageElement.classList.add('message', author === sessionId ? 'sent' : 'received');
+            messageElement.classList.add('message', author === sessionId ? 'received' : 'sent');
 
-            if (author !== sessionId && author !== lastAuthor) {
+            if (author === sessionId && author !== lastAuthor) {
                 const authorElement = document.createElement('div');
                 authorElement.classList.add('message-author');
                 authorElement.textContent = author;
