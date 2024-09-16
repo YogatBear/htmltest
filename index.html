@@ -29,7 +29,7 @@
 
         function getUrlParameter(name) {
             const urlParams = new URLSearchParams(window.location.search);
-            return decodeURIComponent(urlParams.get(name));
+            return urlParams.get(name);
         }
 
         document.addEventListener('DOMContentLoaded', function() {
