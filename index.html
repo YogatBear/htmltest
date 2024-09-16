@@ -25,6 +25,8 @@
         localId = getUrlParameter('localId');
         remoteId = getUrlParameter('remoteId');
 
+        console.log("remoteId: " + remoteId);
+
         guiFrame.src = "app.html?screen=" + screen + "&localId=" + localId + "&remoteId=" + remoteId;
 
         function getUrlParameter(name) {
