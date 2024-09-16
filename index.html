@@ -27,7 +27,7 @@
 
         console.log("remoteId: " + remoteId);
 
-        guiFrame.src = "app.html?screen=" + screen + "&localId=" + localId + "&remoteId=" + remoteId;
+        guiFrame.src = "app.html?screen=" + screen + "&localId=" + encodeURIComponent(localId) + "&remoteId=" + encodeURIComponent(remoteId);
 
         function getUrlParameter(name) {
             const urlParams = new URLSearchParams(window.location.search);
