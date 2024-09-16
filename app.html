@@ -40,25 +40,25 @@
         const channel = new BroadcastChannel('myChannel');
         const screenFrame = document.getElementById('screenFrame');
         const urlParams = new URLSearchParams(window.location.search);
-        const screen = decodeURIComponent(urlParams.get('screen'));
-        const localId = decodeURIComponent(urlParams.get('localId'));
-        const remoteId = decodeURIComponent(urlParams.get('remoteId'));
+        const screen = urlParams.get('screen');
+        const localId = urlParams.get('localId');
+        const remoteId = urlParams.get('remoteId');
 
         switch (screen) {
             case 'MAIN':
                 screenFrame.src = "mainScreen.html";
                 break;
             case 'CHAT':
-                screenFrame.src = "chat.html?sessionId=" + remoteId;
+                screenFrame.src = "chat.html?sessionId=" + encodeURIComponent(remoteId);
                 break;
             case 'CALL':
-                screenFrame.src = "inCall.html?to=" + remoteId;
+                screenFrame.src = "inCall.html?to=" + encodeURIComponent(remoteId);
                 break;
             case 'RING':
-                screenFrame.src = "ringing.html?to=" + remoteId;
+                screenFrame.src = "ringing.html?to=" + encodeURIComponent(remoteId);
                 break;
             case 'INCOMING':
-                screenFrame.src = "incomingCall.html?from=" + remoteId;
+                screenFrame.src = "incomingCall.html?from=" + encodeURIComponent(remoteId);
                 break;
         }
 
