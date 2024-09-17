@@ -44,6 +44,9 @@
         const localId = urlParams.get('localId');
         const remoteId = urlParams.get('remoteId');
 
+        const userAgent = navigator.userAgent;
+        console.log("User Agent: " + userAgent);
+
         switch (screen) {
             case 'MAIN':
                 screenFrame.src = "mainScreen.html";
