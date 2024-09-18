@@ -269,7 +269,7 @@
             clearInterval(callInterval);
         });
 
-        let isMuted = false;
+        var isMuted = false;
         muteButton.addEventListener('click', () => {
             controller.setMute(callId, !isMuted);
         });
@@ -277,15 +277,10 @@
         function toggleMute(bool) {
             isMuted = bool;
             console.log("Mute toggled:", isMuted);
-            if (isMuted) {
-                muteButton.querySelector('.material-icons').textContent = 'mic_off';
-            } else {
-                muteButton.querySelector('.material-icons').textContent = 'mic';
-            }
-            //muteButton.querySelector('.material-icons').textContent = isMuted ? 'mic_off' : 'mic';
+            muteButton.querySelector('.material-icons').textContent = isMuted ? 'mic_off' : 'mic';
         }
 
-        let isOnHold = false;
+        var isOnHold = false;
         holdButton.addEventListener('click', () => {
             controller.setHold(callId, !isOnHold);
         });
