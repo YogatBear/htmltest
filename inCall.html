@@ -276,6 +276,7 @@
 
         function toggleMute(bool) {
             isMuted = bool;
+            console.log("Mute toggled:", isMuted);
             muteButton.querySelector('.material-icons').textContent = isMuted ? 'mic_off' : 'mic';
         }
 
