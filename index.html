@@ -164,10 +164,10 @@
                 this.sendMessageToNativeApp(request);
             }
 
-            getLogs() {
+            getLogs(remoteId = null) {
                 const request = {
                     action: "get-logs",
-                    body: { localId: this.localId, range: 10 }
+                    body: { localId: this.localId, remoteId: remoteId, range: 10 }
                 };
                 this.sendMessageToNativeApp(request);
             }
