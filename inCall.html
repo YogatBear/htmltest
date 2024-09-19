@@ -271,6 +271,7 @@
 
         var isMuted = false;
         muteButton.addEventListener('click', () => {
+            console.log("Mute pressed:", isMuted);
             controller.setMute(callId, !isMuted);
         });
 
