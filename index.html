@@ -21,11 +21,10 @@
     <script>
 
         guiFrame = document.getElementById('guiFrame');
+        pid = getUrlParameter('PID');
         screen = getUrlParameter('screen');
         localId = getUrlParameter('localId');
         remoteId = getUrlParameter('remoteId');
-
-        console.log("remoteId: " + remoteId);
 
         guiFrame.src = "app.html?screen=" + screen + "&localId=" + encodeURIComponent(localId) + "&remoteId=" + encodeURIComponent(remoteId);
 
@@ -42,8 +41,8 @@
 
             constructor() {
                 this.guiFrame = guiFrame;
+                this.pid = pid;
                 this.localId = localId;
-                this.remoteId = remoteId;
             }
 
             receiveData(_data) {
@@ -68,7 +67,7 @@
             call(to) {
                 const callRequest = {
                     action: "call",
-                    body: {localId: this.localId, to: to}
+                    body: { pid: this.pid, localId: this.localId, to: to }
                 };
                 this.sendMessageToNativeApp(callRequest);
             }
@@ -76,7 +75,7 @@
             acceptCall(callId) {
                 const request = {
                     action: "accept-call",
-                    body: { callId: callId }
+                    body: { pid: this.pid, callId: callId }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -84,7 +83,7 @@
             rejectCall(callId) {
                 const request = {
                     action: "reject-call",
-                    body: { callId: callId }
+                    body: { pid: this.pid, callId: callId }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -92,10 +91,7 @@
             setMute(callId, bool) {
                 const request = {
                     action: "set-mute",
-                    body: { 
-                        callId: callId,
-                        mute: bool
-                     }
+                    body: { pid: this.pid, callId: callId, mute: bool}
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -103,10 +99,7 @@
             setHold(callId, bool) {
                 const request = {
                     action: "set-hold",
-                    body: { 
-                        callId: callId,
-                        hold: bool 
-                    }
+                    body: { pid: this.pid, callId: callId, hold: bool }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -114,7 +107,7 @@
             setActiveCall(callId) {
                 const request = {
                     action: "set-active-call",
-                    body: {callId: callId}
+                    body: { pid: this.pid, callId: callId }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -122,7 +115,7 @@
             sendMessage(to, message) {
                 const request = {
                     action: "send-message",
-                    body: {localId: this.localId, to: to, content: message}
+                    body: { pid: this.pid, localId: this.localId, to: to, content: message }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -130,7 +123,7 @@
             store(key, value) {
                 const request = {
                     action: "store",
-                    body: { key: key, value: value }
+                    body: { pid: this.pid, key: key, value: value }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -138,20 +131,14 @@
             changeAudioDevice(callId, deviceId) {
                 const request = {
                     action: "set-audio-device",
-                    body: { 
-                        callId: callId,
-                        deviceId: deviceId 
-                    }
+                    body: { pid: this.pid, callId: callId, deviceId: deviceId }
                 };
                 this.sendMessageToNativeApp(request);
             }
             sendDtmf(callId, digit) {
                 const request = {
                     action: "send-dtmf",
-                    body: { 
-                        callId: callId,
-                        digit: digit 
-                    }
+                    body: { pid: this.pid, callId: callId, digit: digit }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -161,15 +148,15 @@
             getActiveCalls() {
                 const request = {
                     action: "get-active-calls",
-                    body: {}
+                    body: {pid: this.pid}
                 };
                 this.sendMessageToNativeApp(request);
             }
 
-            getLogs() {
+            getLogs(remoteId = null) {
                 const request = {
                     action: "get-logs",
-                    body: { localId: this.localId, range: 10 }
+                    body: { pid: this.pid, localId: this.localId, remoteId: remoteId, range: 10 }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -177,7 +164,7 @@
             getRecentCalls() {
                 const request = {
                     action: "get-recent-calls",
-                    body: { localId: this.localId, range: 10 }
+                    body: { pid: this.pid, localId: this.localId, range: 10 }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -185,7 +172,7 @@
             getMessages(sessionId, range) {
                 const request = {
                     action: "get-messages",
-                    body: {localId: this.localId, sessionId: sessionId, range: range}
+                    body: { pid: this.pid, localId: this.localId, sessionId: sessionId, range: range }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -193,7 +180,7 @@
             getRecentMessages(range) {
                 const request = {
                     action: "get-recent-messages",
-                    body: {localId: this.localId, range: range}
+                    body: { pid: this.pid, localId: this.localId, range: range }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -201,7 +188,7 @@
             getAudioDevices() {
                 const request = {
                     action: "get-audio-devices",
-                    body: {}
+                    body: {pid: this.pid}
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -211,7 +198,7 @@
             displayBackButton(bool) {
                 const request = {
                     action: "display-back-button",
-                    body: { display: bool }
+                    body: { pid: this.pid, display: bool }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -221,6 +208,7 @@
                 this.sendMessage(action, body);
             }
         }
+        
 
     </script>
 </body>
