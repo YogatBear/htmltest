@@ -21,7 +21,7 @@
     <script>
 
         guiFrame = document.getElementById('guiFrame');
-        pid = getUrlParameter('PID');
+        pid = getUrlParameter('pid');
         screen = getUrlParameter('screen');
         localId = getUrlParameter('localId');
         remoteId = getUrlParameter('remoteId');
@@ -67,7 +67,7 @@
             call(to) {
                 const callRequest = {
                     action: "call",
-                    body: { pid: this.pid, localId: this.localId, to: to }
+                    body: { localId: this.localId, pid: this.pid, to: to }
                 };
                 this.sendMessageToNativeApp(callRequest);
             }
@@ -75,7 +75,7 @@
             acceptCall(callId) {
                 const request = {
                     action: "accept-call",
-                    body: { pid: this.pid, callId: callId }
+                    body: { localId: this.localId, pid: this.pid, callId: callId }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -83,7 +83,7 @@
             rejectCall(callId) {
                 const request = {
                     action: "reject-call",
-                    body: { pid: this.pid, callId: callId }
+                    body: { localId: this.localId, pid: this.pid, callId: callId }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -91,7 +91,7 @@
             setMute(callId, bool) {
                 const request = {
                     action: "set-mute",
-                    body: { pid: this.pid, callId: callId, mute: bool}
+                    body: { localId: this.localId, pid: this.pid, callId: callId, mute: bool}
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -99,7 +99,7 @@
             setHold(callId, bool) {
                 const request = {
                     action: "set-hold",
-                    body: { pid: this.pid, callId: callId, hold: bool }
+                    body: { localId: this.localId, pid: this.pid, callId: callId, hold: bool }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -107,7 +107,7 @@
             setActiveCall(callId) {
                 const request = {
                     action: "set-active-call",
-                    body: { pid: this.pid, callId: callId }
+                    body: { localId: this.localId, pid: this.pid, callId: callId }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -115,7 +115,7 @@
             sendMessage(to, message) {
                 const request = {
                     action: "send-message",
-                    body: { pid: this.pid, localId: this.localId, to: to, content: message }
+                    body: { localId: this.localId, pid: this.pid, to: to, content: message }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -123,7 +123,7 @@
             store(key, value) {
                 const request = {
                     action: "store",
-                    body: { pid: this.pid, key: key, value: value }
+                    body: { localId: this.localId, pid: this.pid, key: key, value: value }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -131,14 +131,14 @@
             changeAudioDevice(callId, deviceId) {
                 const request = {
                     action: "set-audio-device",
-                    body: { pid: this.pid, callId: callId, deviceId: deviceId }
+                    body: { localId: this.localId, pid: this.pid, callId: callId, deviceId: deviceId }
                 };
                 this.sendMessageToNativeApp(request);
             }
             sendDtmf(callId, digit) {
                 const request = {
                     action: "send-dtmf",
-                    body: { pid: this.pid, callId: callId, digit: digit }
+                    body: { localId: this.localId, pid: this.pid, callId: callId, digit: digit }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -148,7 +148,7 @@
             getActiveCalls() {
                 const request = {
                     action: "get-active-calls",
-                    body: {pid: this.pid}
+                    body: { localId: this.localId, pid: this.pid }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -156,7 +156,7 @@
             getLogs(remoteId = null) {
                 const request = {
                     action: "get-logs",
-                    body: { pid: this.pid, localId: this.localId, remoteId: remoteId, range: 10 }
+                    body: { localId: this.localId, pid: this.pid, remoteId: remoteId, range: 10 }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -164,7 +164,7 @@
             getRecentCalls() {
                 const request = {
                     action: "get-recent-calls",
-                    body: { pid: this.pid, localId: this.localId, range: 10 }
+                    body: { localId: this.localId, pid: this.pid, range: 10 }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -172,7 +172,7 @@
             getMessages(sessionId, range) {
                 const request = {
                     action: "get-messages",
-                    body: { pid: this.pid, localId: this.localId, sessionId: sessionId, range: range }
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId, range: range }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -180,7 +180,7 @@
             getRecentMessages(range) {
                 const request = {
                     action: "get-recent-messages",
-                    body: { pid: this.pid, localId: this.localId, range: range }
+                    body: { localId: this.localId, pid: this.pid, range: range }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -188,7 +188,7 @@
             getAudioDevices() {
                 const request = {
                     action: "get-audio-devices",
-                    body: {pid: this.pid}
+                    body: { localId: this.localId, pid: this.pid }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -198,7 +198,7 @@
             displayBackButton(bool) {
                 const request = {
                     action: "display-back-button",
-                    body: { pid: this.pid, display: bool }
+                    body: { localId: this.localId, pid: this.pid, display: bool }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -208,7 +208,6 @@
                 this.sendMessage(action, body);
             }
         }
-        
 
     </script>
 </body>
