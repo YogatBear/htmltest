@@ -172,7 +172,7 @@
         });
 
         window.addEventListener('message', (event) => {
-            if (event.data.action === 'call') {
+            if (event.data.action == 'call') {
                 makeCall(event.data.body);
             }
         });
