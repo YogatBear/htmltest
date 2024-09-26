@@ -155,22 +155,6 @@
             makeCall({to: input.value});
         });
 
-        domainButtons.forEach(button => {
-            button.addEventListener("click", function() {
-                input.value += this.textContent.toLowerCase();
-            });
-        });
-
-        keyboardToggle.addEventListener("change", function() {
-            if (this.checked) {
-                input.inputMode = "text";
-                buttonContainer.style.display = "flex";
-            } else {
-                input.inputMode = "tel";
-                buttonContainer.style.display = "none";
-            }
-        });
-
         window.addEventListener('message', (event) => {
             if (event.data.action == 'call') {
                 makeCall(event.data.body);
