@@ -83,7 +83,7 @@
                     li.className = "call-entry";
                     li.innerHTML = `
                         <div class="call-details">
-                            <div class="contact-name">${contact}</div>
+                            <div class="contact-name">${contact != null ? contact : id}</div>
                             <div class="call-time">${timeOrDate}</div>
                         </div>
                         <span class="call-icon material-symbols-outlined">${iconSymbol}</span>`;
