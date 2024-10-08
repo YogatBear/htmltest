@@ -71,7 +71,7 @@
             updateRecentCalls(recentCalls) {
                 this.container.innerHTML = ""; // Clear existing logs
                 recentCalls.forEach(call => {
-                    const [contact, timestamp, status] = call;
+                    const [contact, id, timestamp, status] = call;
                     const callDate = new Date(timestamp);
                     const today = new Date();
                     const isToday = callDate.toDateString() === today.toDateString();
@@ -88,7 +88,7 @@
                         </div>
                         <span class="call-icon material-symbols-outlined">${iconSymbol}</span>`;
                     li.addEventListener('click', () => {
-                        window.parent.postMessage({action: 'call', body: {to: contact}}, '*');
+                        window.parent.postMessage({action: 'call', body: {to: id}}, '*');
                     });
                     this.container.appendChild(li);
                 });
