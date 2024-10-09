@@ -152,7 +152,7 @@
         });
 
         callButton.addEventListener("click", function() {
-            makeCall({to: input.value});
+            makeCall({contact: input.value, id: input.value});
         });
 
         window.addEventListener('message', (event) => {
