@@ -91,9 +91,9 @@
                     this.setPage('main')
                 }
             }
-            callAttempt(to) {
-                this.setPage('callAttempt', {key:"to",value:to}); // Show call attempt screen
-                controller.call(to);
+            callAttempt(contact,remoteId) {
+                this.setPage('callAttempt', {key:"to",value:contact}); // Show call attempt screen
+                controller.call(remoteId);
             }
             callStarted(_with) {
                 this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
@@ -148,7 +148,7 @@
                     app.ring(body.to);
                     break;
                 case 'call-attempt':
-                    app.callAttempt(body.to);
+                    app.callAttempt(body.contact, body.id);
                     break;
                 case 'call-started':
                     app.callStarted(body.from);
