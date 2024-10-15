@@ -98,8 +98,9 @@
             callStarted(_with) {
                 this.setPage('inCall', {key:"to",value:_with}); // Show in-call screen
             }
-            callEnded() {
-                //this.setPage('main');
+            callEnded(remoteId) {
+                controller.rejectCall(remoteId);
+                this.setPage('main');
             }
             receivingCall(from) {
                 this.setPage('incomingCall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
@@ -154,7 +155,7 @@
                     app.callStarted(body.from);
                     break;
                 case 'call-ended':
-                    app.callEnded(body.from);
+                    app.callEnded(body.remoteId);
                     break;
                 case 'receiving-call':
                     app.receivingCall(body.from);

@@ -42,15 +42,20 @@
     </div>
     <script>
         const controller = window.top.controller;
-
         const urlParams = new URLSearchParams(window.location.search);
-        
         const to = urlParams.get('to');
+
         if(to){
             document.querySelector("#name").textContent = to;
         }
+
         document.querySelector("button").addEventListener("click", ()=>{
-            controller.rejectCall(to);
+            const endAttemptRequest = {
+                action: "call-ended",
+                body: {remoteId: to}
+            };
+            window.parent.postMessage(connectRequest, '*');
+
         })      
     </script>
 </body>
