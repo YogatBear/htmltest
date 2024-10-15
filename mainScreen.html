@@ -152,7 +152,9 @@
         });
 
         callButton.addEventListener("click", function() {
-            makeCall({contact: input.value, id: input.value});
+            if (input.value != "") {
+                makeCall({contact: input.value, id: input.value});
+            }
         });
 
         window.addEventListener('message', (event) => {
