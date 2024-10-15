@@ -54,7 +54,7 @@
                 action: "call-ended",
                 body: {remoteId: to}
             };
-            window.parent.postMessage(connectRequest, '*');
+            window.parent.postMessage(endAttemptRequest, '*');
 
         })      
     </script>
