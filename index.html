@@ -21,18 +21,43 @@
     <iframe id="guiFrame" frameBorder="0" style="width:100%; height:100vh;"></iframe>
     <script>
 
-        guiFrame = document.getElementById('guiFrame');
-        pid = getUrlParameter('pid');
-        screen = getUrlParameter('screen');
-        localId = getUrlParameter('localId');
-        remoteId = getUrlParameter('remoteId');
+        let guiFrame = document.getElementById('guiFrame');
+        let pid, screen, localId, remoteId;
 
-        guiFrame.src = "app.html?screen=" + screen + "&localId=" + encodeURIComponent(localId) + "&remoteId=" + encodeURIComponent(remoteId);
+        // Function to get parameters either from URL or localStorage
+        function getParameters() {
+            // First try localStorage
+            const storedParams = localStorage.getItem('appParameters');
+            if (storedParams) {
+                const params = JSON.parse(storedParams);
+                pid = params.pid;
+                screen = params.screen;
+                localId = params.localId;
+                remoteId = params.remoteId || '';
+                return true;
+            }
 
-        function getUrlParameter(name) {
+            // Fall back to URL parameters if no localStorage
             const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
+            pid = urlParams.get('pid');
+            screen = urlParams.get('screen');
+            localId = urlParams.get('localId');
+            remoteId = urlParams.get('remoteId') || '';
+            return (pid && screen && localId);
         }
+
+        // Function to initialize the frame
+        function initializeFrame() {
+            if (getParameters()) {
+                guiFrame.src = "app.html?screen=" + screen + 
+                              "&localId=" + encodeURIComponent(localId) + 
+                              "&remoteId=" + encodeURIComponent(remoteId);
+            }
+        }
+
+        // Listen for both DOM ready and our custom event
+        document.addEventListener('DOMContentLoaded', initializeFrame);
+        window.addEventListener('app-parameters-ready', initializeFrame);
 
         document.addEventListener('DOMContentLoaded', function() {
             window.top.controller = new Controller();
