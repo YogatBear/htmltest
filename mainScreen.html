@@ -119,6 +119,44 @@
         .button-container button {
             width: calc(50% - 5px);
         }
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 80%;
+            box-sizing: border-box;
+        }
+        .modal-content p {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .cancel-button {
+            padding: 12px 24px;
+            border: none;
+            background-color: #d9534f;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .cancel-button:hover {
+            background-color: #c9302c;
+        }
     </style>
 </head>
 <body>
@@ -135,6 +173,7 @@
     </div>
     <script>
         const controller = window.top.controller;
+        const app = window.parent.app;
         const input = document.querySelector("#numberInput");
         const callButton = document.querySelector(".call-button");
         const domainButtons = document.querySelectorAll(".domain-button");
@@ -165,11 +204,42 @@
 
         function makeCall(jsonData) {
             if (jsonData != null) {
-                const connectRequest = {
-                    action: "call-attempt",
-                    body: jsonData
-                };
-                window.parent.postMessage(connectRequest, '*');
+                // Create modal overlay
+                const modalOverlay = document.createElement('div');
+                modalOverlay.classList.add('modal-overlay');
+
+                // Create modal content
+                const modalContent = document.createElement('div');
+                modalContent.classList.add('modal-content');
+
+                // Create message
+                const message = document.createElement('p');
+                message.textContent = `Attempting to call ${jsonData.contact}`;
+
+                // Create cancel button
+                const cancelButton = document.createElement('button');
+                cancelButton.textContent = 'Cancel';
+                cancelButton.classList.add('cancel-button');
+
+                // Append message and button to modal content
+                modalContent.appendChild(message);
+                modalContent.appendChild(cancelButton);
+
+                // Append modal content to overlay
+                modalOverlay.appendChild(modalContent);
+
+                // Append overlay to body
+                document.body.appendChild(modalOverlay);
+
+                controller.call(jsonData.id)
+
+                cancelButton.addEventListener('click', function() {
+                    const endAttemptRequest = {
+                        action: "call-ended",
+                        body: {remoteId: jsonData.contact}
+                    };
+                    window.parent.postMessage(endAttemptRequest, '*');
+                });
             }
         }
     </script>
