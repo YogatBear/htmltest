@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reusable Call Log Component</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
         .recent-calls {
             margin: 0;
@@ -32,8 +31,11 @@
             color: #999;
         }
         .call-icon {
-            font-family: 'Material Symbols Outlined';
-            font-size: 24px;
+            width: 24px;
+            height: 24px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
         }
     </style>
 </head>
@@ -41,7 +43,6 @@
     <ul id="recent-calls" class="recent-calls"></ul>
 
     <script>
-
         const channel = new BroadcastChannel('myChannel');
 
         class RecentCallsComponent {
@@ -76,8 +77,9 @@
                     const today = new Date();
                     const isToday = callDate.toDateString() === today.toDateString();
                     const timeOrDate = isToday ? callDate.toLocaleTimeString([], { timeStyle: 'short' }) : callDate.toLocaleDateString();
-                    const iconSymbol = status.toLowerCase() === 'incoming' ? 'call_received' :
-                                      status.toLowerCase() === 'outgoing' ? 'call_made' : 'call_missed';
+                    const iconPath = status.toLowerCase() === 'incoming' ? './assets/call-received.png' :
+                                   status.toLowerCase() === 'outgoing' ? './assets/call-made.png' : 
+                                   './assets/call-missed.png';
                     
                     const li = document.createElement('li');
                     li.className = "call-entry";
@@ -86,7 +88,7 @@
                             <div class="contact-name">${contact ?? id}</div>
                             <div class="call-time">${timeOrDate}</div>
                         </div>
-                        <span class="call-icon material-symbols-outlined">${iconSymbol}</span>`;
+                        <div class="call-icon" style="background-image: url('${iconPath}')"></div>`;
                     li.addEventListener('click', () => {
                         console.log('contact:', contact);
                         console.log('id:', id);
