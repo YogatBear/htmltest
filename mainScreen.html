@@ -30,6 +30,7 @@
             display: flex;
             align-items: center;
             margin-bottom: 20px;
+            gap: 10px;
         }
         .toggle-container {
             display: flex;
@@ -101,14 +102,16 @@
             background-color: #0056b3;
         }
         .call-button {
-            width: 100%;
-            margin-top: 20px;
+            width: 48px;
             height: 48px;
+            margin-top: 0;
             background-image: url('./assets/call.png');
             background-repeat: no-repeat;
             background-position: center;
             background-size: 24px;
             font-size: 0;
+            border-radius: 5px;
+            filter: brightness(0) invert(1);
         }
         iframe {
             flex: 1;
@@ -169,8 +172,8 @@
     <div class="container">
         <div class="input-container">
             <input type="text" placeholder="Enter number or name" id="numberInput">
+            <button class="call-button" aria-label="Call">Call</button>
         </div>
-        <button class="call-button" aria-label="Call">Call(Replace with icon)</button>
         <iframe src="recentCalls.html"></iframe>
     </div>
     <script>
