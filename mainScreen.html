@@ -166,15 +166,25 @@
         .cancel-button:hover {
             background-color: #c9302c;
         }
-        
+
+        .section-title {
+            font-size: 24px;            /* Adjust font size as needed */
+            font-weight: bold;
+            color: #333;                /* Match your page's text color */
+            margin: 20px 0 0 0;      /* Top, right, bottom, left margins */
+            padding: 0;
+            text-align: left;           /* Align text to the left */
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
         <div class="input-container">
-            <input type="text" placeholder="Enter number or name" id="numberInput">
+            <input type="text" id="numberInput">
             <button class="call-button" aria-label="Call">Call</button>
         </div>
+        <h2 class="section-title">Recent Calls:</h2>
         <iframe src="recentCalls.html"></iframe>
     </div>
     <script>
