@@ -223,8 +223,18 @@
 
                 // Create cancel button
                 const cancelButton = document.createElement('button');
-                cancelButton.textContent = 'Cancel';
                 cancelButton.classList.add('cancel-button');
+                cancelButton.setAttribute('aria-label', 'Cancel'); // For accessibility
+
+                // Create an img element
+                const cancelImage = document.createElement('img');
+                cancelImage.src = './assets/call_end.png'; // Path to your local PNG image
+                cancelImage.alt = 'Cancel'; // Alternative text for accessibility
+                cancelImage.style.width = '24px'; // Adjust the size as needed
+                cancelImage.style.height = '24px';
+
+                // Append the image to the button
+                cancelButton.appendChild(cancelImage);
 
                 // Append message and button to modal content
                 modalContent.appendChild(message);
