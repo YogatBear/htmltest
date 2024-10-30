@@ -91,28 +91,20 @@
             border: 1px solid #ccc;
             flex-grow: 1;
         }
-        button {
-            border: none;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
+    
         .call-button {
             width: 48px;
             height: 48px;
-            margin-top: 0;
-            background-image: url('./assets/call.png');
+            background-color: #cc00ff;  /* Keep the blue background */
+            background-image: url('./images/call-icon.png');
             background-repeat: no-repeat;
             background-position: center;
             background-size: 24px;
             font-size: 0;
             border-radius: 5px;
-            filter: brightness(0) invert(1);
+            filter: brightness(0) invert(1);  /* This makes just the icon white */
         }
+
         iframe {
             flex: 1;
             width: 100%;
