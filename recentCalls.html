@@ -77,9 +77,9 @@
                     const today = new Date();
                     const isToday = callDate.toDateString() === today.toDateString();
                     const timeOrDate = isToday ? callDate.toLocaleTimeString([], { timeStyle: 'short' }) : callDate.toLocaleDateString();
-                    const iconPath = status.toLowerCase() === 'incoming' ? './assets/call_received.png' :
-                                   status.toLowerCase() === 'outgoing' ? './assets/call_made.png' : 
-                                   './assets/call_missed.png';
+                    const iconPath = status.toLowerCase() === 'incoming' ? './images/call_received.png' :
+                                   status.toLowerCase() === 'outgoing' ? './images/call_made.png' : 
+                                   './images/call_missed.png';
                     
                     const li = document.createElement('li');
                     li.className = "call-entry";

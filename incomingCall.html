@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Incoming Call</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,7 +22,7 @@
             max-width: 300px;
             display: flex;
             flex-direction: column;
-            flex: 1; /* Makes the container grow and fill the space */
+            flex: 1;
         }
         h2 {
             margin: 10px 0;
@@ -39,8 +38,8 @@
         .buttons {
             display: flex;
             justify-content: space-around;
-            margin-top: auto; /* Pushes the buttons to the bottom */
-            margin-bottom: 10vh; /* 10% of the viewport height from the bottom */
+            margin-top: auto;
+            margin-bottom: 10vh;
         }
         .call-button {
             display: flex;
@@ -51,18 +50,23 @@
             color: #f0f0f0;
             font-size: 30px;
         }
-        .material-icons {
-            font-size: 24px;
-            background-color: #f0f0f0;
-            border-radius: 50%;
-            padding: 12px;
+        .call-icon {
+            width: 48px;
+            height: 48px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             margin-bottom: 5px;
         }
-        .call-button#acceptButton .material-icons {
-            background-color: #34c759; /* Accept button green */
+        #acceptIcon {
+            background-image: url('images/call.png'); /* Replace with your local accept icon path */
+            background-color: #34c759;
+            border-radius: 50%;
         }
-        .call-button#declineButton .material-icons {
-            background-color: #ff3b30; /* Decline button red */
+        #declineIcon {
+            background-image: url('images/call_end.png'); /* Replace with your local decline icon path */
+            background-color: #ff3b30;
+            border-radius: 50%;
         }
     </style>
 </head>
@@ -72,10 +76,12 @@
         <div class="identity">Caller ID</div>
         <div class="buttons">
             <button class="call-button" id="acceptButton">
-                <i class="material-icons">check</i>
+                <div id="acceptIcon" class="call-icon"></div>
+                Accept
             </button>
             <button class="call-button" id="declineButton">
-                <i class="material-icons">close</i>
+                <div id="declineIcon" class="call-icon"></div>
+                Decline
             </button>
         </div>
     </div>
