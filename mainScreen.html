@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Picker Test</title>
     <style>
         body {
@@ -11,7 +10,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
         }
@@ -25,37 +24,74 @@
             max-width: 300px;
             margin-top: 20px;
         }
+        #pdfPreview {
+            width: 300px;
+            height: 400px;
+            margin-top: 20px;
+            border: none;
+        }
+        #fileInfo {
+            text-align: center;
+        }
+        #pdfLink {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <h1>File Picker Test</h1>
-    <input type="file" id="fileInput" accept="image/*">
-    <div id="fileInfo"></div>
+    <input type="file" id="fileInput" accept="image/*,application/pdf">
+    <div id="fileInfo">No file selected</div>
     <img id="preview" src="" alt="Image preview" style="display: none;">
- 
+    <iframe id="pdfPreview" src="" style="display: none;"></iframe>
+    <a id="pdfLink" href="#" target="_blank" style="display: none;">Open PDF in new tab</a>
+
     <script>
         const fileInput = document.getElementById('fileInput');
         const fileInfo = document.getElementById('fileInfo');
         const preview = document.getElementById('preview');
- 
+        const pdfPreview = document.getElementById('pdfPreview');
+        const pdfLink = document.getElementById('pdfLink');
+
         fileInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
                 fileInfo.textContent = `Selected file: ${file.name} (${file.type}, ${file.size} bytes)`;
-                
+
                 if (file.type.startsWith('image/')) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         preview.src = e.target.result;
                         preview.style.display = 'block';
+                        pdfPreview.style.display = 'none';
+                        pdfLink.style.display = 'none';
                     };
                     reader.readAsDataURL(file);
+                } else if (file.type === 'application/pdf') {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const blob = new Blob([e.target.result], { type: 'application/pdf' });
+                        const url = URL.createObjectURL(blob);
+
+                        // Attempt to display the PDF in an iframe
+                        pdfPreview.src = url;
+                        pdfPreview.style.display = 'block';
+                        pdfLink.href = url;
+                        pdfLink.style.display = 'block';
+                        preview.style.display = 'none';
+                    };
+                    reader.readAsArrayBuffer(file);
                 } else {
+                    fileInfo.textContent = 'Unsupported file type selected';
                     preview.style.display = 'none';
+                    pdfPreview.style.display = 'none';
+                    pdfLink.style.display = 'none';
                 }
             } else {
                 fileInfo.textContent = 'No file selected';
                 preview.style.display = 'none';
+                pdfPreview.style.display = 'none';
+                pdfLink.style.display = 'none';
             }
         });
     </script>
