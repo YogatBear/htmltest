@@ -207,6 +207,14 @@
                 const { action, body} = event.data;
                 this.sendMessage(action, body);
             }
+
+            chatOpened(remoteId){
+                const openChatRequest = {
+                    action: "open-chat",
+                    body: { remoteId: remoteId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
         }
 
     </script>
