@@ -90,14 +90,18 @@
                     li.addEventListener('click', () => {
                         console.log('contact:', contact);
                         console.log('id:', id);
-                        window.parent.postMessage({action: 'call', body: {contact: contact ?? id, id: id}}, '*');
+                        // window.parent.postMessage({action: 'call', body: {contact: contact ?? id, id: id}}, '*');
+                        window.parent.postMessage({action: 'call', body: {to:id}}, '*');
+
                     });
                     this.container.appendChild(li);
                 });
             }
+
         }
 
-        new RecentCallsComponent('recent-calls');
+        const com = new RecentCallsComponent('recent-calls');
+        com.updateRecentCalls([[null,"kaicenat.eth",1733475581000,"OUTGOING"],[null,"matanthegoat.eth",1733475134000,"INCOMING"]])
     </script>
 </body>
 </html>
