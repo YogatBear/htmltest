@@ -7,27 +7,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide-icons/0.321.0/font/lucide.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            user-select: none;
-        }
-        .container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: white;
-            padding: 20px;
-            box-sizing: border-box;
-        }
+
+
         .container, #chat-container {
             transition: transform 0.3s ease-in-out;
         }
@@ -44,115 +25,8 @@
         .slide-left {
             transform: translateX(-100%);
         }
-        .input-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .toggle-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-right: 15px;
-        }
-        .toggle-title {
-            font-size: 12px;
-            margin-bottom: 5px;
-        }
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 28px;
-        }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 28px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #2196F3;
-        }
-        input:checked + .slider:before {
-            transform: translateX(22px);
-        }
-        input[type="text"], button {
-            padding: 12px;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        input[type="text"] {
-            border: 1px solid #ccc;
-            flex-grow: 1;
-        }
-        button {
-            border: none;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        .call-button, .message-button {
-            width: calc(50% - 5px);
-        }
-        .message-button {
-            background-color: #28a745;
-        }
-        .message-button:hover {
-            background-color: #218838;
-        }
-        .iframe-container {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            margin-top: 20px;
-        }
-        iframe {
-            flex: 1;
-            width: 100%;
-            border: none;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        .button-container {
-            display: none;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .button-container button {
-            width: calc(50% - 5px);
-        }
+
+
         :root {
             --primary-white: #ffffff;
             --secondary-purple: #6a5acd;
@@ -310,13 +184,13 @@
         }
 
         iframe {
+            flex: 1;
             width: 100%;
-            height: 250px;
             border: 2px solid var(--light-purple);
             border-radius: 15px;
             background: var(--primary-white);
-        }
-
+            margin-bottom: 10px;
+        }  
     </style>
 </head>
 <body>
@@ -413,9 +287,10 @@
         function openChat(sessionId) {
             chatContainer.innerHTML = `<iframe src="chat.html?sessionId=${encodeURIComponent(sessionId)}" style="width:100%;height:100%;border:none;"></iframe>`;
             document.querySelector('.container').classList.add('slide-left');
-            // chatContainer.classList.add('slide-left');
+            chatContainer.classList.add('slide-left');
             history.pushState({page: 'chat'}, '', 'chat');
             controller.displayBackButton(true);
+
         }
 
         function closeChat() {
