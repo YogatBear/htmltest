@@ -107,6 +107,7 @@
             display: flex;
             align-items: center;
             margin-bottom: 15px;
+            gap:10px
         }
 
         .toggle-switch {
@@ -169,16 +170,6 @@
             background: var(--primary-white);
         }
 
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-
-        .shimmer {
-            background: linear-gradient(to right, #f0f0f0 0%, var(--light-purple) 50%, #f0f0f0 100%);
-            background-size: 1000px 100%;
-            animation: shimmer 2s infinite linear;
-        }
     </style>
 </head>
 <body>
@@ -213,8 +204,8 @@
     <script>
         const controller = window.top.controller;
         const input = document.querySelector("#numberInput");
-        const callButton = document.querySelector(".call-button");
-        const messageButton = document.querySelector(".message-button");
+        const callButton = document.querySelector(".call");
+        const messageButton = document.querySelector(".message");
         const domainButtons = document.querySelectorAll(".domain-button");
         const keyboardToggle = document.querySelector("#keyboardToggle");
         const buttonContainer = document.querySelector(".button-container");
