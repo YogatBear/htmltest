@@ -101,7 +101,8 @@
                     const isToday = messageDate.toDateString() === today.toDateString();
                     const timeOrDate = isToday ? messageDate.toLocaleTimeString([], { timeStyle: 'short' }) : messageDate.toLocaleDateString();
                     const iconSymbol = 'chat';
-                    const messageinfo = author + ': ' + content + ' ' + timeOrDate;
+                    const name = author === msgSessionId ? "" : "You: "
+                    const messageinfo = name + content + ' ';
                     
                     const li = document.createElement('li');
                     li.className = "message-entry";
@@ -110,6 +111,7 @@
                             <div class="contact-name">${msgSessionId}</div>
                             <div class="message-text">${messageinfo}</div>
                         </div>
+                        <p style="margin-right:3px">${timeOrDate}</p>
                         ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}
                         <span class="message-icon material-symbols-outlined">${iconSymbol}</span>`;
                     li.addEventListener('click', () => {
