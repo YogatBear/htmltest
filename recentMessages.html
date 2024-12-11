@@ -114,7 +114,7 @@
                         <span class="message-icon material-symbols-outlined">${iconSymbol}</span>`;
                     li.addEventListener('click', () => {
                         window.parent.postMessage({action: 'chat', body: {sessionId: msgSessionId}}, '*');
-                        this.controller.openChat(ses)
+                        this.controller.openChat(msgSessionId)
                     });
                     document.querySelector("#recent-messages").appendChild(li)
                     this.controller.chatOpened(msgSessionId);
