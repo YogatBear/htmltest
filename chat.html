@@ -21,6 +21,32 @@
             background-color: var(--primary-white);
             overflow-x: hidden;
         }
+        #call-button {
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            background-color: var(--secondary-purple);
+            color: var(--primary-white);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            gap: 10px;
+        }
+        #title {
+            flex: 1;
+
+            color:white;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%); /* Adjusts to center the title */
+            margin: 0; /* Remove default margin */
+        }
+        #top-bar{
+            background-color: var(--secondary-purple);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
         #chat-container {
             flex: 1;
             overflow-y: auto;
@@ -42,7 +68,8 @@
             float: right;
             padding-right: 40px;
             color:white;
-            border: var(--light-purple) 2px solid
+            border: var(--light-purple) 2px solid;
+            color:black
         }
         .message.received {
             background-color: var(--light-purple);
@@ -89,7 +116,7 @@
             font-weight: bold;
             font-size: 13px;
             margin-bottom: 2px;
-            color: #185be0;
+            color:black
         }
         .message-content {
             margin-bottom: 15px;
@@ -111,6 +138,10 @@
     </style>
 </head>
 <body>
+    <div id="top-bar">
+        <h5 id="title"></h5>
+        <button id="call-button">Call</button>
+    </div>
     <div id="chat-container"></div>
     <div class="message-input">
         <input type="text" id="message-text" placeholder="Type a message...">
@@ -184,6 +215,8 @@
 
             lastAuthor = author;
         }
+
+        document.getElementById("title").textContent = sessionId
 
         sendButton.addEventListener('click', () => {
             const message = messageText.value.trim();
