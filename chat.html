@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WhatsApp-style Chat Room</title>
     <style>
+        :root {
+            --primary-white: #ffffff;
+            --secondary-purple: #6a5acd;
+            --light-purple: #9370db;
+            --dark-purple: #4b0082;
+        }
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -12,7 +18,7 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            background-color: #e5ddd5;
+            background-color: var(--primary-white);
             overflow-x: hidden;
         }
         #chat-container {
@@ -33,7 +39,7 @@
             clear: both;
         }
         .message.sent {
-            background-color: #a0cef1;
+            background-color: var(--light-purple);
             float: right;
             padding-right: 40px;
         }
@@ -62,7 +68,7 @@
             font-size: 16px;
         }
         #send-button {
-            background-color: #56a1f6;
+            background-color: var(--secondary-purple);
             color: white;
             border: none;
             padding: 5px 15px;
