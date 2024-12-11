@@ -81,6 +81,7 @@
             align-items: center;
             margin-bottom: 20px;
             position: relative;
+            gap:5px
         }
 
         .input-icon {
@@ -212,7 +213,8 @@
         <div class="input-container">
             <i class="lucide lucide-phone-call input-icon"></i>
             <input type="text" placeholder="Enter number or name" id="numberInput">
-        </div>
+            <button class="action-button message">Add</button>
+            </div>
         <div class="toggle-container">
             <span class="toggle-title">Text Mode</span>
             <label class="toggle-switch">
@@ -220,7 +222,7 @@
                 <span class="slider"></span>
             </label>
         </div>
-        <div class="action-buttons">
+        <!-- <div class="action-buttons">
             <button class="action-button call">
                 <i class="lucide lucide-phone"></i>
                 Call
@@ -229,9 +231,9 @@
                 <i class="lucide lucide-message-circle"></i>
                 Message
             </button>
-        </div>
+        </div> -->
         <div class="iframe-container">
-            <iframe src="recentCalls.html" class="shimmer"></iframe>
+            <!-- <iframe src="recentCalls.html" class="shimmer"></iframe> -->
             <iframe src="recentMessages.html" class="shimmer"></iframe>
         </div>
     </div>
@@ -254,12 +256,12 @@
             this.value = this.value.toLowerCase();
         });
 
-        callButton.addEventListener("click", function() {
-            if (input.value === ""){
-                return
-            }
-            makeCall({to: input.value});
-        });
+        // callButton.addEventListener("click", function() {
+        //     if (input.value === ""){
+        //         return
+        //     }
+        //     makeCall({to: input.value});
+        // });
 
         messageButton.addEventListener("click", function() {
             if (input.value === ""){
