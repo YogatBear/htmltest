@@ -96,6 +96,7 @@
                 recentMessages.forEach(msg => {
                     
                     const [messageId, time, author, content, msgSessionId, unreadCount] = msg;
+
                     const messageDate = new Date(time);
                     const today = new Date();
                     const isToday = messageDate.toDateString() === today.toDateString();
@@ -125,6 +126,7 @@
 
         const com = new RecentMessagesComponent('recent-messages');
         com.updateRecentMessages([["2",1733906057000,"gwyneth.eth","Testttt","gwyneth.eth",2]])
+
 
     </script>
 </body>
