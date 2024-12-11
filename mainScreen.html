@@ -327,6 +327,7 @@
                     action: "call-attempt",
                     body: jsonData
                 };
+                console.log(window.parent)
                 window.parent.postMessage(connectRequest, '*');
             }
         }

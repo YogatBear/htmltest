@@ -217,13 +217,16 @@
 
         document.getElementById("title").textContent = sessionId
         document.getElementById("call-button").addEventListener("click", ()=>{
+            console.log("call")
+            console.log(window.parent.parent)
+
             const connectRequest = {
                     action: "call-attempt",
                     body: {
                         to: sessionId
                     }
                 };
-                window.parent.postMessage(connectRequest, '*');
+                window.parent.parent.postMessage(connectRequest, '*');
         })
         sendButton.addEventListener('click', () => {
             const message = messageText.value.trim();
