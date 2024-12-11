@@ -254,10 +254,16 @@
         });
 
         callButton.addEventListener("click", function() {
+            if (input.value === ""){
+                return
+            }
             makeCall({to: input.value});
         });
 
         messageButton.addEventListener("click", function() {
+            if (input.value === ""){
+                return
+            }
             openChat(input.value);
         })
 
