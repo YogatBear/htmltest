@@ -3,71 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Main Page</title>
+    <title>Purple Connect</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide-icons/0.321.0/font/lucide.min.css" rel="stylesheet">
     <style>
-        html, body {
-            height: 100%;
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        :root {
+            --primary-white: #ffffff;
+            --secondary-purple: #6a5acd;
+            --light-purple: #9370db;
+            --dark-purple: #4b0082;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-        }
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            user-select: none;
-        }
-        .container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: white;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .container, #chat-container {
-            transition: transform 0.3s ease-in-out;
+            transition: all 0.3s ease;
         }
 
-        #chat-container {
-            position: fixed;
-            top: 0;
-            left: 100%;
-            width: 100%;
+        html, body {
             height: 100%;
-            background: white;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--primary-white) 0%, var(--light-purple) 100%);
+            color: var(--dark-purple);
+            overflow-x: hidden;
         }
 
-        .slide-left {
-            transform: translateX(-100%);
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(106, 90, 205, 0.2);
+            position: relative;
+            overflow: hidden;
         }
+
         .input-container {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
+            position: relative;
         }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            color: var(--secondary-purple);
+            z-index: 10;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 15px 15px 50px;
+            border: 2px solid var(--light-purple);
+            border-radius: 15px;
+            font-size: 16px;
+            background-color: var(--primary-white);
+            color: var(--dark-purple);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--secondary-purple);
+            box-shadow: 0 0 10px rgba(106, 90, 205, 0.2);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-button {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            background-color: var(--secondary-purple);
+            color: var(--primary-white);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            gap: 10px;
+        }
+
+        .action-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(106, 90, 205, 0.4);
+        }
+
+        .action-button.message {
+            background-color: var(--light-purple);
+        }
+
         .toggle-container {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            margin-right: 15px;
+            margin-bottom: 15px;
         }
-        .toggle-title {
-            font-size: 12px;
-            margin-bottom: 5px;
-        }
+
         .toggle-switch {
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 28px;
+            width: 60px;
+            height: 34px;
         }
+
         .toggle-switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
+
         .slider {
             position: absolute;
             cursor: pointer;
@@ -75,107 +129,84 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: var(--light-purple);
             transition: .4s;
-            border-radius: 28px;
+            border-radius: 34px;
         }
+
         .slider:before {
             position: absolute;
             content: "";
-            height: 20px;
-            width: 20px;
+            height: 26px;
+            width: 26px;
             left: 4px;
             bottom: 4px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
         }
+
         input:checked + .slider {
-            background-color: #2196F3;
+            background-color: var(--secondary-purple);
         }
+
         input:checked + .slider:before {
-            transform: translateX(22px);
+            transform: translateX(26px);
         }
-        input[type="text"], button {
-            padding: 12px;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        input[type="text"] {
-            border: 1px solid #ccc;
-            flex-grow: 1;
-        }
-        button {
-            border: none;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        .call-button, .message-button {
-            width: calc(50% - 5px);
-        }
-        .message-button {
-            background-color: #28a745;
-        }
-        .message-button:hover {
-            background-color: #218838;
-        }
+
         .iframe-container {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
             margin-top: 20px;
         }
+
         iframe {
-            flex: 1;
             width: 100%;
-            border: none;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            height: 250px;
+            border: 2px solid var(--light-purple);
+            border-radius: 15px;
+            background: var(--primary-white);
         }
-        .button-container {
-            display: none;
-            justify-content: space-between;
-            margin-bottom: 20px;
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
         }
-        .button-container button {
-            width: calc(50% - 5px);
+
+        .shimmer {
+            background: linear-gradient(to right, #f0f0f0 0%, var(--light-purple) 50%, #f0f0f0 100%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite linear;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="input-container">
-            <div class="toggle-container">
-                <span class="toggle-title">Text Mode</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="keyboardToggle">
-                    <span class="slider"></span>
-                </label>
-            </div>
+            <i class="lucide lucide-phone-call input-icon"></i>
             <input type="text" placeholder="Enter number or name" id="numberInput">
         </div>
-        <div class="button-container">
-            <button class="domain-button">.cellact</button>
-            <button class="domain-button">.eth</button>
+        <div class="toggle-container">
+            <span class="toggle-title">Text Mode</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="keyboardToggle">
+                <span class="slider"></span>
+            </label>
         </div>
         <div class="action-buttons">
-            <button class="call-button">Call</button>
-            <button class="message-button">Message</button>
+            <button class="action-button call">
+                <i class="lucide lucide-phone"></i>
+                Call
+            </button>
+            <button class="action-button message">
+                <i class="lucide lucide-message-circle"></i>
+                Message
+            </button>
         </div>
         <div class="iframe-container">
-            <iframe src="recentCalls.html"></iframe>
-            <iframe src="recentMessages.html"></iframe>
+            <iframe src="recentCalls.html" class="shimmer"></iframe>
+            <iframe src="recentMessages.html" class="shimmer"></iframe>
         </div>
     </div>
     <div id="chat-container"></div>

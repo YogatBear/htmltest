@@ -39,6 +39,23 @@
             font-family: 'Material Symbols Outlined';
             font-size: 24px;
         }
+        .unread-bubble {
+            background-color: rgb(115, 0, 113);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border-radius: 50%;
+            padding: 5px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 5px; /* Adjust based on your layout */
+            right: 5px; /* Adjust based on your layout */
+        }
+
     </style>
 </head>
 <body>
@@ -78,7 +95,7 @@
                 this.container.innerHTML = ""; // Clear existing logs
                 recentMessages.forEach(msg => {
                     
-                    const [messageId, time, author, content, msgSessionId] = msg;
+                    const [messageId, time, author, content, msgSessionId, unreadCount] = msg;
                     const messageDate = new Date(time);
                     const today = new Date();
                     const isToday = messageDate.toDateString() === today.toDateString();
@@ -93,6 +110,7 @@
                             <div class="contact-name">${msgSessionId}</div>
                             <div class="message-text">${messageinfo}</div>
                         </div>
+                        ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}
                         <span class="message-icon material-symbols-outlined">${iconSymbol}</span>`;
                     li.addEventListener('click', () => {
                         window.parent.postMessage({action: 'chat', body: {sessionId: msgSessionId}}, '*');
@@ -105,7 +123,7 @@
         }
 
         const com = new RecentMessagesComponent('recent-messages');
-
+        com.updateRecentMessages([["2",1733906057000,"gwyneth.eth","Testttt","gwyneth.eth",2]])
 
     </script>
 </body>
