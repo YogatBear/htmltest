@@ -279,15 +279,15 @@
             });
         });
 
-        keyboardToggle.addEventListener("change", function() {
-            if (this.checked) {
-                input.inputMode = "text";
-                buttonContainer.style.display = "flex";
-            } else {
-                input.inputMode = "tel";
-                buttonContainer.style.display = "none";
-            }
-        });
+        // keyboardToggle.addEventListener("change", function() {
+        //     if (this.checked) {
+        //         input.inputMode = "text";
+        //         buttonContainer.style.display = "flex";
+        //     } else {
+        //         input.inputMode = "tel";
+        //         buttonContainer.style.display = "none";
+        //     }
+        // });
 
         window.addEventListener('message', (event) => {
             switch (event.data.action) {
