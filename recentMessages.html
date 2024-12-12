@@ -55,19 +55,6 @@
             top: 5px; /* Adjust based on your layout */
             right: 5px; /* Adjust based on your layout */
         }
-        .profile-circle {
-            width: 40px; /* Adjust size as needed */
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 10px; /* Adjust spacing */
-            color: white; /* Text color for the initial */
-            font-size: 16px; /* Adjust font size */
-            font-weight: bold;
-            text-transform: uppercase;
-        }
 
     </style>
 </head>
@@ -105,44 +92,44 @@
             }
 
             updateRecentMessages(recentMessages) {
-                this.container.innerHTML = ""; // Clear existing logs
-                recentMessages.forEach(msg => {
-                    const [messageId, time, author, content, msgSessionId, unreadCount] = msg;
+            this.container.innerHTML = ""; // Clear existing logs
+            recentMessages.forEach(msg => {
+                const [messageId, time, author, content, msgSessionId, unreadCount] = msg;
 
-                    const messageDate = new Date(time);
-                    const today = new Date();
-                    const isToday = messageDate.toDateString() === today.toDateString();
-                    const timeOrDate = isToday ? messageDate.toLocaleTimeString([], { timeStyle: 'short' }) : messageDate.toLocaleDateString();
-                    const iconSymbol = 'chat';
-                    const name = author === msgSessionId ? "" : "You: ";
-                    const messageinfo = name + content + ' ';
+                const messageDate = new Date(time);
+                const today = new Date();
+                const isToday = messageDate.toDateString() === today.toDateString();
+                const timeOrDate = isToday ? messageDate.toLocaleTimeString([], { timeStyle: 'short' }) : messageDate.toLocaleDateString();
+                const iconSymbol = 'chat';
+                const name = author === msgSessionId ? "" : "You: ";
+                const messageinfo = name + content + ' ';
 
-                    // Generate a random color
-                    const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+                // Generate a random color
+                const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 
-                    const li = document.createElement('li');
-                    li.className = "message-entry";
+                const li = document.createElement('li');
+                li.className = "message-entry";
 
-                    li.innerHTML = `
-                        <div class="profile-circle" style="background-color: ${randomColor};">
-                            <span class="profile-initial">${msgSessionId.charAt(0).toUpperCase()}</span>
-                        </div>
-                        <div class="message-details">
-                            <div class="contact-name">${msgSessionId}</div>
-                            <div class="message-text">${messageinfo}</div>
-                        </div>
-                        <p style="margin-right:3px">${timeOrDate}</p>
-                        ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}
-                        <span class="message-icon material-symbols-outlined">${iconSymbol}</span>`;
+                li.innerHTML = `
+                    <div class="profile-circle" style="background-color: ${randomColor};">
+                        <span class="profile-initial">${msgSessionId.charAt(0).toUpperCase()}</span>
+                    </div>
+                    <div class="message-details">
+                        <div class="contact-name">${msgSessionId}</div>
+                        <div class="message-text">${messageinfo}</div>
+                    </div>
+                    <p style="margin-right:3px">${timeOrDate}</p>
+                    ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}
+                    <span class="message-icon material-symbols-outlined">${iconSymbol}</span>`;
 
-                    li.addEventListener('click', () => {
-                        window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
-                        this.controller.chatOpened(msgSessionId);
-                    });
-
-                    document.querySelector("#recent-messages").appendChild(li);
+                li.addEventListener('click', () => {
+                    window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
+                    this.controller.chatOpened(msgSessionId);
                 });
-            }
+
+                document.querySelector("#recent-messages").appendChild(li);
+            });
+        }
 
         }
 
