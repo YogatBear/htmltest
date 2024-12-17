@@ -19,7 +19,7 @@ document.getElementById("send-transaction").addEventListener("click", () => {
     const chainId = 80002; // Replace with the correct chain ID (80001 for Mumbai Testnet)
 
     // Correct deep link format
-    const metamaskDeepLink = `https://metamask.app.link/send?address=${to}&value=${value}&data=${data}&chain_id=${chainId}`;
+    const metamaskDeepLink = `https://metamask.app.link/send/${to}@${chainId}?value=0&data=${data}`;
 
     // Open MetaMask
     window.location.href = metamaskDeepLink;
