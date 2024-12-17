@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web3 Transaction</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+</head>
+<body>
+    <h1>Web3 Transaction</h1>
+    <button id="generate-and-sign">Generate Random Number and Sign</button>
+
+    <script>
+        // Set the blockchain network and contract details
+        const NETWORK = "ethereum"; // e.g., 'ethereum', 'binance', 'polygon'
+        const CHAIN_ID = "0x1"; // Example: '0x1' for Ethereum mainnet, '0x89' for Polygon
+        const APP_DEEP_LINK = "myapp://"; // Replace with your app's deep link
+
+        document.getElementById("generate-and-sign").addEventListener("click", async () => {
+            try {
+                // Check if Web3 provider is available (e.g., MetaMask)
+                if (typeof window.ethereum === "undefined") {
+                    alert("Please install a Web3 wallet like MetaMask.");
+                    return;
+                }
+
+                // Create a Web3 instance
+                const web3 = new Web3(window.ethereum);
+
+                // Request access to the user's wallet
+                await window.ethereum.request({ method: "eth_requestAccounts" });
+
+                // Generate a random number
+                const randomNumber = Math.floor(Math.random() * 1000000);
+
+                // Prepare a transaction
+                const accounts = await web3.eth.getAccounts();
+                const from = accounts[0];
+                const transaction = {
+                    from: from,
+                    to: "0xYourContractAddress", // Replace with your smart contract address
+                    value: "0x0", // No Ether is sent in this example
+                    data: web3.utils.asciiToHex(randomNumber.toString()), // Convert random number to hex
+                    chainId: parseInt(CHAIN_ID, 16) // Chain ID as a number
+                };
+
+                // Send the transaction for signing
+                const signedTx = await window.ethereum.request({
+                    method: "eth_sendTransaction",
+                    params: [transaction],
+                });
+
+                alert("Transaction submitted! Tx Hash: " + signedTx);
+
+                // Redirect back to the app with the random number and transaction hash
+                window.location.href = `${APP_DEEP_LINK}?random=${randomNumber}&txHash=${signedTx}`;
+            } catch (error) {
+                console.error("An error occurred:", error);
+                alert("Failed to send the transaction. Check the console for details.");
+            }
+        });
+    </script>
+</body>
+</html>
