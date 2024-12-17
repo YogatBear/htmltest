@@ -10,17 +10,21 @@
     <button id="send-transaction">Send Transaction</button>
 
     <script>
-        document.getElementById("send-transaction").addEventListener("click", () => {
-            const to = "0xA96abD7db9c94a339B95EDC82B51099Cc3B1c56a"; // Replace with the recipient address
-            const value = "0"; // Amount of ETH to send, in Wei
-            const randomData = Math.floor(Math.random() * 1000000).toString(16); // Random number in hex
-            const data = `0x${randomData}`; // Add your encoded data here
+document.getElementById("send-transaction").addEventListener("click", () => {
+    const to = "0xA96abD7db9c94a339B95EDC82B51099Cc3B1c56a"; // Replace with the recipient address
+    const value = "0"; // Amount of ETH to send, in Wei
+    const randomData = Math.floor(Math.random() * 1000000).toString(16); // Random number in hex
+    const data = `0x${randomData}`; // Add your encoded data here
 
-            const chainId = 1; // Ethereum Mainnet
-            const metamaskDeepLink = `https://metamask.app.link/send/80002?to=${to}&value=${value}&data=${data}`;
+    const chainId = 80002; // Replace with the correct chain ID (80001 for Mumbai Testnet)
 
-            // Open MetaMask
-            window.location.href = metamaskDeepLink;
+    // Correct deep link format
+    const metamaskDeepLink = `https://metamask.app.link/send?address=${to}&value=${value}&data=${data}&chain_id=${chainId}`;
+
+    // Open MetaMask
+    window.location.href = metamaskDeepLink;
+});
+
         });
     </script>
 </body>
