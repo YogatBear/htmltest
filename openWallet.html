@@ -20,7 +20,7 @@ document.getElementById("send-transaction").addEventListener("click", () => {
     const jsonData = {
         "action": "sign-commitment",
         "body":{
-            "commitment":data
+            "content":data
         }
     }
         if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
