@@ -4,48 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web3 Transaction with MetaMask</title>
-    <!-- Include Ethers.js -->
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-    <!-- Include circomlibjs -->
-<!--     <script src="https://cdn.jsdelivr.net/npm/circomlibjs@0.1.7/"></script>
-    <!-- Include crypto-polyfill for browsers --> -->
-    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.js"></script>
 </head>
 <body>
     <h1>Web3 Transaction</h1>
     <button id="send-transaction">Send Transaction</button>
 
-    <script>
+    <script type="module">
+        import { Identity } from "@semaphore-protocol/identity";
+
         async function generateCommitment() {
-        const { buildMimcSponge } = require( 'https://cdn.jsdelivr.net/npm/circomlibjs@latest/dist/web/index.mjs');
-            const mimc = await buildMimcSponge()
-            let correctLength = false;
-            let nullifier;
-            let secret;
-            let commitment;
-            let nullifierHash;
-            while (!correctLength) {
-                nullifier = ethers.BigNumber.from(ethers.utils.randomBytes(31)).toString();
-                secret = ethers.BigNumber.from(ethers.utils.randomBytes(31)).toString();
-                commitment = mimc.F.toString(mimc.multiHash([nullifier, secret]));
-                nullifierHash = mimc.F.toString(mimc.multiHash([nullifier]));
-                if (commitment.length === 76) {
-                    correctLength = true;
-                }
-            }
-            return {
-                nullifier: nullifier,
-                secret: secret,
-                commitment: commitment,
-                nullifierHash: nullifierHash
-            };
+            // Create a random Semaphore identity
+            const identity = new Identity();
+
+            // Log identity details (do not expose privateKey in production)
+            console.log("Private Key:", identity.privateKey);
+            console.log("Public Key:", identity.publicKey);
+            console.log("Commitment:", identity.commitment);
+
+            // Return the identity commitment
+            return identity.commitment;
         }
 
         document.getElementById("send-transaction").addEventListener("click", async () => {
             const to = "0xA96abD7db9c94a339B95EDC82B51099Cc3B1c56a"; // Replace with the recipient address
             const value = "0"; // Amount of ETH to send, in Wei
             const randomData = Math.floor(Math.random() * 1000000).toString(16); // Random number in hex
-            const data = await generateCommitment(); // Add your encoded data here
+            const data = await generateCommitment(); // Generate Semaphore commitment
 
             const chainId = 80002; // Replace with the correct chain ID (80001 for Mumbai Testnet)
             const jsonData = {
@@ -54,6 +38,7 @@
                     "content": data
                 }
             };
+
             if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
                 window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
             } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
