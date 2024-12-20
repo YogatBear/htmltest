@@ -7,8 +7,8 @@
     <!-- Include Ethers.js -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
     <!-- Include circomlibjs -->
-    <script src="https://cdn.jsdelivr.net/npm/circomlibjs@0.1.7/"></script>
-    <!-- Include crypto-polyfill for browsers -->
+<!--     <script src="https://cdn.jsdelivr.net/npm/circomlibjs@0.1.7/"></script>
+    <!-- Include crypto-polyfill for browsers --> -->
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.js"></script>
 </head>
 <body>
@@ -17,7 +17,7 @@
 
     <script>
         async function generateCommitment() {
-            const mimc = await circomlibjs.buildMimcSponge();
+        import { buildMimcSponge } from 'https://cdn.jsdelivr.net/npm/circomlibjs@latest/dist/web/index.mjs';
             let correctLength = false;
             let nullifier;
             let secret;
