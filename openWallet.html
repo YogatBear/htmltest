@@ -17,12 +17,20 @@ document.getElementById("send-transaction").addEventListener("click", () => {
     const data = `0x53b628660000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000001e240`; // Add your encoded data here
 
     const chainId = 80002; // Replace with the correct chain ID (80001 for Mumbai Testnet)
-
-    // Correct deep link format
-    const metamaskDeepLink = `https://metamask.app.link/send/${to}@${chainId}?value=0&data=${data}`;
-
-    // Open MetaMask
-    window.location.href = metamaskDeepLink;
+    const jsonData = {
+        "action": "sign-commitment",
+        "body":{
+            "commitment":data
+        }
+    }
+        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+            window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
+        } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
+            console.log(JSON.stringify(jsonData));
+            window.AndroidBridge.processAction(JSON.stringify(jsonData));
+        } else {
+            console.log("Native interface not available");
+        }
 });
 
     </script>
