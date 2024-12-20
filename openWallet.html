@@ -17,7 +17,7 @@
 
     <script>
         async function generateCommitment() {
-        import { buildMimcSponge } from 'https://cdn.jsdelivr.net/npm/circomlibjs@latest/dist/web/index.mjs';
+        const { buildMimcSponge } = require( 'https://cdn.jsdelivr.net/npm/circomlibjs@latest/dist/web/index.mjs');
             const mimc = await buildMimcSponge()
             let correctLength = false;
             let nullifier;
