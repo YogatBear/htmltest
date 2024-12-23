@@ -5,177 +5,207 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Call Page</title>
     <style>
-        html, body {
-            height: 100%;
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        :root {
+            --primary-white: #ffffff;
+            --secondary-purple: #6a5acd;
+            --light-purple: #9370db;
+            --dark-purple: #4b0082;
+        }
+
+        /* Reset & Android WebView Tweaks */
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
         }
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
-            color: #333;
+        :focus {
+            outline: none !important;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--primary-white) 0%, var(--light-purple) 100%);
+            color: var(--dark-purple);
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
             user-select: none;
         }
+
         .container {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: white;
+            background: rgba(255, 255, 255, 0.9);
             padding: 20px;
             box-sizing: border-box;
+            border-radius: 0;
+            box-shadow: none;
+            width: 100%;
+            margin: 0;
+            overflow: hidden;
         }
+
         .input-container {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
+            position: relative;
             gap: 10px;
         }
-        .toggle-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-right: 15px;
-        }
-        .toggle-title {
-            font-size: 12px;
-            margin-bottom: 5px;
-        }
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 28px;
-        }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 28px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #2196F3;
-        }
-        input:checked + .slider:before {
-            transform: translateX(22px);
-        }
-        input[type="text"], button {
-            padding: 12px;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
+
         input[type="text"] {
-            border: 1px solid #ccc;
-            flex-grow: 1;
+            flex: 1;
+            padding: 15px;
+            border: 2px solid var(--light-purple);
+            border-radius: 15px;
+            font-size: 16px;
+            background-color: var(--primary-white);
+            color: var(--dark-purple);
+            outline: none;
         }
-        button {
-            border: none;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
+
+        input[type="text"]:focus {
+            border-color: var(--secondary-purple);
+            box-shadow: 0 0 10px rgba(106, 90, 205, 0.2);
+            transform: scale(1.02);
         }
-        button:hover {
-            background-color: #0056b3;
-        }
+
         .call-button {
             width: 48px;
             height: 48px;
-            background-color: #7b00ff;
-            background-image: url('./images/call.png');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 24px;
-            font-size: 0;
-            border-radius: 5px;
+            border-radius: 15px;
+            background-color: var(--secondary-purple);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(106, 90, 205, 0.4);
+        }
+
+        .call-button:active {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(106, 90, 205, 0.6);
+        }
+
+        .call-button::after {
+            content: "";
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: url('./images/call.png') no-repeat center center;
+            background-size: 24px 24px;
         }
 
         iframe {
             flex: 1;
             width: 100%;
-            border: none;
+            border: 2px solid var(--light-purple);
+            border-radius: 15px;
+            background: var(--primary-white);
             margin-top: 20px;
-            border-radius: 5px;
+            box-shadow: none;
         }
-        .button-container {
-            display: none;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .button-container button {
-            width: calc(50% - 5px);
-        }
-        /* Modal Styles */
+
+        /* Modal Overlay */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.6);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 999;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
         }
+
         .modal-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
+            background: var(--primary-white);
+            border-radius: 20px;
+            padding: 20px;
             text-align: center;
-            max-width: 80%;
-            box-sizing: border-box;
+            width: 300px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+            transform: scale(0.9);
+            animation: popIn 0.3s forwards;
+            color: var(--dark-purple);
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
+
         .modal-content p {
+            margin: 0 0 20px 0;
             font-size: 18px;
-            margin-bottom: 20px;
-            color: #333;
         }
+
         .cancel-button {
-            padding: 12px 24px;
             border: none;
-            background-color: #d9534f;
-            color: white;
-            font-size: 16px;
-            border-radius: 5px;
+            background: var(--secondary-purple);
+            border-radius: 15px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 5px 15px rgba(106, 90, 205, 0.4);
         }
+
         .cancel-button:hover {
-            background-color: #c9302c;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(106, 90, 205, 0.6);
         }
-        
+
+        .cancel-button img {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.9);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="input-container">
-            <input type="text" id="numberInput">
-            <button class="call-button" aria-label="Call">Call</button>
+            <input type="text" id="numberInput" placeholder="Enter number...">
+            <button class="call-button" aria-label="Call"></button>
         </div>
-        <iframe src="recentCalls.html"></iframe>
+        <iframe src="recentcalls.html"></iframe>
     </div>
     <script>
         const controller = window.top.controller;
@@ -199,6 +229,11 @@
         callButton.addEventListener("click", function() {
             if (input.value != "") {
                 makeCall({contact: input.value, id: input.value});
+            } else {
+                // Blur the button after click if no input provided to reset its state
+                setTimeout(() => {
+                    callButton.blur();
+                }, 200);
             }
         });
 
@@ -210,6 +245,9 @@
 
         function makeCall(jsonData) {
             if (jsonData != null) {
+                // Blur the call button after clicking call
+                callButton.blur();
+
                 // Create modal overlay
                 const modalOverlay = document.createElement('div');
                 modalOverlay.classList.add('modal-overlay');
@@ -225,14 +263,12 @@
                 // Create cancel button
                 const cancelButton = document.createElement('button');
                 cancelButton.classList.add('cancel-button');
-                cancelButton.setAttribute('aria-label', 'Cancel'); // For accessibility
+                cancelButton.setAttribute('aria-label', 'Cancel');
 
                 // Create an img element
                 const cancelImage = document.createElement('img');
-                cancelImage.src = './images/call_end.png'; // Path to your local PNG image
-                cancelImage.alt = 'Cancel'; // Alternative text for accessibility
-                cancelImage.style.width = '24px'; // Adjust the size as needed
-                cancelImage.style.height = '24px';
+                cancelImage.src = './images/call_end.png'; 
+                cancelImage.alt = 'Cancel'; 
 
                 // Append the image to the button
                 cancelButton.appendChild(cancelImage);

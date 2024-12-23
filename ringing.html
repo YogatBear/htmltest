@@ -4,55 +4,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ringing</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
+        body, html {
             margin: 0;
-            webkit-user-select: none; 
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f3e8ff;
             user-select: none;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
         }
         .container {
             text-align: center;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            background-color: #ffffff;
         }
-        h2 {
+        .ringing-info {
             margin-bottom: 20px;
         }
-        button {
-            padding: 10px 20px;
+        .ringing-info h2 {
+            font-size: 24px;
+            margin: 0;
+            color: #5e2d92;
+        }
+        .ringing-info span {
+            color: #7a47b6;
+            font-weight: bold;
+        }
+        .action-buttons {
+            margin-top: 20px;
+        }
+        .action-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
             border: none;
-            border-radius: 5px;
-            background-color: #dc3545;
+            border-radius: 50px;
+            font-size: 16px;
             color: white;
             cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            margin: 5px;
         }
-        button:hover {
-            background-color: #c82333;
+        .action-button.end-call {
+            background-color: #b02764;
+        }
+        .action-button.end-call:hover {
+            background-color: #910252;
+        }
+        .action-button.accept-call {
+            background-color: #5e2d92;
+        }
+        .action-button.accept-call:hover {
+            background-color: #472075;
+        }
+        .material-icons {
+            margin-right: 8px;
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Ringing <span id="name"></span></h2>
-        <button>Hang Up</button>
+        <div class="ringing-info">
+            <h2>Ringing <span id="name"></span></h2>
+        </div>
+        <div class="action-buttons">
+            <button class="action-button end-call" id="hangUpButton">
+                <i class="material-icons">call_end</i> Hang Up
+            </button>
+        </div>
     </div>
     <script>
         const controller = window.top.controller;
 
         const urlParams = new URLSearchParams(window.location.search);
-        
         const to = decodeURIComponent(urlParams.get('to'));
-        if(to){
+
+        if (to) {
             document.querySelector("#name").textContent = to;
         }
-        document.querySelector("button").addEventListener("click", ()=>{
+        document.querySelector("#hangUpButton").addEventListener("click", () => {
             controller.rejectCall(to);
-        })
-        
+        });
     </script>
 </body>
 </html>

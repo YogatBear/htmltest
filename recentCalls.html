@@ -5,37 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reusable Call Log Component</title>
     <style>
-        .recent-calls {
+        
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            list-style: none;
-            webkit-user-select: none; 
-            user-select: none;
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
         }
+        :focus {
+            outline: none !important;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            /* background: linear-gradient(135deg, #bd24d8bc, #9b27b069); */
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .recent-calls {
+            width: 100%;
+            max-width: 400px;
+            margin: 10px;
+            padding: 0;
+            list-style: none;
+            /* background: rgba(255, 255, 255, 0.1); */
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            height: 90%;
+        }
+
         .call-entry {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(170, 112, 177, 0.2);
+            transition: background 0.3s ease, transform 0.2s ease;
+            cursor: pointer;
         }
+
+        .call-entry:last-child {
+            border-bottom: none;
+        }
+
+        .call-entry:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.02);
+        }
+
         .call-details {
             flex-grow: 1;
         }
+
         .contact-name {
             font-size: 16px;
-            color: #333;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: rgba(0, 0, 0, 0.7);
+
         }
+
         .call-time {
-            font-size: 12px;
-            color: #999;
+            font-size: 14px;
+            color: rgba(129, 127, 127, 0.7);
         }
+
         .call-icon {
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
+        }
+
+        /* Scrollbar Styling */
+        .recent-calls {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .recent-calls::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .recent-calls::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .recent-calls::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
         }
     </style>
 </head>
@@ -43,6 +114,7 @@
     <ul id="recent-calls" class="recent-calls"></ul>
 
     <script>
+        
         const channel = new BroadcastChannel('myChannel');
 
         class RecentCallsComponent {
@@ -71,6 +143,7 @@
 
             updateRecentCalls(recentCalls) {
                 this.container.innerHTML = ""; // Clear existing logs
+                console.log("updating recent")
                 recentCalls.forEach(call => {
                     const [contact, id, timestamp, status] = call;
                     const callDate = new Date(timestamp);
