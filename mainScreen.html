@@ -205,7 +205,7 @@
             <input type="text" id="numberInput" placeholder="Enter number...">
             <button class="call-button" aria-label="Call"></button>
         </div>
-        <iframe src="recentcalls.html"></iframe>
+        <iframe src="recentCalls.html"></iframe>
     </div>
     <script>
         const controller = window.top.controller;
@@ -283,7 +283,9 @@
                 // Append overlay to body
                 document.body.appendChild(modalOverlay);
 
-                controller.call(jsonData.id)
+                //controller.call(jsonData.id)
+                controller.contactPicker()
+
 
                 cancelButton.addEventListener('click', function() {
                     const endAttemptRequest = {

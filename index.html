@@ -194,6 +194,14 @@
                 this.sendMessageToNativeApp(request);
             }
 
+            contactPicker() {
+                const request = {
+                    action: "contact-picker",
+                    body: { localId: this.localId, pid: this.pid }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
             // Webview capabilities
 
             displayBackButton(bool) {
