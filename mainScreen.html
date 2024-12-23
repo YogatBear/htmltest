@@ -79,7 +79,7 @@
             transform: scale(1.02);
         }
 
-        .call-button {
+        .action-button {
             width: 48px;
             height: 48px;
             border-radius: 15px;
@@ -90,12 +90,12 @@
             box-shadow: 0 5px 15px rgba(106, 90, 205, 0.4);
         }
 
-        .call-button:active {
+        .action-button:active {
             transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(106, 90, 205, 0.6);
         }
 
-        .call-button::after {
+        .action-button::after {
             content: "";
             position: absolute;
             width: 24px;
@@ -103,8 +103,17 @@
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            background: url('./images/call.png') no-repeat center center;
             background-size: 24px 24px;
+            background-repeat: no-repeat;
+            background-position: center center;
+        }
+
+        .call-button::after {
+            background-image: url('./images/call.png');
+        }
+
+        .contacts-button::after {
+            background-image: url('./images/contacts.png');
         }
 
         iframe {
@@ -181,21 +190,13 @@
 
         /* Animations */
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         @keyframes popIn {
-            from {
-                transform: scale(0.9);
-            }
-            to {
-                transform: scale(1);
-            }
+            from { transform: scale(0.9); }
+            to { transform: scale(1); }
         }
     </style>
 </head>
@@ -203,7 +204,9 @@
     <div class="container">
         <div class="input-container">
             <input type="text" id="numberInput" placeholder="Enter number...">
-            <button class="call-button" aria-label="Call"></button>
+            <button class="action-button call-button" aria-label="Call"></button>
+            <button class="action-button contacts-button" aria-label="Contacts"></button>
+
         </div>
         <iframe src="recentCalls.html"></iframe>
     </div>
@@ -212,10 +215,8 @@
         const app = window.parent.app;
         const input = document.querySelector("#numberInput");
         const callButton = document.querySelector(".call-button");
-        const domainButtons = document.querySelectorAll(".domain-button");
-        const keyboardToggle = document.querySelector("#keyboardToggle");
-        const buttonContainer = document.querySelector(".button-container");
-
+        const contactsButton = document.querySelector(".contacts-button");
+        
         controller.getAudioDevices();
 
         // Set initial input type
@@ -230,11 +231,19 @@
             if (input.value != "") {
                 makeCall({contact: input.value, id: input.value});
             } else {
-                // Blur the button after click if no input provided to reset its state
                 setTimeout(() => {
                     callButton.blur();
                 }, 200);
             }
+        });
+
+        contactsButton.addEventListener("click", function() {
+            controller.contactPicker();
+        });
+
+        contactsButton.addEventListener("click", function() {
+            controller.contactPicker();
+            contactsButton.blur();
         });
 
         window.addEventListener('message', (event) => {
@@ -248,47 +257,32 @@
 
         function makeCall(jsonData) {
             if (jsonData != null) {
-                // Blur the call button after clicking call
                 callButton.blur();
 
-                // Create modal overlay
                 const modalOverlay = document.createElement('div');
                 modalOverlay.classList.add('modal-overlay');
 
-                // Create modal content
                 const modalContent = document.createElement('div');
                 modalContent.classList.add('modal-content');
 
-                // Create message
                 const message = document.createElement('p');
                 message.textContent = `Attempting to call ${jsonData.contact}`;
 
-                // Create cancel button
                 const cancelButton = document.createElement('button');
                 cancelButton.classList.add('cancel-button');
                 cancelButton.setAttribute('aria-label', 'Cancel');
 
-                // Create an img element
                 const cancelImage = document.createElement('img');
-                cancelImage.src = './images/call_end.png'; 
-                cancelImage.alt = 'Cancel'; 
+                cancelImage.src = './images/call_end.png';
+                cancelImage.alt = 'Cancel';
 
-                // Append the image to the button
                 cancelButton.appendChild(cancelImage);
-
-                // Append message and button to modal content
                 modalContent.appendChild(message);
                 modalContent.appendChild(cancelButton);
-
-                // Append modal content to overlay
                 modalOverlay.appendChild(modalContent);
-
-                // Append overlay to body
                 document.body.appendChild(modalOverlay);
 
-                //controller.call(jsonData.id)
-                controller.contactPicker()
-
+                controller.call(jsonData.id);
 
                 cancelButton.addEventListener('click', function() {
                     const endAttemptRequest = {
