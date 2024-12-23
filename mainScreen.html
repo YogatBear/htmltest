@@ -246,8 +246,14 @@
             if (event.data.action == 'call') {
                 makeCall(event.data.body);
             }
-            else if (event.data.action == 'inject-remote-id') {
-                input.value = event.data.body.id;
+        });
+
+        channel.addEventListener('message', (event) => {
+            try {
+                const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+                if (data.injectRemoteId !== undefined) input.value = (data.injectRemoteId);
+            } catch (error) {
+                console.error("Error parsing message data:", error);
             }
         });
 
