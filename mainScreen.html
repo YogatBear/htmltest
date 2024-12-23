@@ -65,6 +65,7 @@
 
         input[type="text"] {
             flex: 1;
+            min-width: 0;  /* Allows input to shrink below default min-width */
             padding: 15px;
             border: 2px solid var(--light-purple);
             border-radius: 15px;
@@ -114,6 +115,7 @@
             width: 72px;  /* 1.5x height for slightly wider call button */
             height: 48px;
             aspect-ratio: 1.5;
+            background-color: var(--green);
         }
 
         .call-button::after {
