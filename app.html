@@ -49,19 +49,19 @@
 
         switch (screen) {
             case 'MAIN':
-                screenFrame.src = "mainscreen.html";
+                screenFrame.src = "mainScreen.html";
                 break;
             case 'CHAT':
                 screenFrame.src = "chat.html?sessionId=" + encodeURIComponent(remoteId);
                 break;
             case 'CALL':
-                screenFrame.src = "incall.html?to=" + encodeURIComponent(remoteId);
+                screenFrame.src = "inCall.html?to=" + encodeURIComponent(remoteId);
                 break;
             case 'RING':
                 screenFrame.src = "ringing.html?to=" + encodeURIComponent(remoteId);
                 break;
             case 'INCOMING':
-                screenFrame.src = "incomingcall.html?from=" + encodeURIComponent(remoteId);
+                screenFrame.src = "incomingCall.html?from=" + encodeURIComponent(remoteId);
                 break;
         }
 
@@ -129,11 +129,11 @@
 
         const app = new App(
             "test.eth",
-            "mainscreen.html",
+            "mainScreen.html",
             "ringing.html",
             "callattempt.html",
-            "incall.html",
-            "incomingcall.html"
+            "inCall.html",
+            "incomingCall.html"
         );
 
         window.app = app;
