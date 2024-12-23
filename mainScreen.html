@@ -81,8 +81,9 @@
         }
 
         .action-button {
-            width: 12vw;
+            width: 48px;  /* Same as height for square buttons */
             height: 48px;
+            aspect-ratio: 1;  /* Maintains square shape */
             border-radius: 15px;
             background-color: var(--secondary-purple);
             border: none;
@@ -110,8 +111,9 @@
         }
 
         .call-button {
-            background-color: var(--green);
-            width: 18vw;
+            width: 72px;  /* 1.5x height for slightly wider call button */
+            height: 48px;
+            aspect-ratio: 1.5;
         }
 
         .call-button::after {
