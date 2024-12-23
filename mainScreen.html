@@ -241,6 +241,9 @@
             if (event.data.action == 'call') {
                 makeCall(event.data.body);
             }
+            else if (event.data.action == 'inject-remote-id') {
+                input.value = event.data.body.id;
+            }
         });
 
         function makeCall(jsonData) {
