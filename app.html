@@ -190,6 +190,10 @@
                 case 'new-message':
                     app.dataFetched(body);
                     break;
+                case 'inject-remote-id':
+                    app.dataFetched(body);
+                    break;
+                    
                 default:
                     console.log('Unknown action:', action);
                     break;
