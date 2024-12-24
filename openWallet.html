@@ -7,6 +7,7 @@
         <button id="send-transaction">Generate commitment and sign</button>
     <script type="module">
         import {Identity} from "https://cdn.skypack.dev/pin/@semaphore-protocol/identity@v4.8.2-xU7JBMKKdqTriRZSHbsc/mode=imports/optimized/@semaphore-protocol/identity.js";
+	    import * as ethers from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.js";
         async function generateIdentity() {
             // Create a random Semaphore identity
             const identity = new Identity();
