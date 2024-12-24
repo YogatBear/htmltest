@@ -3,24 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Semaphore Identity Generation</title>
-    <script src="https://unpkg.com/circomlibjs@0.1.7/build/main.cjs"></script>
     <script type="module">
-        import { ed25519 } from 'https://cdn.jsdelivr.net/npm/ed25519@0.0.5/index.min.js';
-        import { poseidon } from 'https://cdn.jsdelivr.net/npm/@noble/curves@1.7.0/esm/poseidon.js';
+        import { Identity } from "https://cdn.skypack.dev/@semaphore-protocol/identity";
+        async function generateCommitment() {
+            // Create a random Semaphore identity
+            const identity = new Identity();
 
-        async function generateSemaphoreIdentity() {
-            // Generate a random private key
-            const privateKey = ed25519.utils.randomPrivateKey();
+            // Log identity details (do not expose privateKey in production)
+            console.log("Private Key:", identity.privateKey);
+            console.log("Public Key:", identity.publicKey);
+            console.log("Commitment:", identity.commitment);
 
-            // Derive the public key
-            const publicKey = ed25519.getPublicKey(privateKey);
-
-            // Compute the Poseidon hash of the public key to create the commitment
-            const identityCommitment = poseidon([publicKey]);
-
-            console.log("Private Key:", privateKey);
-            console.log("Public Key:", publicKey);
-            console.log("Identity Commitment:", identityCommitment);
+            // Return the identity commitment
+            return identity.commitment;
         }
 
         generateSemaphoreIdentity();
