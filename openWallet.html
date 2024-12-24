@@ -1035,8 +1035,9 @@
 
   const iface = new ethers.Interface(newabi);
   const data = iface.encodeFunctionData("buyProduct", [1, identity.commitment]);
-  
+  const decoded = iface.decodeFunctionData("buyProduct", data);
   console.log(data)
+console.log("decoded: ", decoded)
 
             const chainId = 80002; // Replace with the correct chain ID (80001 for Mumbai Testnet)
             const jsonData = {
