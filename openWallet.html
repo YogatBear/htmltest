@@ -5,7 +5,7 @@
     <title>Semaphore Identity Generation</title>
     <script src="https://unpkg.com/circomlibjs@0.1.7/build/main.cjs"></script>
     <script type="module">
-        import { ed25519 } from 'https://cdn.jsdelivr.net/npm/@noble/curves@1.7.0/esm/ed25519.js';
+        import { ed25519 } from 'https://cdn.jsdelivr.net/npm/ed25519@0.0.5/index.min.js';
         import { poseidon } from 'https://cdn.jsdelivr.net/npm/@noble/curves@1.7.0/esm/poseidon.js';
 
         async function generateSemaphoreIdentity() {
