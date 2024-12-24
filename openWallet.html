@@ -2,31 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web3 Transaction with MetaMask</title>
-</head>
-<body>
-    <h1>Web3 Transaction</h1>
-    <button id="send-transaction">Send Transaction</button>
-
+    <title>Semaphore Identity Generation</title>
+    <script src="https://unpkg.com/circomlibjs@0.1.7/build/main.cjs"></script>
     <script type="module">
-        import { Identity } from "https://cdn.skypack.dev/@semaphore-protocol/identity";
-import Buffer from "https://cdn.jsdelivr.net/npm/buffer@6.0.3/index.js";
-window.buffer = Buffer.Buffer;
+        import { ed25519 } from 'https://cdn.jsdelivr.net/npm/@noble/curves@1.7.0/esm/ed25519.js';
+        import { poseidon } from 'https://cdn.jsdelivr.net/npm/@noble/curves@1.7.0/esm/poseidon.js';
 
+        async function generateSemaphoreIdentity() {
+            // Generate a random private key
+            const privateKey = ed25519.utils.randomPrivateKey();
 
-        async function generateCommitment() {
-            // Create a random Semaphore identity
-            const identity = new Identity();
+            // Derive the public key
+            const publicKey = ed25519.getPublicKey(privateKey);
 
-            // Log identity details (do not expose privateKey in production)
-            console.log("Private Key:", identity.privateKey);
-            console.log("Public Key:", identity.publicKey);
-            console.log("Commitment:", identity.commitment);
+            // Compute the Poseidon hash of the public key to create the commitment
+            const identityCommitment = poseidon([publicKey]);
 
-            // Return the identity commitment
-            return identity.commitment;
+            console.log("Private Key:", privateKey);
+            console.log("Public Key:", publicKey);
+            console.log("Identity Commitment:", identityCommitment);
         }
+
+        generateSemaphoreIdentity();
 
         document.getElementById("send-transaction").addEventListener("click", async () => {
             const to = "0xA96abD7db9c94a339B95EDC82B51099Cc3B1c56a"; // Replace with the recipient address
