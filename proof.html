@@ -61,7 +61,7 @@
                 document.getElementById('private-key').textContent = identity.privateKey;
                 document.getElementById('public-key').textContent = identity.publicKey;
                 document.getElementById('commitment').textContent = identity.commitment;
-                document.getElementById('proof').textContent = JSON.stringify(proof, null, 2);
+
                 document.getElementById('result').style.display = 'block';
 
               const semaphoreEthers = new SemaphoreEthers("https://rpc-amoy.polygon.technology", {
@@ -71,7 +71,7 @@
               const members = await semaphoreEthers.getGroupMembers("1")
               const group = new Group(members)
               const proof = await generateProof(identity, group, 0, "test")
-                
+                                document.getElementById('proof').textContent = JSON.stringify(proof, null, 2);
             } catch (error) {
                 console.error('Error generating identity or proof:', error);
                 alert('Failed to generate identity or proof. Check console for details.');
