@@ -13,8 +13,9 @@
         import {Identity} from "https://cdn.skypack.dev/pin/@semaphore-protocol/identity@v4.8.2-xU7JBMKKdqTriRZSHbsc/mode=imports/optimized/@semaphore-protocol/identity.js";
 	    import * as ethers from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.js";
         async function generateIdentity() {
+	const privateKeyString = generateRandomPrivateKey();
             // Create a random Semaphore identity
-            const identity = new Identity();
+            const identity = new Identity(privateKeyString);
 
             // Log identity details (do not expose privateKey in production)
             console.log("Private Key:", identity.privateKey);
@@ -30,6 +31,15 @@
             // Return the identity commitment
             return identity;
         }
+	    function generateRandomPrivateKey() {
+  // Create a 32-byte random Uint8Array
+  const randomBytes = crypto.getRandomValues(new Uint8Array(32));
+
+  // Convert the Uint8Array to a hexadecimal string
+  return Array.from(randomBytes)
+      .map(byte => byte.toString(16).padStart(2, '0'))
+      .join('');
+}
         document.getElementById('copy-button').addEventListener('click', () => {
             const privateKeyText = document.getElementById('private-key').textContent;
 
