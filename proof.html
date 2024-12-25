@@ -7,11 +7,9 @@
 </head>
 <body>
     <h1>Generate Semaphore Identity and Proof</h1>
-    <form id="identity-form">
-        <label for="wallet-address">Enter Wallet Address:</label>
-        <input type="text" id="wallet-address" placeholder="Enter your wallet address" required>
-        <button type="submit">Generate Identity and Proof</button>
-    </form>
+    <p><strong>Wallet Address (from URI):</strong> <span id="wallet-address"></span></p>
+    <button id="generate-button">Generate Identity and Proof</button>
+    
     <div id="result" style="margin-top: 20px; display: none;">
         <h3>Results</h3>
         <p><strong>Private Key:</strong> <span id="private-key"></span></p>
@@ -23,15 +21,20 @@
     <script type="module">
         import { Identity } from "https://cdn.skypack.dev/pin/@semaphore-protocol/identity@v4.8.2-xU7JBMKKdqTriRZSHbsc/mode=imports/optimized/@semaphore-protocol/identity.js";
 
-        document.getElementById('identity-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
+        // Extract the wallet address from the URI parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const walletAddress = urlParams.get('walletAddress');
+        const walletAddressElement = document.getElementById('wallet-address');
 
-            // Retrieve the wallet address from the input
-            const walletAddress = document.getElementById('wallet-address').value.trim();
-            if (!walletAddress) {
-                alert('Please enter a wallet address.');
-                return;
-            }
+        if (!walletAddress) {
+            walletAddressElement.textContent = "Not provided in URI!";
+            alert('No wallet address found in URI parameters. Please include ?walletAddress=<address> in the URL.');
+        } else {
+            walletAddressElement.textContent = walletAddress;
+        }
+
+        document.getElementById('generate-button').addEventListener('click', async () => {
+            if (!walletAddress) return;
 
             try {
                 // Use the wallet address as the private key
