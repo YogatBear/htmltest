@@ -8,6 +8,7 @@
 <body>
     <h1>Generate Semaphore Identity and Proof</h1>
     <p><strong>Wallet Address (from URI):</strong> <span id="wallet-address"></span></p>
+    <input id="private-key"></input>
     <button id="generate-button">Generate Identity and Proof</button>
     
     <div id="result" style="margin-top: 20px; display: none;">
@@ -35,10 +36,15 @@
 
         document.getElementById('generate-button').addEventListener('click', async () => {
             if (!walletAddress) return;
+            const privateKey = document.getElementById('private-key').value
+
+            if(privateKey === ""){
+                return
+            }
 
             try {
                 // Use the wallet address as the private key
-                const identity = new Identity(walletAddress);
+                const identity = new Identity(privateKey);
 
                 // Log identity details
                 console.log("Private Key:", identity.privateKey);
@@ -47,10 +53,9 @@
 
                 // Generate proof for group ID 1
                 const groupId = 1;
-                const proof = identity.generateProof(groupId, {
-                    signal: "testSignal",
-                    nullifierHash: identity.nullifierHash,
-                });
+
+
+
 
                 // Display results
                 document.getElementById('private-key').textContent = identity.privateKey;
@@ -58,6 +63,15 @@
                 document.getElementById('commitment').textContent = identity.commitment;
                 document.getElementById('proof').textContent = JSON.stringify(proof, null, 2);
                 document.getElementById('result').style.display = 'block';
+
+              const semaphoreEthers = new SemaphoreEthers("https://rpc-amoy.polygon.technology", {
+                address: "0x46Af5b92E8052cbf040Fe7f0179212C71C1A72a5"
+              })
+            
+              const members = await semaphoreEthers.getGroupMembers("1")
+              const group = new Group(members)
+              const proof = await generateProof(identity, group, 0, "test")
+                
             } catch (error) {
                 console.error('Error generating identity or proof:', error);
                 alert('Failed to generate identity or proof. Check console for details.');
