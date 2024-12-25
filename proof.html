@@ -23,7 +23,7 @@
         import { Identity } from "https://cdn.skypack.dev/pin/@semaphore-protocol/identity@v4.8.2-xU7JBMKKdqTriRZSHbsc/mode=imports/optimized/@semaphore-protocol/identity.js";
         // import {SemaphoreEthers} from "https://cdn.jsdelivr.net/npm/@semaphore-protocol/data@4.4.2/dist/index.js";
 import semaphoreProtocolproof from 'https://cdn.jsdelivr.net/npm/@semaphore-protocol/proof@4.8.2/+esm'
-import * as semaphoreProtocoldata from 'https://cdn.jsdelivr.net/npm/@semaphore-protocol/data@4.8.2/+esm'
+import {SemaphoreEthers} from 'https://cdn.jsdelivr.net/npm/@semaphore-protocol/data@4.8.2/+esm'
         console.log(semaphoreProtocoldata)
         // Extract the wallet address from the URI parameter
         const urlParams = new URLSearchParams(window.location.search);
@@ -67,7 +67,7 @@ import * as semaphoreProtocoldata from 'https://cdn.jsdelivr.net/npm/@semaphore-
 
                 document.getElementById('result').style.display = 'block';
 
-              const semaphoreEthers = new semaphoreProtocoldata.SemaphoreEthers("https://rpc-amoy.polygon.technology", {
+              const semaphoreEthers = new SemaphoreEthers("https://rpc-amoy.polygon.technology", {
                 address: "0x46Af5b92E8052cbf040Fe7f0179212C71C1A72a5"
               })
             
