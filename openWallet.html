@@ -5,6 +5,10 @@
     <title>Semaphore Identity Generation</title>
     <body>
         <button id="send-transaction">Generate commitment and sign</button>
+	<div id="private-key-container" style="margin-top: 20px; display: none;">
+        	<p><strong>Private Key:</strong> <span id="private-key"></span></p>
+        <button id="copy-button">Copy Private Key</button>
+    </div>
     <script type="module">
         import {Identity} from "https://cdn.skypack.dev/pin/@semaphore-protocol/identity@v4.8.2-xU7JBMKKdqTriRZSHbsc/mode=imports/optimized/@semaphore-protocol/identity.js";
 	    import * as ethers from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.js";
@@ -17,10 +21,24 @@
             console.log("Public Key:", identity.publicKey);
             console.log("Commitment:", identity.commitment);
 
+		const privateKeyContainer = document.getElementById('private-key-container');
+            const privateKeyElement = document.getElementById('private-key');
+
+            privateKeyElement.textContent = identity.privateKey;
+            privateKeyContainer.style.display = 'block';
+
             // Return the identity commitment
             return identity;
         }
+        document.getElementById('copy-button').addEventListener('click', () => {
+            const privateKeyText = document.getElementById('private-key').textContent;
 
+            navigator.clipboard.writeText(privateKeyText).then(() => {
+                alert('Private Key copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        });
         document.getElementById("send-transaction").addEventListener("click", async () => {
             const identity = await generateIdentity(); // Generate Semaphore commitment
             const abi = [
