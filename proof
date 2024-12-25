@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semaphore Identity and Proof</title>
+</head>
+<body>
+    <h1>Generate Semaphore Identity and Proof</h1>
+    <form id="identity-form">
+        <label for="wallet-address">Enter Wallet Address:</label>
+        <input type="text" id="wallet-address" placeholder="Enter your wallet address" required>
+        <button type="submit">Generate Identity and Proof</button>
+    </form>
+    <div id="result" style="margin-top: 20px; display: none;">
+        <h3>Results</h3>
+        <p><strong>Private Key:</strong> <span id="private-key"></span></p>
+        <p><strong>Public Key:</strong> <span id="public-key"></span></p>
+        <p><strong>Commitment:</strong> <span id="commitment"></span></p>
+        <p><strong>Proof:</strong> <span id="proof"></span></p>
+    </div>
+
+    <script type="module">
+        import { Identity } from "https://cdn.skypack.dev/pin/@semaphore-protocol/identity@v4.8.2-xU7JBMKKdqTriRZSHbsc/mode=imports/optimized/@semaphore-protocol/identity.js";
+
+        document.getElementById('identity-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            // Retrieve the wallet address from the input
+            const walletAddress = document.getElementById('wallet-address').value.trim();
+            if (!walletAddress) {
+                alert('Please enter a wallet address.');
+                return;
+            }
+
+            try {
+                // Use the wallet address as the private key
+                const identity = new Identity(walletAddress);
+
+                // Log identity details
+                console.log("Private Key:", identity.privateKey);
+                console.log("Public Key:", identity.publicKey);
+                console.log("Commitment:", identity.commitment);
+
+                // Generate proof for group ID 1
+                const groupId = 1;
+                const proof = identity.generateProof(groupId, {
+                    signal: "testSignal",
+                    nullifierHash: identity.nullifierHash,
+                });
+
+                // Display results
+                document.getElementById('private-key').textContent = identity.privateKey;
+                document.getElementById('public-key').textContent = identity.publicKey;
+                document.getElementById('commitment').textContent = identity.commitment;
+                document.getElementById('proof').textContent = JSON.stringify(proof, null, 2);
+                document.getElementById('result').style.display = 'block';
+            } catch (error) {
+                console.error('Error generating identity or proof:', error);
+                alert('Failed to generate identity or proof. Check console for details.');
+            }
+        });
+    </script>
+</body>
+</html>
