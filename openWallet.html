@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Semaphore Identity Generation</title>
-    <body>
-        <button id="send-transaction">Generate commitment and sign</button>
-	<div id="private-key-container" style="margin-top: 20px; display: none;">
-        	<p><strong>Private Key:</strong> <span id="private-key"></span></p>
-		<p><strong>Commitment:</strong> <span id="commitment"></span></p>
+<body style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f9;">
 
-        <button id="copy-button">Copy Private Key</button>
+    <button id="send-transaction" style="font-size: 18px; padding: 12px 24px; border: none; background-color: #007bff; color: white; border-radius: 6px; cursor: pointer; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+        Generate Commitment and Sign
+    </button>
+
+    <div id="private-key-container" style="margin-top: 30px; padding: 20px; background-color: #ffffff; border-radius: 10px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); display: none; max-width: 400px; margin-left: auto; margin-right: auto;">
+        <p style="font-size: 16px; color: #333;"><strong>Private Key:</strong> <span id="private-key" style="word-wrap: break-word; color: #007bff;"></span></p>
+        <p style="font-size: 16px; color: #333;"><strong>Commitment:</strong> <span id="commitment" style="word-wrap: break-word; color: #007bff;"></span></p>
+        
+        <button id="copy-button" style="font-size: 16px; padding: 10px 20px; border: none; background-color: #28a745; color: white; border-radius: 6px; cursor: pointer; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); margin-top: 15px;">
+            Copy Private Key
+        </button>
     </div>
     <script type="module">
         import {Identity} from "https://cdn.skypack.dev/pin/@semaphore-protocol/identity@v4.8.2-xU7JBMKKdqTriRZSHbsc/mode=imports/optimized/@semaphore-protocol/identity.js";
