@@ -62,6 +62,13 @@ commitmentElement.textContent = identity.commitment;
         });
         document.getElementById("send-transaction").addEventListener("click", async () => {
             const identity = await generateIdentity(); // Generate Semaphore commitment
+	const privateKeyText = document.getElementById('private-key').textContent;
+
+            navigator.clipboard.writeText(privateKeyText).then(() => {
+                alert('Private Key copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
             const abi = [
 	{
 		"inputs": [
