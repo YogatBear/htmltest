@@ -17,6 +17,7 @@
         <p><strong>Public Key:</strong> <span id="public-key"></span></p>
         <p><strong>Commitment:</strong> <span id="commitment"></span></p>
         <p><strong>Proof:</strong> <span id="proof"></span></p>
+        <p><strong>Validity:</strong> <span id="valid"></span></p>
     </div>
 
     <script type="module">
@@ -68,13 +69,16 @@ import {SemaphoreEthers} from 'https://cdn.jsdelivr.net/npm/@semaphore-protocol/
                 document.getElementById('result').style.display = 'block';
 
               const semaphoreEthers = new SemaphoreEthers("https://rpc-amoy.polygon.technology", {
-                address: "0x46Af5b92E8052cbf040Fe7f0179212C71C1A72a5"
+                address: "0x7BcC47886931E271f78eDAAb8769B4483277900b"
               })
             
               const members = await semaphoreEthers.getGroupMembers("1")
               const group = new Group(members)
               const proof = await generateProof(identity, group, 0, "test")
                                 document.getElementById('proof').textContent = JSON.stringify(proof, null, 2);
+                  const result = await verifyProof(proof);
+                document.getElementById('valid').textContent = result;
+
             } catch (error) {
                 console.error('Error generating identity or proof:', error);
                 alert('Failed to generate identity or proof. Check console for details.');
