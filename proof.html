@@ -8,7 +8,7 @@
 <body>
     <h1>Generate Semaphore Identity and Proof</h1>
     <p><strong>Wallet Address (from URI):</strong> <span id="wallet-address"></span></p>
-    <input id="private-key"></input>
+    <input id="private-key-input"></input>
     <button id="generate-button">Generate Identity and Proof</button>
     
     <div id="result" style="margin-top: 20px; display: none;">
@@ -40,7 +40,7 @@ import {SemaphoreEthers} from 'https://cdn.jsdelivr.net/npm/@semaphore-protocol/
 
         document.getElementById('generate-button').addEventListener('click', async () => {
             if (!walletAddress) return;
-            const privateKey = document.getElementById('private-key').value
+            const privateKey = document.getElementById('private-key-input').textContent
 
             if(privateKey === ""){
                 return
