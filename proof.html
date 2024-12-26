@@ -13,16 +13,16 @@
     
     <div id="result" style="margin-top: 20px; display: none;">
         <h3>Results</h3>
+        <p><strong>Validity:</strong> <span id="valid"></span></p>
         <p><strong>Private Key:</strong> <span id="private-key"></span></p>
         <p><strong>Public Key:</strong> <span id="public-key"></span></p>
         <p><strong>Commitment:</strong> <span id="commitment"></span></p>
         <p><strong>Proof:</strong> <span id="proof"></span></p>
-        <p><strong>Validity:</strong> <span id="valid"></span></p>
     </div>
 
     <script type="module">
         import { Identity } from "https://cdn.skypack.dev/pin/@semaphore-protocol/identity@v4.8.2-xU7JBMKKdqTriRZSHbsc/mode=imports/optimized/@semaphore-protocol/identity.js";
-import {generateProof} from 'https://cdn.jsdelivr.net/npm/@semaphore-protocol/proof@4.8.2/+esm';
+import {generateProof, verifyProof} from 'https://cdn.jsdelivr.net/npm/@semaphore-protocol/proof@4.8.2/+esm';
 import {SemaphoreEthers} from 'https://cdn.jsdelivr.net/npm/@semaphore-protocol/data@4.8.2/+esm';
         import {Group } from "https://cdn.jsdelivr.net/npm/@semaphore-protocol/group@4.8.2/+esm";
         console.log(SemaphoreEthers)
