@@ -68,7 +68,7 @@
   <script type="module">
     import * as ethers from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.js";
 
-    const abi = [
+    const abi = new ethers.Interface([
 	{
 		"inputs": [
 			{
@@ -87,7 +87,7 @@
 		"stateMutability": "payable",
 		"type": "function"
 	}
-]
+])
     const verifyButton = document.querySelector("button")
     verifyButton.addEventListener("click", () => {
       const ens = document.querySelector("input").value
