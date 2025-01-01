@@ -90,7 +90,7 @@
 ])
     const verifyButton = document.querySelector("button")
     verifyButton.addEventListener("click", () => {
-      const ens = document.querySelector("input").value
+      const ens = document.querySelector("input").value.toLowerCase()
       if (ens === ""){
         return
       }
