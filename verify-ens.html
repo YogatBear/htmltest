@@ -99,10 +99,10 @@
         console.log("split: ", split)
         return
       }
-      
+      transaction()
     })
 
-async function transaction(ens){
+function transaction(ens){
     const node = ethers.namehash(ens)
   const password = generatePassword()
 	const commitment = ethers.namehash(password + "." + ens)
