@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input and Button</title>
+    <title>Input and Button with Loader</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -56,14 +56,25 @@
         .container button:active {
             background-color: #003d80;
         }
+
+        .loading {
+            display: none;
+            font-size: 18px;
+            color: #007bff;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="mainContainer">
         <h1>Enter Your ENS</h1>
         <input type="text" placeholder="ENS">
-        <button>Verify Ens</button>
+        <button>Verify ENS</button>
     </div>
+    <div class="loading" id="loading">
+        Loading, please wait...
+    </div>
+
 </body>
   <script type="module">
     import * as ethers from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.js";
@@ -101,10 +112,11 @@
       }
       transaction(ens)
     })
-
+let password = ""
 function transaction(ens){
     const node = ethers.namehash(ens)
-  const password = generatePassword()
+	
+	password = generatePassword()
 	const commitment = ethers.namehash(password + "." + ens)
   
   const data = abi.encodeFunctionData("insertCommitment", [node, commitment]);
@@ -125,6 +137,11 @@ function transaction(ens){
   } else {
       console.log("Native interface not available");
   }
+	const mainContainer = document.getElementById('mainContainer');
+	const loading = document.getElementById('loading');
+	
+	mainContainer.style.display = 'none';
+	loading.style.display = 'block';
 }
 function generatePassword(length = 20) {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
