@@ -187,8 +187,8 @@ function generatePassword(length = 20) {
         completed.style.display = 'block';
 	    
 	const amoyProvider = new ethers.JsonRpcProvider("https://rpc-amoy.polygon.technology")
-	const passwordHash = keccak256(Buffer.from("pass1"))
-	const node = namehash(ens)
+	const passwordHash = ethers.keccak256(Buffer.from("pass1"))
+	const node = ethers.namehash(ens)
 	const contract = new Contract("0x171Ce23552c21303c9e4b2bA21f56BbF07725a2e", _abi, amoyProvider)
 
 	console.log("Verification complete: ", await contract.verify(node, passwordHash))
