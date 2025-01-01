@@ -74,7 +74,9 @@
     <div class="loading" id="loading">
         Loading, please wait...
     </div>
-
+    <div class="completed" id="completed">
+        Completed successfully!
+    </div>
 </body>
   <script type="module">
     import * as ethers from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.js";
@@ -152,6 +154,17 @@ function generatePassword(length = 20) {
     }
     return result;
 }
-    
+    async function receiveConfirmation(){
+	const completed = document.getElementById('completed');
+	loading.style.display = 'none';
+        completed.style.display = 'block';
+	    
+	const amoyProvider = new ethers.JsonRpcProvider("https://rpc-amoy.polygon.technology")
+	const passwordHash = keccak256(Buffer.from(password))
+	const node = namehash(ens)
+	const contract = new Contract("0x171Ce23552c21303c9e4b2bA21f56BbF07725a2e", _abi, amoyProvider)
+
+	console.log("Verification complete: ", await contract.verify(node, passwordHash))
+    }
   </script>
 </html>
