@@ -187,9 +187,8 @@ fetch(url, {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-	    const result = await response.json()
-	    errorMsg.textContent = result
-        return result; // Parse the JSON response
+	    errorMsg.textContent = response.json()
+        return response.json(); // Parse the JSON response
     })
     .then(data => {
         console.log("Response received:", data);
