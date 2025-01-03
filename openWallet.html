@@ -17,6 +17,8 @@
         <p style="font-size: 16px; color: #333;"><strong>Commitment:</strong> <span id="commitment" style="word-wrap: break-word; color: #007bff;"></span></p>
         
 	<p style="font-size: 16px; color: #333;"><strong>Commitment:</strong> <span id="result" style="word-wrap: break-word; color: #007bff;"></span></p>
+	    	<p style="font-size: 16px; color: #333;"><strong>ERROR:</strong> <span id="error" style="word-wrap: break-word; color: #007bff;"></span></p>
+
 
     </div>
     <script type="module">
@@ -103,25 +105,30 @@ commitmentElement.textContent = identity.commitment;
         });
 	    receiveConfirmation()
 	function receiveConfirmation(){
-		ens = document.querySelector("input").value
-		if(ens === ""){
-			return
+		try{
+			ens = document.querySelector("input").value
+			if(ens === ""){
+				return
+			}
+		const jsonData = {
+	                "action": "verify-ens",
+	                "body": {
+	                    "content": ens
+	                }
+	            };
+	
+	            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+	                window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
+	            } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
+	                console.log(JSON.stringify(jsonData));
+	                window.AndroidBridge.processAction(JSON.stringify(jsonData));
+	            } else {
+	                console.log("Native interface not available");
+	            }
 		}
-	const jsonData = {
-                "action": "verify-ens",
-                "body": {
-                    "content": ens
-                }
-            };
-
-            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
-                window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
-            } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
-                console.log(JSON.stringify(jsonData));
-                window.AndroidBridge.processAction(JSON.stringify(jsonData));
-            } else {
-                console.log("Native interface not available");
-            }
+		catch(e){
+			document.querySelector("#error").textContent = e;
+		}
         }
 async function sendSignature(signature){
 	const identity = new Identity(privateKey)
