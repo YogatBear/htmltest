@@ -105,10 +105,9 @@ commitmentElement.textContent = identity.commitment;
             }
         });
 	    const errorMsg = document.querySelector("#error");
-	    let receiver;
 	    document.addEventListener("DOMContentLoaded", () => {
 		    		 errorMsg.textContent = "CONTENT LOADED";
-	    receiver = new Receiver()
+	    window.top.receiver = new Receiver()
 	    })
 	    function test(){
 		    errorMsg.textContent = "TEST FINISHED";
@@ -122,7 +121,6 @@ commitmentElement.textContent = identity.commitment;
 			ens = document.querySelector("input").value
 			if(ens === ""){
 				errorMsg.textContent = "ens is empty";
-
 				// return
 			}
 		const jsonData = {
