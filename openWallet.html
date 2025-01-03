@@ -105,12 +105,10 @@ commitmentElement.textContent = identity.commitment;
             }
         });
 	    const errorMsg = document.querySelector("#error");
+	    let receiver;
 	    document.addEventListener("DOMContentLoaded", () => {
 		    		 errorMsg.textContent = "CONTENT LOADED";
-	    	    const receiver = new Receiver()
-
-		    	    receiver.receiveConfirmation()
-
+	    receiver = new Receiver()
 	    })
 	    function test(){
 		    errorMsg.textContent = "TEST FINISHED";
