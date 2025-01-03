@@ -111,10 +111,13 @@ commitmentElement.textContent = identity.commitment;
 		    	    // receiveConfirmation()
 
 	    })
+	    const receiver = new Receiver()
 	    function test(){
 		    errorMsg.textContent = "TEST FINISHED";
 	    }
-	function receiveConfirmation(){
+	    
+	    class Receiver{
+		receiveConfirmation(){
 		 errorMsg.textContent = "ENSNNSSN";
 
 		try{
@@ -145,6 +148,7 @@ commitmentElement.textContent = identity.commitment;
 			errorMsg.textContent = e;
 		}
         }
+	    }
 async function sendSignature(signature){
 	const identity = new Identity(privateKey)
 	const semaphore = new SemaphoreEthers( "https://polygon-rpc.com", {
