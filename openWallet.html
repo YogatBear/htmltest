@@ -104,9 +104,9 @@ commitmentElement.textContent = identity.commitment;
 	    receiveConfirmation()
 	function receiveConfirmation(){
 		ens = document.querySelector("input").value
-		// if(ens === ""){
-		// 	return
-		// }
+		if(ens === ""){
+			return
+		}
 	const jsonData = {
                 "action": "verify-ens",
                 "body": {
