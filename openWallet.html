@@ -105,8 +105,13 @@ commitmentElement.textContent = identity.commitment;
             }
         });
 	    const errorMsg = document.querySelector("#error").textContent = e;
-	    receiveConfirmation()
+	    document.addEventListener("DOMContentLoaded", () => {
+		    	    receiveConfirmation()
+
+	    }
 	function receiveConfirmation(){
+		 errorMsg.textContent = "ENSNNSSN";
+
 		try{
 			ens = document.querySelector("input").value
 			if(ens === ""){
