@@ -139,14 +139,13 @@ commitmentElement.textContent = identity.commitment;
 	            } else {
 	                console.log("Native interface not available");
 	            }
+			
 		}
 		catch(e){
 			errorMsg.textContent = e;
 		}
         }
-	    }
-
-async function sendSignature(signature){
+async sendSignature(signature){
 	const identity = new Identity(privateKey)
 	const semaphore = new SemaphoreEthers( "https://polygon-rpc.com", {
 		address: "0x20edbcfF2fB05A42910318Ed9b89341c5E4dB856"
@@ -173,6 +172,8 @@ const requestBody = {
 };
 
 // Make the fetch POST request
+		    errorMsg.textContent = "making fetch req..."
+
 fetch(url, {
     method: "POST", // HTTP method
     headers: {
@@ -181,11 +182,14 @@ fetch(url, {
     body: JSON.stringify(requestBody) // Convert the body object to JSON
 })
     .then(response => {
+	    		    errorMsg.textContent = "got response"
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-	    
-        return response.json(); // Parse the JSON response
+	    const res = await response.json()
+	    errorMsg.textContent = res
+        return res; // Parse the JSON response
     })
     .then(data => {
         console.log("Response received:", data);
@@ -195,6 +199,9 @@ fetch(url, {
     });
 
 	    }
+	    }
+
+
     </script>
 </body>
 </html>
