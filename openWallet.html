@@ -17,10 +17,11 @@
         <p style="font-size: 16px; color: #333;"><strong>Commitment:</strong> <span id="commitment" style="word-wrap: break-word; color: #007bff;"></span></p>
         
 	<p style="font-size: 16px; color: #333;"><strong>Commitment:</strong> <span id="result" style="word-wrap: break-word; color: #007bff;"></span></p>
-	    	<p style="font-size: 16px; color: #333;"><strong>ERROR:</strong> <span id="error" style="word-wrap: break-word; color: #007bff;"></span></p>
 
 
     </div>
+		    	<p style="font-size: 16px; color: #333;"><strong>ERROR:</strong> <span id="error" style="word-wrap: break-word; color: #007bff;"></span></p>
+
     <script type="module">
         import {Identity} from "https://cdn.skypack.dev/pin/@semaphore-protocol/identity@v4.8.2-xU7JBMKKdqTriRZSHbsc/mode=imports/optimized/@semaphore-protocol/identity.js";
 	    import * as ethers from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.js";
@@ -103,11 +104,14 @@ commitmentElement.textContent = identity.commitment;
                 console.log("Native interface not available");
             }
         });
+	    const errorMsg = document.querySelector("#error").textContent = e;
 	    receiveConfirmation()
 	function receiveConfirmation(){
 		try{
 			ens = document.querySelector("input").value
 			if(ens === ""){
+				errorMsg.textContent = "ens is empty";
+
 				return
 			}
 		const jsonData = {
@@ -116,7 +120,8 @@ commitmentElement.textContent = identity.commitment;
 	                    "content": ens
 	                }
 	            };
-	
+					errorMsg.textContent = "ENS: " + ens;
+
 	            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
 	                window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
 	            } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
@@ -127,7 +132,7 @@ commitmentElement.textContent = identity.commitment;
 	            }
 		}
 		catch(e){
-			document.querySelector("#error").textContent = e;
+			errorMsg.textContent = e;
 		}
         }
 async function sendSignature(signature){
