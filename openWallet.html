@@ -18,17 +18,21 @@
         <p style="font-size: 16px; color: #333;"><strong>Private Key:</strong> <span id="private-key" style="word-wrap: break-word; color: #007bff;"></span></p>
         <p style="font-size: 16px; color: #333;"><strong>Commitment:</strong> <span id="commitment" style="word-wrap: break-word; color: #007bff;"></span></p>
         
-        <button id="copy-button" style="font-size: 16px; padding: 10px 20px; border: none; background-color: #28a745; color: white; border-radius: 6px; cursor: pointer; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); margin-top: 15px;">
-            Copy Private Key
-        </button>
+	<p style="font-size: 16px; color: #333;"><strong>Commitment:</strong> <span id="result" style="word-wrap: break-word; color: #007bff;"></span></p>
+
     </div>
     <script type="module">
         import {Identity} from "https://cdn.skypack.dev/pin/@semaphore-protocol/identity@v4.8.2-xU7JBMKKdqTriRZSHbsc/mode=imports/optimized/@semaphore-protocol/identity.js";
 	    import * as ethers from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.js";
+	    let privateKey = ""
+	    let ens = ""
         async function generateIdentity() {
-	const privateKeyString = generateRandomPrivateKey();
+		if(privateKey !== ""){
+			return
+		}
+	privateKey = generateRandomPrivateKey();
             // Create a random Semaphore identity
-            const identity = new Identity(privateKeyString);
+            const identity = new Identity(privateKey);
 
             // Log identity details (do not expose privateKey in production)
             console.log("Private Key:", identity.privateKey);
@@ -56,1041 +60,33 @@ commitmentElement.textContent = identity.commitment;
       .map(byte => byte.toString(16).padStart(2, '0'))
       .join('');
 }
-        document.getElementById('copy-button').addEventListener('click', () => {
-            const privateKeyText = document.getElementById('private-key').textContent;
-
-            navigator.clipboard.writeText(privateKeyText).then(() => {
-                alert('Private Key copied to clipboard!');
-            }).catch(err => {
-                console.error('Failed to copy:', err);
-            });
-        });
         document.getElementById("send-transaction").addEventListener("click", async () => {
             const identity = await generateIdentity(); // Generate Semaphore commitment
-	const privateKeyText = document.getElementById('private-key').textContent;
 
-            navigator.clipboard.writeText(privateKeyText).then(() => {
-                alert('Private Key copied to clipboard!');
-            }).catch(err => {
-                console.error('Failed to copy:', err);
-            });
-            const abi = [
-	{
+
+	const abi = [{
 		"inputs": [
 			{
-				"internalType": "uint256[2]",
-				"name": "_pA",
-				"type": "uint256[2]"
-			},
-			{
-				"internalType": "uint256[2][2]",
-				"name": "_pB",
-				"type": "uint256[2][2]"
-			},
-			{
-				"internalType": "uint256[2]",
-				"name": "_pC",
-				"type": "uint256[2]"
-			},
-			{
-				"internalType": "uint256[4]",
-				"name": "_pubSignals",
-				"type": "uint256[4]"
+				"internalType": "uint256",
+				"name": "groupId",
+				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "merkleTreeDepth",
+				"name": "commitment",
 				"type": "uint256"
 			}
 		],
-		"name": "verifyProof",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
+		"name": "buyProduct",
+		"outputs": [],
+		"stateMutability": "payable",
 		"type": "function"
-	}
-]
-  const bytecode = '6080604052604051806101800160405280604051806101c001604052807f013ef7196e97358e510c577b797bf6e3cd39a2c16b548d73bbe8f1b33c146fe581526020017f2405be5fc409b9bbe849cefa4670e2f2a885a05297a5bd61bbd1cda937472ec481526020017f0196c02e6d88030071206cdef1ec0d569b136b27d825a0ab9eb951820c93e5f681526020017f184175828d0d3652055c9bcca5d8cdf7e8fc2360647fe9cad0ed421955561f8c81526020017f2440ec222e2a1583c4dcde1937422ac002663b9648aa13bf91085826c7d29c0a81526020017f2358e1db3e0934ca48af49ee922c8a08e9525d6d4ab69538fda8cab11930322b81526020017f2a64fab9ec8500bf84dd3f79acdca3957477df7575323969ad5f43d12ca58b0381526020017f2084d6b65d520a69aec4f77119ba07aa4ba30844716b3a3bc851d69b50a8995781526020017f0b4bfd4e46ca962ce47287d8a6fcaac3de05dca8f56e676868a2cf9555fcfb5e81526020017f0390a10dd59148d792af91ba00d8634cef3edeb0e31c9de0e77da89432bfa9f781526020017f237015692fac4c78242204d6a991ff50ed1e999db38fa500932386aa9f8c69d781526020017f0f444648f9e0d2ea670e01e9aebfb2e99b7a7948f45402932084f424d5eec47181526020017f0b22f938508e2f9a1744f12d4cf18ea556c18aa543b2c40e9e95db3bd8fb711d81526020017f0b645ecebab2fd4a623a41a5830884d1cb3e596a8618960d0760e74de4ffcc2f8152508152602001604051806101c001604052807f0f4f987b1efdb56995efffd0b1b25eb3deebc1e06b38fd443ce1cb22fed3842681526020017f11e1a3e4ed0a9bd9dca060de44d12105ba8b5f89ef20dfa230eeb2a9fdce46ab81526020017f165d0638a737d6260b25608ae97698ef687aec5ab964d5d022ee37c7456dcb5781526020017f2287e284e930bf3c0618fb4af91a5774581579aa7051f96cb26afb844030c64681526020017f2b4613e8c07ef908a6adee2289eb6542814edf0cfdaf1b8d5610c5161913f5ff81526020017f0543e4cf7447121dd4c27d03a5a84733cc1eb51f9eacdfcc90005084b5e6d05981526020017f07e509c557d49250507bd434a77a23c92e4f6bffcbd541eeefd420b56cebe14681526020017f06b105f855e8a78ca522d71decae7cd39434a3d6872afe8aeb9b95140d14369b81526020017f18345c1764032ce292bf4c322d9b4ada01d197b0c029a6d56d3554d3575b9f4d81526020017f24506814b04e3ca0efd80b32ee03488fbafc4c4c2d9ef41f265fce3839a8cd4e81526020017f2da0fa88b6c7e6562539ea8717df39728b881def91795d75939d28948b6c2ba881526020017f022924f05a80eb024c3256ed1e7ee1356e07fa6f61597231ffb48a69a1b1e8e681526020017f2942e03f3396f75a58c3ab94abb01638e68b33232a00f1251d7cc69200bdfe3381526020017f144d0ff502082eda66045a529b01baf5368fb7cc1bf393b389b8ddb4209fc8ac8152508152602001604051806101c001604052807f1105fd4c15b8a58d7b97e20859463291dd46b582db02245e446bf439c7bbe8fe81526020017f1105cc789a725b7fec51c250d61a28b879670a441f6c3b517ace3ab51df7d53981526020017f130642d65fa756a54c5e1ceabd2c06d86b14d2ed7430e0e196268d295df6c76a81526020017f2206b6806756f52165d90c6d231b42f92c881f8bd777b05f8c44faf1555a8ca781526020017f0297b2b6bd8bbe44425c3eeecb10a403170c8b30fb3b82ddab710282ead16c8381526020017e4f23062ceb024a83e0ce73b6d6010a1aa93e268b487743d026d297ce0547ef81526020017f01c911561e000e67e8ab0f6723d51d1f5dec89542a2cda2dbe380783e03f276f81526020017f2acef5974f8e14cb7bddc41daa6f53580dd42a9df7017d01d2ca4b8f702600dd81526020017f14e87f2e58f15efda3cc2d3e9f83bbcfcdeb4974a54e5c55777011f9b792e9d881526020017f2a83478814788be4717b525824bb1ed69f4598d7b977590234806b68715a320981526020017f29bf95777f03da3719c1576cc963aa131ff8a8c7e7d7571bd6f499f6d02b3e4c81526020017f062e1a45181ed3c3c1bec6e2ad2f36468ff233142af4af31325cdfa1f2dd423e81526020017f27d2fc3c724c259029cd00dfcdee2dbfc356b420922ae33ceac7e8053cc71c2481526020017f1942605fda94bf8b67ce81303e3594a3ae946b7b129412c4979577d0b7cfe31b8152508152602001604051806101c001604052807f146fb822d3cb83ffdc1b4db22d6f94937a2424885d6d7039b56e54391e84535d81526020017f05aa08eda3c5c049dc1a5915df0c2b67c3619da9650af2bd09e7b2617d80412081526020017f02e455f0d4bda17e5d934aa338f0310c74550e1f8da686e30dc1560cb77bb4b481526020017f28618b94685412e5b97988cc831b8b4aeb3b545a8c8f8fb1fcf34ebe36cce92181526020017f0cae392659f88489291a63eef467d5e0bd7c42320216762705adcb574fa43a2681526020017f1bbd80d93947826138ab9feec5dbe6e3a5bb3f5e3d814bd53e72d211cc884fb981526020017f277d11d2b31a0054843d07c876991ec302c34cf7f493bd1db86b6e3ef73a4cea81526020017f1bae8bd1e005ad0ba9e4359677c814fe054041b10361ce387a7356281ca5f13781526020017f01918458b77ddc49e149dd542b09dde77a473f9c0af990678e4b6421b89746d681526020017f2cc7dbe4f27e8b13baaa5dfaa61f221b6d841787e41dc4b484e12e54b444200881526020017f13a01b8d34c04dbdfd35e59960387931050b32d0a17f05eb3dfd0a494e5f31bc81526020017f156db3b3ca7c27276bead97a9643b6a12666de3004c1478fee65d8fa04374ee281526020017f19846331d71e7b7512afbbde8d9fc48a75f86dd30e7ddc34e30b6e9fecdaea2e81526020017f0fbc61a5f6b54b4372627c40e3a9dbca5607c92614a0fb7405a30418698dcdf88152508152602001604051806101c001604052807f1bc1cdf66a14f07180056d51b17e14fdb0587dd43cb34be6716b1e252adb1cfa81526020017f2f1bd8c1d7195efb5bd5652c60cb5665222103196ec5fd17260f24147a5246d181526020017f1dbb2e3df7ee585ad22503c13ddcc0c89de2de8e99256ddc68cf582d79e038f781526020017f18bff4b4441669229b6cc7aadb911025f8eab818235854fc7f5f9ffb7ea5544981526020017f0f86bde52a992c0d79ef3627e1b8b59173f58d06a3afecff95f8f4fff637cf2281526020017f1fc41a0bb009782293fbec9b6eba20e2b8c663aa15a16abc6eed9d69e930861781526020017f2d0488f4ebe5a068b01133b98ebb80d78963f244b3aa8068ba6c80718b65d7c781526020017f19d4dcbc64b1fcc9dcf3db4c6ca7cef9900698f8bb6557ade9e5cf367beeb68881526020017f2feef8108cc2379d73513a82eea70cd81a181c2e33ca89d0330ca838745d668181526020017f036febce371368756a43cd14d3a6af46d362a5c35e72804e6fe78b527104045f81526020017f151ee45f65557c9fccff218169be14dc1b78cc4a90d3b0b9d506e5ec6d495b8481526020017f3023eec5f70baff57dd0415700fd8b546f2637b0cad1cd2b1df1741021425a8081526020017f07ad80c2f6f58260557ed72bbb230c6d289d83441306a803aabf029af042e59e81526020017f304f0fe42620f00d880b9f1a56f71db31c431fe3be02c54c665efe9d8771c5918152508152602001604051806101c001604052807f0f2001b0e2808cbe9fbe1ccdb7ed5af2c802913d179c5e1f5a220404b5d0d08681526020017f19e1e5b8bd9467181560627b0129b48bbca4d2a563ce06dba1396a8cd096d56981526020017f11fbeb4a7fcca72609e8e1afe73a7782b5110b95515c16ad922b02fcc9a674dd81526020017f05e9cb5667c5dcbe735ffbf57e7476411903f06314f24a60a24c3889df82298f81526020017f1ef7fd3c775a80711f137928f1ac39bbbb01a89943bc5c43739ec9173fe027f281526020017f14d7a93d5f26077e0a6eaaa4bd738bae57ff22aadf8a8473943b6f644f69725681526020017f14d5f3ffccf62b2b26972a6d7dfcb776332b20433ddbb4f9a828e40f7b4d32af81526020017f0b684a19560776462c22d8791f3e97bcfac812fa12ee8703030ff95c4bf2751881526020017f0d1eaf5b352c9588c6c20031067dd28a5a363b4aeedbb4aeed3aa978dbc8fddc81526020017f0e882683cb6b0d55e194c3d5708b62be8b91a9941142587ede47096e204c9faa81526020017f2651be7344e6be5368f137de2166acaeda517815aec590822b47f98f577858b581526020017f2d4172fa3f220bdd4d4b3d69455897b30a51f27586a9b369a9536c51d00093db81526020017f1a4c7436cd7c282eaf249163b2a726daa3fb2737e38da00f615a495036eee15081526020017f052f661471df979be9aead5b150e64f05734858cebf8abdd31500ebe9daf50598152508152602001604051806101c001604052807f23dd6bf92585d187ac2d4671cf13f94d985feb5b3719c40ab35592d2f647cb6581526020017f1fb85ef6f9fdc6083995ff6aad9ae22a98752a601abaf3d534cf980df6f795c981526020017f036e63661c990ad12eb950cd2e0584372457358ac5cc984ce91a87677c1672f681526020017f0c49edf60dbc9d2851dcc8c716e0c6d45d3497aa997c6eb957466cae69c0148e81526020017f215972553fb8fff61a3121aafee6a99b3b8357e1f28bbd0239a4f4465edf9e6281526020017f269241a97474c2eb2646670ae0caa1c92101a39b35992b7ec79e256ab1d32b0981526020017f22158165e2541a0a6527743827c084bc86de22b85ecfb896314ade24b266dcbc81526020017f0f46fdfd54e79b00e309b8dc467108870e7d88f634094b67a8cc39d8a0137d6381526020017f0729f76399befc2699e621290467ead8869b064300743ff00e5d8f29c1f4e10581526020017f15757e58bc3916c6838d401b015d3cb65334be4194b9a1b023db43def60463aa81526020017f0872d1decba9a9852e202eba96f8a1ab09c7db0fd986416415785e24f49917fc81526020017f1b044e4cdf43015374e1b202cfd5b7b1bc24c8000b03eb6ea6b47e27f798b4e181526020017f24719f2ee741477db930f10849677e3744c9a7bcd40725d59147122ae3c86ada81526020017f229383e070bf106140ea30a9f70bae89db9e249f47d7fc7298645e78d35d74b28152508152602001604051806101c001604052807f11c60f8708f714a35e9802644cf964dea7b833fca39c3222b8a41d69192b8ca581526020017f1e6227bddd81fd0e8f005549131313a938f2719603381817aa49d400a124a21f81526020017f0cac8a3d12db8c062984c3e0d60334aac8ebfa38427efe8b38b38d158aa677e681526020017f03273f6efecfc1cffb2e907fe7c96167b1ae08343f80a3aabbf770692ca8b5bf81526020017f101dbc5349e77ef96db2867138a099319784843d19ccd6671d156d33ca3d6ebc81526020017f218e0b68e696c429bd606de3a19b9ad4d9ebb49d46bb147071231ec5f65deba581526020017f0bf75f2284152eb39be5ed8fef968d1c3efc61ac1844cff901e2b78bc86e08c381526020017f250b05198a4e6d784d61b2aaea5a8c43e30e6d13163c6e3bd2d5d7a57f6a1c0181526020017f01dded98e05eea4b37305cd85f82652eeeff6b96b58425b45ce75ee38f86d20381526020017f1b3ed770919c526c1f28d432c5d325d48595eb2ec421336d6e664f40825776ef81526020017f2b0aba4b8ab317a7b430445baecf7f5987ced258efa0830622603934779d42d881526020017f0e6605839b92f86559928b0e5e58bd17ff393fc53dc2d5e6f3afe06b0d9072f081526020017f1220668f0b98e6bce306615f834b9675d2b55e943e11390044d0a4759b07a0c381526020017f11b84e82e20896a8e9147881f50da4e0f416841c54082d02b737a3a3a58409868152508152602001604051806101c001604052807f1c55d668f0fa8615d358a8e6ea0f77032084bd9731a10b3718ee42b6fdaefbe581526020017f0ac3e311875aa40fd753aad1507d6cb4e38d42ef65feb48ff137f1b21b461d0581526020017f28763f6f0d6b8fa547ae8369793636b291ee8750cc430cefe97bfd4baac96d2d81526020017f187b4a7cf2d4e3ffe2b0f9809d298b06821f9ef6731e24636d9a0f28794eeb8f81526020017f1422e102170d9718b1a52839ffe6b9c5d14a607c7ecbbef752de37ee5765166181526020017f14dfcf6fc14826c0fad5d5e96863a1ddeb61714b2980876766aa04484ccab2de81526020017f13de803188ad0eb01bd75707816728e4edd0889f66729cd6dd74f9c435193cba81526020017f03d0608a4af4381d7e8e55699bc86bbe7129ecc48139da64f482e369f724693381526020017f28efbf3fd955c09ee8a42f4bff0291c4ba84c475e56f1216e86cf2294c3d2c2f81526020017e4090e425df767152b89824be03c885a47d8dc4b8fb81dcd925c8ed2d104d4681526020017f23301a53fc52d7c64110826687c60087a060ddefd664e271e51dadd4fc906f6c81526020017f14b975b5a7edb7c1ff9d0a8bec341b8aa4f9a3010a84bf31be02c8b6a96de1c681526020017f0ae235220e7846e32c05a51710e86eb7a2003ecb46e14729a689c5143e3cc74281526020017f13a399d18336d73804247f99d7ca7b73ae52c795d0528dcf88424ec64cd05a408152508152602001604051806101c001604052807f177bd0aa638195181175a48f43dad85a5c8d2f01c8a86df160f6470b2196a6dd81526020017f1985d0e08910848c0ce0098a576cdb62d47c81e0feeb5e9283524c2fcfe1670381526020017f2ad1d5cd62c1e648c9a0e4bb7896a75c987f3a8bb8c35afb58145d9783225f9b81526020017e1c10259a73e31d020da03a89bcc36653383cfec8b42dbe1761aae9d0794b0281526020017f208a1cefd7f049abe5fe7f9e28181972b19e0c990235987e4c61af8e99897e8881526020017f2468be9041a6e586e2b38f770ffd557f8d69bd6178885d69d5ebfb3d61a97f2d81526020017f2ab4da8a56c29e6a298095d65b8d76fbf2eac0ce37ff65f026e9823a990f1f0081526020017f0862c458efe128fd0acb55a0d916fd18758c55de4421fb967620912c8a11370181526020017f13e27e5a7e766681d5e2803c7c9266a192dfb655fc5789be2b2cbfd86bc60f0a81526020017f066877adf78ef454dceb57055e6be1d9f5103ca0cf1f9c6032c0c6c1ed806bc781526020017f0f7dd0841e4174177419f1d9dfa7fb25b755a1568fd55dc62c16d6224e4477ed81526020017f0e8b506cbe28b71bbaf916e54990f3e1a61e3e34acb17084162ef7a15092404e81526020017f285b2d4c2b36020176cbe6f1b9cdf31f8d0fdf99c9a25505a15a860fd261600981526020017f2d8c936ef9b48c5d75fb413b7cac72cff186ab0f4cb9dfa9197dba85fef597388152508152602001604051806101c001604052807f0f4c67f52343b883391b284231b1ab9f514b667923d2efe404c79ebb142a7fc181526020017f2c8dd21aa0556db4187df9dbccfe619a938d4d6971ab20c8fb8499ff18f9b39381526020017f19cf5f8d82ef2fd726d4e61bfd25974d08a1d18f7940199b8ab90d7b9a56da2c81526020017f24803334cd560fc2ce2976b89a87d17ace733b3e70f773d169383635d9ab9c6681526020017f28a711d0889b002aa16bfd36ba33e294f44ac058a3b4a1e98cf2d0ea9ef3db3081526020017f12c90064eb460c56b0a0cab9a5e72acf3d85ba15017e0348a9d6a88db8e838d681526020017f07491a578400d71cf7f42b0bd2a1178b243a88a8c11c98e0de05d959b393eeb981526020017f1906102ab9146ea3953f8110734966b84ff8689ee9f44caf0d1b6b96bdad350781526020017f15a9dd087e3877b0bc59a6af17b72b6476a73de3f54fbfa2d43a2e76e4f1d0ba81526020017f10098ce1b8f6abdb6dcac4faf8eb9963a97ad0720a67e75835eaaab0a4d25f3b81526020017f30374184c976db1e962f5646efacf55116cfc3ef1bf2d13969407f94ada6384181526020017f06528f7a7e9e73b458fc680b8c59621d2da946c34455c8cb80ec70d77c01857181526020017f09ab55a91a7063b85c45a4308bce56e874aa3977ee6921d6f3541a3c92d9e2e581526020017f300718e2d685750add78894c11638ba2d2fd7954d11cd5b5c8aa0f7cd38766ca8152508152602001604051806101c001604052807f072d5adc75e4da51b8f796fc45a234d2f8ca4ca8708e0cd54174e9f63aff648681526020017f2fea19288315b9162b4b9947f38aa430d8cd885ed56b4bde5ce9c2714af7c30581526020017f026d3be9e7f7f9092b632bba1165848d93bf6f2f1bf756d1dc42879a72e47af081526020017f0bca1235cef12479afd16ddcc8dbb4ecf1aa1e589f13141509804a38a345297581526020017f092b3130bdb7f9be5f33d3ac5fdac9ac2d853deee532b4c93f3585022255686881526020017f0f8c32d7b52be36eefe7d264d66b3ee4c59255f16f9e239b46959dd40b4623cc81526020017f0b96504f8b767e15046db623894abede0fcd6437af458769b4f49eb493a37fcb81526020017f0bad1845ad553f1d7fecd0d97d73010d8fe475f3dea683e8eca65623d065353781526020017f11ede2d36debc21a2bd22d22400cb8b1cd14e846d5b6a273068f6137a600554581526020017f0a62374f4d0b8800bf6848c777d1259704de995e1469633e57a65e196e0070f081526020017f1ee504d746aa3bdafb86361d8f09d3a5509869996fe13bdad29f8fbd357f5ffd81526020017f1ff336222321debd2161b0b1dbb66ddf92fd56050f82e244315b57af052e26c081526020017f14fb8fd0381cc9122e8d11e02ff39bd9f2168fad1e9bff2c858c97fe6759e5ca81526020017e80ddd094a23483e51116d6aed63f579212f84448aa3ed4ed57ace80af12935815250815250600090600c6119be9291906119d1565b503480156119cb57600080fd5b50611ab6565b82600c600e028101928215611a11579160200282015b82811115611a105782518290600e611a00929190611a22565b50916020019190600e01906119e7565b5b509050611a1e9190611a62565b5090565b82600e8101928215611a51579160200282015b82811115611a50578251825591602001919060010190611a35565b5b509050611a5e9190611a86565b5090565b5b80821115611a825760008181611a799190611aa3565b50600e01611a63565b5090565b5b80821115611a9f576000816000905550600101611a87565b5090565b5080600e0190611ab39190611a86565b50565b6106e280611ac56000396000f3fe608060405234801561001057600080fd5b506004361061002b5760003560e01c8063a23f019914610030575b600080fd5b61004a60048036038101906100459190610566565b610060565b60405161005791906105ff565b60405180910390f35b60008060006001846100729190610649565b600c81106100835761008261067d565b5b600e0201600e806020026040519081016040528092919082600e80156100be576020028201915b8154815260200190600101908083116100aa575b5050505050905061045c565b7f30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f000000181106100fb576000805260206000f35b50565b600060405183815284602082015285604082015260408160608360076107d05a03fa915081610131576000805260206000f35b825160408201526020830151606082015260408360808360066107d05a03fa915081610161576000805260206000f35b505050505050565b600060808601600087016080890151815260a0890151602082015261019c600088013560e08b015160c08c0151846100fe565b6101b660208801356101208b01516101008c0151846100fe565b6101d060408801356101608b01516101408c0151846100fe565b6101ea60608801356101a08b01516101808c0151846100fe565b833582527f30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd4760208501357f30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd4703066020830152843560408301526020850135606083015260408501356080830152606085013560a08301527f2d4d9aa7e302d9df41749d5507949d05dbea33fbb16c643b22f599a2be6df2e260c08301527f14bedd503c37ceb061d8ec60209fe345ce89830a19230301f076caff004d192660e08301527f0967032fcbf776d1afc985f88877f182d38480a653f2decaa9794cbc3bf3060c6101008301527f0e187847ad4c798374d0d6732bf501847dd68bc0e071241e0213bc7fc13db7ab6101208301527f304cfbd1e08a704a99f5e847d93f8c3caafddec46b7a0d379da69a4d112346a76101408301527f1739c1b1a457a8c7313123d24d2f9192f896b7c63eea05a9d57f06547ad0cec8610160830152600088015161018083015260206000018801516101a08301527f198e9393920d483a7260bfb731fb5d25f1aa493335a9e71297e485b7aef312c26101c08301527f1800deef121f1e76426a00665e5c4479674322d4f75edadd46debd5cd992f6ed6101e08301527f090689d0585ff075ec9e99ad690c3395bc4b313370b38ef355acdadcd122975b6102008301527f12c85ea5db8c6deb4aab71808dcb408fe3d1e7690c43d37b4ce6cc0166fa7daa61022083015285356102408301526020860135610260830152885161028083015260208901516102a083015260408901516102c083015260608901516102e08301526020826103008460086107d05a03fa8251811693505050509695505050505050565b604051610380810160405261047460008601356100ca565b61048160208601356100ca565b61048e60408601356100ca565b61049b60608601356100ca565b6104a860808601356100ca565b6104b6828287898b8d610169565b8060005260206000f35b600080fd5b600080fd5b6000819050826020600202820111156104e6576104e56104c5565b5b92915050565b600081905082604060020282011115610508576105076104c5565b5b92915050565b60008190508260206004028201111561052a576105296104c5565b5b92915050565b6000819050919050565b61054381610530565b811461054e57600080fd5b50565b6000813590506105608161053a565b92915050565b60008060008060006101a08688031215610583576105826104c0565b5b6000610591888289016104ca565b95505060406105a2888289016104ec565b94505060c06105b3888289016104ca565b9350506101006105c58882890161050e565b9250506101806105d788828901610551565b9150509295509295909350565b60008115159050919050565b6105f9816105e4565b82525050565b600060208201905061061460008301846105f0565b92915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b600061065482610530565b915061065f83610530565b92508282039050818111156106775761067661061a565b5b92915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fdfea264697066735822122001999d3a62224fff5637ef902b0cd83420ce3e105c7202344f31bcd5a80cb63e64736f6c634300081a0033';
+	}]
 
-	const newabi = [
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				}
-			],
-			"name": "acceptGroupAdmin",
-			"outputs": [],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "identityCommitment",
-					"type": "uint256"
-				}
-			],
-			"name": "addMember",
-			"outputs": [],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256[]",
-					"name": "identityCommitments",
-					"type": "uint256[]"
-				}
-			],
-			"name": "addMembers",
-			"outputs": [],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "commitment",
-					"type": "uint256"
-				}
-			],
-			"name": "buyProduct",
-			"outputs": [],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "address",
-					"name": "admin",
-					"type": "address"
-				},
-				{
-					"internalType": "uint256",
-					"name": "merkleTreeDuration",
-					"type": "uint256"
-				}
-			],
-			"name": "createGroup",
-			"outputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				}
-			],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [],
-			"name": "createGroup",
-			"outputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				}
-			],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "address",
-					"name": "admin",
-					"type": "address"
-				}
-			],
-			"name": "createGroup",
-			"outputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				}
-			],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "amount",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "commitment",
-					"type": "uint256"
-				}
-			],
-			"name": "deposit",
-			"outputs": [],
-			"stateMutability": "payable",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "contract ISemaphoreVerifier",
-					"name": "_verifier",
-					"type": "address"
-				}
-			],
-			"stateMutability": "nonpayable",
-			"type": "constructor"
-		},
-		{
-			"inputs": [],
-			"name": "LeafAlreadyExists",
-			"type": "error"
-		},
-		{
-			"inputs": [],
-			"name": "LeafCannotBeZero",
-			"type": "error"
-		},
-		{
-			"inputs": [],
-			"name": "LeafDoesNotExist",
-			"type": "error"
-		},
-		{
-			"inputs": [],
-			"name": "LeafGreaterThanSnarkScalarField",
-			"type": "error"
-		},
-		{
-			"inputs": [
-				{
-					"components": [
-						{
-							"internalType": "uint256",
-							"name": "merkleTreeDepth",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "merkleTreeRoot",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "nullifier",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "message",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "scope",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256[8]",
-							"name": "points",
-							"type": "uint256[8]"
-						}
-					],
-					"internalType": "struct ISemaphore.SemaphoreProof",
-					"name": "proof",
-					"type": "tuple"
-				},
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				}
-			],
-			"name": "redeemProduct",
-			"outputs": [],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "identityCommitment",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256[]",
-					"name": "merkleProofSiblings",
-					"type": "uint256[]"
-				}
-			],
-			"name": "removeMember",
-			"outputs": [],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [],
-			"name": "Semaphore__CallerIsNotTheGroupAdmin",
-			"type": "error"
-		},
-		{
-			"inputs": [],
-			"name": "Semaphore__CallerIsNotThePendingGroupAdmin",
-			"type": "error"
-		},
-		{
-			"inputs": [],
-			"name": "Semaphore__GroupDoesNotExist",
-			"type": "error"
-		},
-		{
-			"inputs": [],
-			"name": "Semaphore__GroupHasNoMembers",
-			"type": "error"
-		},
-		{
-			"inputs": [],
-			"name": "Semaphore__InvalidProof",
-			"type": "error"
-		},
-		{
-			"inputs": [],
-			"name": "Semaphore__MerkleTreeDepthIsNotSupported",
-			"type": "error"
-		},
-		{
-			"inputs": [],
-			"name": "Semaphore__MerkleTreeRootIsExpired",
-			"type": "error"
-		},
-		{
-			"inputs": [],
-			"name": "Semaphore__MerkleTreeRootIsNotPartOfTheGroup",
-			"type": "error"
-		},
-		{
-			"inputs": [],
-			"name": "Semaphore__YouAreUsingTheSameNullifierTwice",
-			"type": "error"
-		},
-		{
-			"inputs": [
-				{
-					"components": [
-						{
-							"internalType": "uint256",
-							"name": "merkleTreeDepth",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "merkleTreeRoot",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "nullifier",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "message",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "scope",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256[8]",
-							"name": "points",
-							"type": "uint256[8]"
-						}
-					],
-					"internalType": "struct ISemaphore.SemaphoreProof",
-					"name": "proof",
-					"type": "tuple"
-				},
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				}
-			],
-			"name": "withdraw",
-			"outputs": [],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [],
-			"name": "WrongSiblingNodes",
-			"type": "error"
-		},
-		{
-			"anonymous": false,
-			"inputs": [
-				{
-					"indexed": true,
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"indexed": true,
-					"internalType": "address",
-					"name": "oldAdmin",
-					"type": "address"
-				},
-				{
-					"indexed": true,
-					"internalType": "address",
-					"name": "newAdmin",
-					"type": "address"
-				}
-			],
-			"name": "GroupAdminPending",
-			"type": "event"
-		},
-		{
-			"anonymous": false,
-			"inputs": [
-				{
-					"indexed": true,
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"indexed": true,
-					"internalType": "address",
-					"name": "oldAdmin",
-					"type": "address"
-				},
-				{
-					"indexed": true,
-					"internalType": "address",
-					"name": "newAdmin",
-					"type": "address"
-				}
-			],
-			"name": "GroupAdminUpdated",
-			"type": "event"
-		},
-		{
-			"anonymous": false,
-			"inputs": [
-				{
-					"indexed": true,
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				}
-			],
-			"name": "GroupCreated",
-			"type": "event"
-		},
-		{
-			"anonymous": false,
-			"inputs": [
-				{
-					"indexed": true,
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "oldMerkleTreeDuration",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "newMerkleTreeDuration",
-					"type": "uint256"
-				}
-			],
-			"name": "GroupMerkleTreeDurationUpdated",
-			"type": "event"
-		},
-		{
-			"anonymous": false,
-			"inputs": [
-				{
-					"indexed": true,
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "index",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "identityCommitment",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "merkleTreeRoot",
-					"type": "uint256"
-				}
-			],
-			"name": "MemberAdded",
-			"type": "event"
-		},
-		{
-			"anonymous": false,
-			"inputs": [
-				{
-					"indexed": true,
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "index",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "identityCommitment",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "merkleTreeRoot",
-					"type": "uint256"
-				}
-			],
-			"name": "MemberRemoved",
-			"type": "event"
-		},
-		{
-			"anonymous": false,
-			"inputs": [
-				{
-					"indexed": true,
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "index",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "identityCommitment",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "newIdentityCommitment",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "merkleTreeRoot",
-					"type": "uint256"
-				}
-			],
-			"name": "MemberUpdated",
-			"type": "event"
-		},
-		{
-			"anonymous": false,
-			"inputs": [
-				{
-					"indexed": true,
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "startIndex",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256[]",
-					"name": "identityCommitments",
-					"type": "uint256[]"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "merkleTreeRoot",
-					"type": "uint256"
-				}
-			],
-			"name": "MembersAdded",
-			"type": "event"
-		},
-		{
-			"anonymous": false,
-			"inputs": [
-				{
-					"indexed": true,
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "merkleTreeDepth",
-					"type": "uint256"
-				},
-				{
-					"indexed": true,
-					"internalType": "uint256",
-					"name": "merkleTreeRoot",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "nullifier",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "message",
-					"type": "uint256"
-				},
-				{
-					"indexed": true,
-					"internalType": "uint256",
-					"name": "scope",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256[8]",
-					"name": "points",
-					"type": "uint256[8]"
-				}
-			],
-			"name": "ProofValidated",
-			"type": "event"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"internalType": "address",
-					"name": "newAdmin",
-					"type": "address"
-				}
-			],
-			"name": "updateGroupAdmin",
-			"outputs": [],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "newMerkleTreeDuration",
-					"type": "uint256"
-				}
-			],
-			"name": "updateGroupMerkleTreeDuration",
-			"outputs": [],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "identityCommitment",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "newIdentityCommitment",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256[]",
-					"name": "merkleProofSiblings",
-					"type": "uint256[]"
-				}
-			],
-			"name": "updateMember",
-			"outputs": [],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"components": [
-						{
-							"internalType": "uint256",
-							"name": "merkleTreeDepth",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "merkleTreeRoot",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "nullifier",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "message",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "scope",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256[8]",
-							"name": "points",
-							"type": "uint256[8]"
-						}
-					],
-					"internalType": "struct ISemaphore.SemaphoreProof",
-					"name": "proof",
-					"type": "tuple"
-				}
-			],
-			"name": "validateProof",
-			"outputs": [],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [],
-			"name": "balance",
-			"outputs": [
-				{
-					"internalType": "uint256",
-					"name": "",
-					"type": "uint256"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				}
-			],
-			"name": "getGroupAdmin",
-			"outputs": [
-				{
-					"internalType": "address",
-					"name": "",
-					"type": "address"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				}
-			],
-			"name": "getMerkleTreeDepth",
-			"outputs": [
-				{
-					"internalType": "uint256",
-					"name": "",
-					"type": "uint256"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				}
-			],
-			"name": "getMerkleTreeRoot",
-			"outputs": [
-				{
-					"internalType": "uint256",
-					"name": "",
-					"type": "uint256"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				}
-			],
-			"name": "getMerkleTreeSize",
-			"outputs": [
-				{
-					"internalType": "uint256",
-					"name": "",
-					"type": "uint256"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [],
-			"name": "groupCounter",
-			"outputs": [
-				{
-					"internalType": "uint256",
-					"name": "",
-					"type": "uint256"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "",
-					"type": "uint256"
-				}
-			],
-			"name": "groups",
-			"outputs": [
-				{
-					"internalType": "uint256",
-					"name": "merkleTreeDuration",
-					"type": "uint256"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "identityCommitment",
-					"type": "uint256"
-				}
-			],
-			"name": "hasMember",
-			"outputs": [
-				{
-					"internalType": "bool",
-					"name": "",
-					"type": "bool"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "identityCommitment",
-					"type": "uint256"
-				}
-			],
-			"name": "indexOf",
-			"outputs": [
-				{
-					"internalType": "uint256",
-					"name": "",
-					"type": "uint256"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [],
-			"name": "verifier",
-			"outputs": [
-				{
-					"internalType": "contract ISemaphoreVerifier",
-					"name": "",
-					"type": "address"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "groupId",
-					"type": "uint256"
-				},
-				{
-					"components": [
-						{
-							"internalType": "uint256",
-							"name": "merkleTreeDepth",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "merkleTreeRoot",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "nullifier",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "message",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "scope",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256[8]",
-							"name": "points",
-							"type": "uint256[8]"
-						}
-					],
-					"internalType": "struct ISemaphore.SemaphoreProof",
-					"name": "proof",
-					"type": "tuple"
-				}
-			],
-			"name": "verifyProof",
-			"outputs": [
-				{
-					"internalType": "bool",
-					"name": "",
-					"type": "bool"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		}
-	]
-
-  const iface = new ethers.Interface(newabi);
+  const iface = new ethers.Interface(abi);
   const data = iface.encodeFunctionData("buyProduct", [1, identity.commitment]);
-  const decoded = iface.decodeFunctionData("buyProduct", data);
   console.log(data)
-console.log("decoded: ", decoded)
 
-            const chainId = 80002; // Replace with the correct chain ID (80001 for Mumbai Testnet)
             const jsonData = {
                 "action": "sign-commitment",
                 "body": {
@@ -1107,6 +103,76 @@ console.log("decoded: ", decoded)
                 console.log("Native interface not available");
             }
         });
+	function receiveConfirmation(){
+		ens = document.querySelector("input").value
+		if(ens === ""){
+			return
+		}
+	const jsonData = {
+                "action": "verify-ens",
+                "body": {
+                    "content": ens
+                }
+            };
+
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+                window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
+            } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
+                console.log(JSON.stringify(jsonData));
+                window.AndroidBridge.processAction(JSON.stringify(jsonData));
+            } else {
+                console.log("Native interface not available");
+            }
+        }
+async function sendSignature(signature){
+	const identity = new Identity(privateKey)
+	const semaphore = new SemaphoreEthers( "https://polygon-rpc.com", {
+		address: "0x20edbcfF2fB05A42910318Ed9b89341c5E4dB856"
+	})
+	console.log("getting group members...")
+	const members = await semaphore.getGroupMembers("1")
+	const group = new Group(members)
+	const proof = await generateProof(identity, group, 1, group.root)
+
+const url = "https://us-central1-arnacon-nl.cloudfunctions.net/ens-proof-validator";
+
+
+const urlParams = new URL(window.location.href).searchParams;
+
+// Get the walletAddress parameter
+const walletAddress = urlParams.get("walletAddress");
+// Define the body of the request
+const requestBody = {
+    proof: proof,
+    groupId: "1",
+    ens: ens,
+    signature: signature,
+    arnaconAddress: walletAddress
+};
+
+// Make the fetch POST request
+fetch(url, {
+    method: "POST", // HTTP method
+    headers: {
+        "Content-Type": "application/json" // Specify JSON content
+    },
+    body: JSON.stringify(requestBody) // Convert the body object to JSON
+})
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+	    
+        return response.json(); // Parse the JSON response
+    })
+    .then(data => {
+        console.log("Response received:", data);
+    })
+    .catch(error => {
+        console.error("Error occurred:", error);
+    });
+
+	    }
     </script>
 </body>
 </html>
