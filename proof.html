@@ -64,8 +64,8 @@
                 console.log("Public Key:", identity.publicKey);
                 console.log("Commitment:", identity.commitment);
 
-                const semaphoreEthers = new SemaphoreEthers("https://rpc-amoy.polygon.technology", {
-                    address: "0x7BcC47886931E271f78eDAAb8769B4483277900b"
+                const semaphoreEthers = new SemaphoreEthers("https://polygon-rpc.com", {
+                    address: "0x20edbcfF2fB05A42910318Ed9b89341c5E4dB856"
                 });
 
                 const members = await semaphoreEthers.getGroupMembers("1");
@@ -74,8 +74,16 @@
                 const proof = await generateProof(identity, group, 0, "test");
                 console.log("Proof:", proof);
 
-                const result = await verifyProof(proof);
-                console.log("Proof Validity:", result);
+                try {
+                    const response = await fetch("cloud_func");
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const result = await response.json(); // or `response.text()` if expecting plain text
+                    console.log(result);
+                } catch (error) {
+                    console.error("Fetch error:", error);
+                }                
 
                 document.getElementById('private-key').textContent = identity.privateKey;
                 document.getElementById('public-key').textContent = identity.publicKey;
