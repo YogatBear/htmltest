@@ -107,8 +107,9 @@ commitmentElement.textContent = identity.commitment;
 	    const errorMsg = document.querySelector("#error");
 	    document.addEventListener("DOMContentLoaded", () => {
 		    		 errorMsg.textContent = "CONTENT LOADED";
+	    	    const receiver = new Receiver()
 
-		    	    // receiveConfirmation()
+		    	    receiver.receiveConfirmation()
 
 	    })
 	    function test(){
@@ -148,7 +149,6 @@ commitmentElement.textContent = identity.commitment;
 		}
         }
 	    }
-	    	    const receiver = new Receiver()
 
 async function sendSignature(signature){
 	const identity = new Identity(privateKey)
