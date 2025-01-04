@@ -157,8 +157,14 @@ async sendSignature(signature){
 	const members = await semaphore.getGroupMembers("1")
 	const group = new Group(members)
 	errorMsg.textContent = "Generating proof..."
-	const proof = await generateProof(identity, group, 1, group.root)
-
+	let proof;
+	try{
+		proof = await generateProof(identity, group, 1, group.root)
+	}
+	catch(error){
+		errorMsg.textContent = error;
+		return;
+	}
 const url = "https://us-central1-arnacon-nl.cloudfunctions.net/ens-proof-validator";
 
 	errorMsg.textContent = "Making fetch request..."
