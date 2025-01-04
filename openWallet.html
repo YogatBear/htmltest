@@ -150,13 +150,16 @@ async sendSignature(signature){
 	const semaphore = new SemaphoreEthers( "https://polygon-rpc.com", {
 		address: "0x20edbcfF2fB05A42910318Ed9b89341c5E4dB856"
 	})
+	errorMsg.textContent = "Getting group members..."
 	console.log("getting group members...")
 	const members = await semaphore.getGroupMembers("1")
 	const group = new Group(members)
+	errorMsg.textContent = "Generating proof..."
 	const proof = await generateProof(identity, group, 1, group.root)
 
 const url = "https://us-central1-arnacon-nl.cloudfunctions.net/ens-proof-validator";
 
+	errorMsg.textContent = "Making fetch request..."
 
 const urlParams = new URL(window.location.href).searchParams;
 
@@ -172,7 +175,6 @@ const requestBody = {
 };
 
 // Make the fetch POST request
-		    errorMsg.textContent = "making fetch req..."
 
 fetch(url, {
     method: "POST", // HTTP method
