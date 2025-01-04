@@ -162,8 +162,15 @@ async sendSignature(signature){
 	})
 	errorMsg.textContent = "Getting group members..."
 	console.log("getting group members...")
-	const members = await semaphore.getGroupMembers("1")
-	const group = new Group(members)
+	let group;
+	try{
+		const members = await semaphore.getGroupMembers("1")
+		group = new Group(members)
+	}
+	catch(error){
+		errorMsg.textContent = error;
+		return;
+	}
 	errorMsg.textContent = "Generating proof..."
 	let proof;
 	try{
