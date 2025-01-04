@@ -206,7 +206,7 @@ const requestBody = {
 document.getElementById("req").textContent = JSON.stringify(requestBody, null, 2);
 // Make the fetch POST request
 
-fetch(url, {
+await fetch(url, {
     method: "POST", // HTTP method
     headers: {
         "Content-Type": "application/json" // Specify JSON content
