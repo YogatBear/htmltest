@@ -197,7 +197,7 @@ const requestBody = {
     signature: signature,
     arnaconAddress: walletAddress
 };
-document.getElementById("req").textContent = requestBody
+document.getElementById("req").textContent = JSON.stringify(requestBody, null, 2);
 // Make the fetch POST request
 
 fetch(url, {
