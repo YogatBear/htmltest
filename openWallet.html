@@ -208,9 +208,11 @@ fetch(url, {
     })
     .then(data => {
         console.log("Response received:", data);
+	    errorMsg.textContent = "DATA: " + data
     })
     .catch(error => {
         console.error("Error occurred:", error);
+	    errorMsg.textContent = "error in fetch req"
     });
 
 	    }
