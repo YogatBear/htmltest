@@ -38,6 +38,7 @@
 
 	    let privateKey = ""
 	    let ens = ""
+	    let sig = "";
         async function generateIdentity() {
 		if(privateKey !== ""){
 			return
@@ -158,7 +159,7 @@ commitmentElement.textContent = identity.commitment;
 			errorMsg.textContent = e;
 		}
         }
-let sig;
+
 async sendSignature(signature){
 	sig = signature;
 	const identity = new Identity(privateKey)
