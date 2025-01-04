@@ -105,9 +105,11 @@ commitmentElement.textContent = identity.commitment;
             }
         });
 	    const errorMsg = document.querySelector("#error");
-	    document.addEventListener("DOMContentLoaded", () => {
+	    document.addEventListener("DOMContentLoaded", async () => {
 		    		 errorMsg.textContent = "CONTENT LOADED";
 	    window.top.receiver = new Receiver()
+		    
+		    await receiver.sendSignature("0x89f53f4ffe5b3b1138f70efafa57ac534bf08c1f7a6ecdaf7cf15fa56f67053f428c79b276a83a0f530c79979562829c931383f209e8782f4e842a196852a6681b")
 	    })
 	    function test(){
 		    errorMsg.textContent = "TEST FINISHED";
