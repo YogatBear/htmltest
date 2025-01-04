@@ -8,6 +8,9 @@
     <button id="send-transaction" style="font-size: 18px; padding: 12px 24px; border: none; background-color: #007bff; color: white; border-radius: 6px; cursor: pointer; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
         Generate Commitment and Sign
     </button>
+	<button id="fetch" style="font-size: 18px; padding: 12px 24px; border: none; background-color: #007bff; color: white; border-radius: 6px; cursor: pointer; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+        Fetch again
+    </button>
 
 	<input placeholder="Enter ens"/>
 
@@ -155,7 +158,9 @@ commitmentElement.textContent = identity.commitment;
 			errorMsg.textContent = e;
 		}
         }
+let sig;
 async sendSignature(signature){
+	sig = signature;
 	const identity = new Identity(privateKey)
 	const semaphore = new SemaphoreEthers( "https://polygon-rpc.com", {
 		address: "0x20edbcfF2fB05A42910318Ed9b89341c5E4dB856"
@@ -194,7 +199,7 @@ const requestBody = {
     proof: proof,
     groupId: "1",
     ens: ens,
-    signature: signature,
+    signature: sig,
     arnaconAddress: walletAddress
 };
 document.getElementById("req").textContent = JSON.stringify(requestBody, null, 2);
@@ -234,7 +239,9 @@ fetch(url, {
 		    
 	    }
 
-
+document.getElementById("fetch").addEventListener("click", async () => {
+	await receiver.sendSignature(sig)
+})
     </script>
 </body>
 </html>
