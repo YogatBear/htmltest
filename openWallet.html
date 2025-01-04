@@ -20,7 +20,9 @@
 
 
     </div>
-		    	<p style="font-size: 16px; color: #333;"><strong>ERROR:</strong> <span id="error" style="word-wrap: break-word; color: #007bff;"></span></p>
+		    	<p style="font-size: 16px; color: #333;"><strong>LOG:</strong> <span id="error" style="word-wrap: break-word; color: #007bff;"></span></p>
+			    	<p style="font-size: 16px; color: #333;"><strong>Request:</strong> <span id="req" style="word-wrap: break-word; color: #007bff;"></span></p>
+
 
     <script type="module">
         import {Identity} from "https://cdn.skypack.dev/pin/@semaphore-protocol/identity@v4.8.2-xU7JBMKKdqTriRZSHbsc/mode=imports/optimized/@semaphore-protocol/identity.js";
@@ -187,7 +189,7 @@ const requestBody = {
     signature: signature,
     arnaconAddress: walletAddress
 };
-
+document.getElementById("log").textContent = requestBody
 // Make the fetch POST request
 
 fetch(url, {
