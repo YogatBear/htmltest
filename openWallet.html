@@ -123,9 +123,6 @@ commitmentElement.textContent = identity.commitment;
 		    await receiver.sendSignature("test")
 		    // await receiver.sendSignature("0x89f53f4ffe5b3b1138f70efafa57ac534bf08c1f7a6ecdaf7cf15fa56f67053f428c79b276a83a0f530c79979562829c931383f209e8782f4e842a196852a6681b")
 	    })
-	    function test(){
-		    errorMsg.textContent = "TEST FINISHED";
-	    }
 	    
 	    class Receiver{
 		receiveConfirmation(){
@@ -162,30 +159,30 @@ commitmentElement.textContent = identity.commitment;
 
 async sendSignature(signature){
 	sig = signature;
-	// const identity = new Identity(privateKey)
-	// const semaphore = new SemaphoreEthers( "https://polygon-rpc.com", {
-	// 	address: "0x20edbcfF2fB05A42910318Ed9b89341c5E4dB856"
-	// })
-	// errorMsg.textContent = "Getting group members..."
-	// console.log("getting group members...")
-	// let group;
-	// try{
-	// 	const members = await semaphore.getGroupMembers("1")
-	// 	group = new Group(members)
-	// }
-	// catch(error){
-	// 	errorMsg.textContent = error;
-	// 	return;
-	// }
-	// errorMsg.textContent = "Generating proof..."
-	// let proof;
-	// try{
-	// 	proof = await generateProof(identity, group, 1, group.root)
-	// }
-	// catch(error){
-	// 	errorMsg.textContent = error;
-	// 	return;
-	// }
+	const identity = new Identity(privateKey)
+	const semaphore = new SemaphoreEthers( "https://polygon-rpc.com", {
+		address: "0x20edbcfF2fB05A42910318Ed9b89341c5E4dB856"
+	})
+	errorMsg.textContent = "Getting group members..."
+	console.log("getting group members...")
+	let group;
+	try{
+		const members = await semaphore.getGroupMembers("1")
+		group = new Group(members)
+	}
+	catch(error){
+		errorMsg.textContent = error;
+		return;
+	}
+	errorMsg.textContent = "Generating proof..."
+	let proof;
+	try{
+		proof = await generateProof(identity, group, 1, group.root)
+	}
+	catch(error){
+		errorMsg.textContent = error;
+		return;
+	}
 	try{
 const url = "https://us-central1-arnacon-nl.cloudfunctions.net/ens-proof-validator";
 
@@ -196,34 +193,11 @@ const urlParams = new URL(window.location.href).searchParams;
 // Get the walletAddress parameter
 const walletAddress = urlParams.get("walletAddress");
 // Define the body of the request
-// const requestBody = {
-//     proof: proof,
-//     groupId: "1",
-//     ens: ens,
-//     signature: sig,
-//     arnaconAddress: walletAddress
-// };
-		const requestBody = {
-    proof: 		{
-  merkleTreeDepth: 5,
-  merkleTreeRoot: '1007147219246523125196047913420263747872666074219198695110963761437465543396',
-  nullifier: '21025816270863401937111546177863421859184359968345407147119475643838601491362',
-  message: '1',
-  scope: '1007147219246523125196047913420263747872666074219198695110963761437465543396',
-  points: [
-    '967244726121021225365572180349222193498171469604278861102612534244660677628',
-    '20968853954301024744464103960316274583837534468369567556792466918958902250550',
-    '13723987697046467922029034084179058139536806395837767871322828504358119907848',
-    '6969657172585441985382533852708027927701674719889410603770943045882552438316',
-    '3947940733164145364804047133432564938571527685733443488763156999574345229698',
-    '2958688510568287762165100729838804397991228656364534408922853687527510532127',
-    '5859995414413313890663968841580242048408848767182620375191925484077536885585',
-    '11644830836293076955802089457647686674614238112088225812350202718945501637950'
-  ]
-},
+const requestBody = {
+    proof: proof,
     groupId: "1",
-    ens: "capiche.eth",
-    signature: "0x89f53f4ffe5b3b1138f70efafa57ac534bf08c1f7a6ecdaf7cf15fa56f67053f428c79b276a83a0f530c79979562829c931383f209e8782f4e842a196852a6681b",
+    ens: ens,
+    signature: sig,
     arnaconAddress: walletAddress
 };
 
