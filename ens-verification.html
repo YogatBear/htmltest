@@ -103,7 +103,7 @@
 		 errorMsg.textContent = "ENSNNSSN";
 
     		try{
-    			ens = document.querySelector("input").value
+    			ens = document.querySelector("input").value.toLowerCase()
     			if(ens === ""){
     				errorMsg.textContent = "ens is empty";
     				return
