@@ -95,42 +95,7 @@
 	    const errorMsg = document.querySelector("#error");
 	    document.addEventListener("DOMContentLoaded", async () => {
 		    		 errorMsg.textContent = "CONTENT LOADED";
-	    window.top.receiver = new Receiver()
 	    })
-	    
-	    class Receiver{
-		receiveConfirmation(){
-		 errorMsg.textContent = "ENSNNSSN";
-
-    		try{
-    			ens = document.querySelector("input").value.toLowerCase()
-    			if(ens === ""){
-    				errorMsg.textContent = "ens is empty";
-    				return
-    			}
-		      const jsonData = {
-	                "action": "verify-ens",
-	                "body": {
-	                    "content": ens
-	                }
-	            };
-					errorMsg.textContent = "ENS: " + ens;
-
-	            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
-	                window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
-	            } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
-	                console.log(JSON.stringify(jsonData));
-	                window.AndroidBridge.processAction(JSON.stringify(jsonData));
-	            } else {
-	                console.log("Native interface not available");
-	            }
-			
-		}
-		catch(e){
-			errorMsg.textContent = e;
-		}
-        }
-      }
 
     </script>
 </body>
