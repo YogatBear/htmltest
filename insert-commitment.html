@@ -29,6 +29,7 @@ const price = 1
 const chainId = 137
 const contractAddress = "0xA3Afff4F1A7b472D20Ef0b27E084201c963bb6dD"
 let privateKey = ""
+	    const suffix = "email"
 function generateRandomPrivateKey() {
   // Create a 32-byte random Uint8Array
   const randomBytes = crypto.getRandomValues(new Uint8Array(32));
@@ -74,10 +75,11 @@ function generateRandomPrivateKey() {
                 "action": "insert-commitment",
                 "body": {
                     "metaTx": data,
-                    "price": price,
+                    "price": price.toString(),
                     "chainId": chainId,
                     "contractAddress": contractAddress,
-                    "privateKey": privateKey
+                    "privateKey": privateKey,
+			"suffix": suffix
                 }
             };
 
