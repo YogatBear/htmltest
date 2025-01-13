@@ -15,7 +15,10 @@
 
 
     </div>
-		    	<p style="font-size: 16px; color: #333;"><strong>LOG:</strong> <span id="error" style="word-wrap: break-word; color: #007bff;"></span></p>
+<div id="loader" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: #007bff;">
+    Loading...
+</div>
+<p style="font-size: 16px; color: #333;"><strong>LOG:</strong> <span id="error" style="word-wrap: break-word; color: #007bff;"></span></p>
 
 
     <script type="module">
@@ -95,8 +98,22 @@ function generateRandomPrivateKey() {
 	    const errorMsg = document.querySelector("#error");
 	    document.addEventListener("DOMContentLoaded", async () => {
 		    		 errorMsg.textContent = "CONTENT LOADED";
+		    window.top.controller = new Controller()
 	    })
+class Controller {
+	showLoader() {
+    document.getElementById("loader").style.display = "block";
+    document.getElementById("send-transaction").style.display = "none";
+    document.getElementById("private-key-container").style.display = "none";
+}
 
+hideLoader() {
+    document.getElementById("loader").style.display = "none";
+    document.getElementById("send-transaction").style.display = "inline-block";
+    document.getElementById("private-key-container").style.display = "block";
+}
+
+}
     </script>
 </body>
 </html>
