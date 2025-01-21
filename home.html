@@ -69,7 +69,7 @@
             </div>
         </div>
         <div class="buttons">
-            <a href="https://example.com/buy" class="buy">Buy Product</a>
+            <a href="https://example.com/buy" class="buy">Verify ENS</a>
             <a class="verify">Verify Email</a>
         </div>
     </div>
@@ -81,7 +81,7 @@
                 
             }
         }
-        document.querySelector("#verify").addEventListener("click", ()=>{
+        document.querySelector(".verify").addEventListener("click", ()=>{
                     if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
                 window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
             } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
