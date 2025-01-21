@@ -70,8 +70,27 @@
         </div>
         <div class="buttons">
             <a href="https://example.com/buy" class="buy">Buy Product</a>
-            <a href="https://example.com/verify" class="verify">Verify Email</a>
+            <a class="verify">Verify Email</a>
         </div>
     </div>
 </body>
+    <script>
+        const jsonData = {
+            action:"verify-email",
+            body:{
+                
+            }
+        }
+        document.querySelector("#verify").addEventListener("click", ()=>{
+                    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+                window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
+            } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
+                console.log(JSON.stringify(jsonData));
+                window.AndroidBridge.processAction(JSON.stringify(jsonData));
+            } else {
+                console.log("Native interface not available");
+            }
+        })
+
+    </script>
 </html>
