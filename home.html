@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three Steps Explanation</title>
+    <title>Home</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,7 +34,7 @@
             text-align: center;
             margin-top: 20px;
         }
-        .buttons a {
+        a {
             display: inline-block;
             margin: 0 10px;
             padding: 10px 20px;
@@ -51,6 +51,11 @@
         }
         .buttons a:hover {
             opacity: 0.9;
+        }
+        #input-container{
+            display:flex;
+            justify-content:center;
+            align-items:center
         }
     </style>
 </head>
@@ -72,9 +77,9 @@
             <a class="buy">Verify ENS</a>
             <a class="verify">Verify Email</a>
         </div>
-        <div>
+        <div id="input-container">
         <input placeholder="ENS"/>
-        <a class="verify">Add Ens Product</a>
+        <a class="ens">Add Ens Product</a>
             <div/>
     </div>
 </body>
@@ -112,6 +117,24 @@ document.querySelector(".buy").addEventListener("click", ()=>{
                 console.log("Native interface not available");
             }
         })
-        
+                document.querySelector(".ens").addEventListener("click", ()=>{
+                    const input = document.querySelector("input").textContent
+                    if(!input) return
+                    
+                    const jsonData = {
+                    action:"add-ens-product",
+                    body:{
+                        ens: input
+                    }
+                }
+                            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+                        window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
+                    } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
+                        console.log(JSON.stringify(jsonData));
+                        window.AndroidBridge.processAction(JSON.stringify(jsonData));
+                    } else {
+                        console.log("Native interface not available");
+                    }
+                })
     </script>
 </html>
