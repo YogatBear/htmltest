@@ -128,7 +128,7 @@
                             <span class="profile-initial">${msgSessionId.charAt(0).toUpperCase()}</span>
                         </div>
                         <div class="message-details">
-                            <div class="contact-name">${msgSessionId}</div>
+                            <div class="contact-name">${formatName(msgSessionId)}</div>
                             <div class="message-text">${messageinfo}</div>
                         </div>
                         <p style="margin-right:3px">${timeOrDate}</p>
@@ -149,6 +149,12 @@
         const com = new RecentMessagesComponent('recent-messages');
         com.updateRecentMessages([["2",1733906057000,"gwyneth.eth","Testttt","gwyneth.eth",2]])
 
+function formatName(name) {
+    if (name.length > 25) {
+        return name.substring(0, 24) + "...";
+    }
+    return name;
+}
 
     </script>
 </body>
