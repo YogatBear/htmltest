@@ -112,8 +112,10 @@
         const stepTitles = document.querySelectorAll('.step-title');
         stepTitles.forEach(title => {
             title.addEventListener('click', () => {
-                const stepContent = title.closest(".step").querySelector(".step-content");
-                stepContent.style.display = stepContent.style.display === 'block' ? 'none' : 'block';
+                const stepContent = title.nextElementSibling.querySelector(".step-content");
+                if (stepContent) {
+                    stepContent.style.display = stepContent.style.display === 'block' ? 'none' : 'block';
+                }
             });
         });
 
