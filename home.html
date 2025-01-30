@@ -29,12 +29,8 @@
         }
         .step-title {
             cursor: pointer;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: 1px solid #007bff;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            font-size: 18px;
+            font-weight: bold;
         }
         .step-content {
             display: none;
@@ -78,13 +74,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>Steps to receive Email product</h1>
+        <h1 class="step-title">Steps to receive Email product</h1>
         <div class="steps">
             <div class="step">
-                <div class="step-title">
-                    <strong>Click to View Steps for Email Product</strong>
-                </div>
-                <div class="step-content">
+                <div class="step-content" id="email-steps">
                     <div><strong>1. Verify Email</strong> Press 'Verify Email' button and follow the steps to verify your email.</div>
                     <div><strong>2. Wait For Completion</strong> After completing step 1, wait a few seconds for us to send you the email product.</div>
                     <div><strong>3. Use Product</strong> The product is ready for calling and receiving calls.</div>
@@ -92,13 +85,10 @@
             </div>
         </div>
         
-        <h1>Steps to receive ENS product</h1>
+        <h1 class="step-title">Steps to receive ENS product</h1>
         <div class="steps">
             <div class="step">
-                <div class="step-title">
-                    <strong>Click to View Steps for ENS Product</strong>
-                </div>
-                <div class="step-content">
+                <div class="step-content" id="ens-steps">
                     <div><strong>1. Verify ENS</strong> Press 'Verify ENS' button and follow the steps to verify your mainnet ENS.</div>
                     <div><strong>2. Connected Successfully</strong> After completing step 1, your ENS and application are now connected.</div>
                     <div><strong>3. Add ENS Product</strong> Input an ENS name you own on the mainnet, and press "Add ENS Product" to get the product.</div>
@@ -122,7 +112,7 @@
         const stepTitles = document.querySelectorAll('.step-title');
         stepTitles.forEach(title => {
             title.addEventListener('click', () => {
-                const stepContent = title.nextElementSibling;
+                const stepContent = title.closest(".step").querySelector(".step-content");
                 stepContent.style.display = stepContent.style.display === 'block' ? 'none' : 'block';
             });
         });
