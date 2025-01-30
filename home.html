@@ -27,22 +27,20 @@
         .steps {
             margin: 20px 0;
         }
-        .step {
-            margin-bottom: 15px;
+        .step-title {
             cursor: pointer;
             padding: 10px;
-            background-color: #f1f1f1;
-            border: 1px solid #ccc;
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #007bff;
             border-radius: 5px;
+            margin-bottom: 10px;
         }
         .step-content {
             display: none;
             padding: 10px;
             background-color: #f9f9f9;
             border-top: 1px solid #ccc;
-        }
-        .step.open .step-content {
-            display: block;
         }
         .buttons {
             text-align: center;
@@ -83,21 +81,13 @@
         <h1>Steps to receive Email product</h1>
         <div class="steps">
             <div class="step">
-                <strong>1. Verify Email</strong>
-                <div class="step-content">
-                    Press 'Verify Email' button and follow the steps to verify your email.
+                <div class="step-title">
+                    <strong>Click to View Steps for Email Product</strong>
                 </div>
-            </div>
-            <div class="step">
-                <strong>2. Wait For Completion</strong>
                 <div class="step-content">
-                    After completing step 1, wait a few seconds for us to send you the email product.
-                </div>
-            </div>
-            <div class="step">
-                <strong>3. Use Product</strong>
-                <div class="step-content">
-                    The product is ready for calling and receiving calls.
+                    <div><strong>1. Verify Email</strong> Press 'Verify Email' button and follow the steps to verify your email.</div>
+                    <div><strong>2. Wait For Completion</strong> After completing step 1, wait a few seconds for us to send you the email product.</div>
+                    <div><strong>3. Use Product</strong> The product is ready for calling and receiving calls.</div>
                 </div>
             </div>
         </div>
@@ -105,27 +95,14 @@
         <h1>Steps to receive ENS product</h1>
         <div class="steps">
             <div class="step">
-                <strong>1. Verify ENS</strong>
-                <div class="step-content">
-                    Press 'Verify ENS' button and follow the steps to verify your mainnet ENS.
+                <div class="step-title">
+                    <strong>Click to View Steps for ENS Product</strong>
                 </div>
-            </div>
-            <div class="step">
-                <strong>2. Connected Successfully</strong>
                 <div class="step-content">
-                    After completing step 1, your ENS and application are now connected.
-                </div>
-            </div>
-            <div class="step">
-                <strong>3. Add ENS Product</strong>
-                <div class="step-content">
-                    Input an ENS name you own on the mainnet, and press "Add ENS Product" to get the product.
-                </div>
-            </div>
-            <div class="step">
-                <strong>4. Use ENS Product</strong>
-                <div class="step-content">
-                    If the wallet you connected is the owner of this ENS, you will be able to make and receive calls.
+                    <div><strong>1. Verify ENS</strong> Press 'Verify ENS' button and follow the steps to verify your mainnet ENS.</div>
+                    <div><strong>2. Connected Successfully</strong> After completing step 1, your ENS and application are now connected.</div>
+                    <div><strong>3. Add ENS Product</strong> Input an ENS name you own on the mainnet, and press "Add ENS Product" to get the product.</div>
+                    <div><strong>4. Use ENS Product</strong> If the wallet you connected is the owner of this ENS, you will be able to make and receive calls.</div>
                 </div>
             </div>
         </div>
@@ -141,11 +118,12 @@
     </div>
 
     <script>
-        // Toggle the visibility of the step content when the step header is clicked
-        const steps = document.querySelectorAll('.step');
-        steps.forEach(step => {
-            step.addEventListener('click', () => {
-                step.classList.toggle('open');
+        // Toggle the visibility of the entire step content (both title and content)
+        const stepTitles = document.querySelectorAll('.step-title');
+        stepTitles.forEach(title => {
+            title.addEventListener('click', () => {
+                const stepContent = title.nextElementSibling;
+                stepContent.style.display = stepContent.style.display === 'block' ? 'none' : 'block';
             });
         });
 
@@ -200,3 +178,5 @@
     </script>
 </body>
 </html>
+
+
