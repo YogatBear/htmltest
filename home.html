@@ -29,6 +29,20 @@
         }
         .step {
             margin-bottom: 15px;
+            cursor: pointer;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .step-content {
+            display: none;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-top: 1px solid #ccc;
+        }
+        .step.open .step-content {
+            display: block;
         }
         .buttons {
             text-align: center;
@@ -69,50 +83,79 @@
         <h1>Steps to receive Email product</h1>
         <div class="steps">
             <div class="step">
-                <strong>1. Verify Email</strong> Press 'Verify Email' button and follow the steps to verify your email.
+                <strong>1. Verify Email</strong>
+                <div class="step-content">
+                    Press 'Verify Email' button and follow the steps to verify your email.
+                </div>
             </div>
             <div class="step">
-                <strong>2. Wait For Completion:</strong> After completing step 1, wait a few seconds for us to send you the email product.
+                <strong>2. Wait For Completion</strong>
+                <div class="step-content">
+                    After completing step 1, wait a few seconds for us to send you the email product.
+                </div>
             </div>
             <div class="step">
-                <strong>3. Use Product:</strong> The product is ready for calling and receiving calls
+                <strong>3. Use Product</strong>
+                <div class="step-content">
+                    The product is ready for calling and receiving calls.
+                </div>
             </div>
         </div>
-                <h1>Steps to receive ENS product</h1>
+        
+        <h1>Steps to receive ENS product</h1>
         <div class="steps">
             <div class="step">
-                <strong>1. Verify ENS</strong> Press 'Verify ENS' button and follow the steps to verify your mainnet ENS.
+                <strong>1. Verify ENS</strong>
+                <div class="step-content">
+                    Press 'Verify ENS' button and follow the steps to verify your mainnet ENS.
+                </div>
             </div>
             <div class="step">
-                <strong>2. Connected Successfully:</strong> After completing step 1, your ens and application are now connected.
+                <strong>2. Connected Successfully</strong>
+                <div class="step-content">
+                    After completing step 1, your ENS and application are now connected.
+                </div>
             </div>
             <div class="step">
-                <strong>3. Add ENS Product:</strong> Input an ENS name you own on the mainnet, and press "Add ENS Product" to get the product.
+                <strong>3. Add ENS Product</strong>
+                <div class="step-content">
+                    Input an ENS name you own on the mainnet, and press "Add ENS Product" to get the product.
+                </div>
             </div>
             <div class="step">
-                <strong>3. Use ENS Product:</strong> If the wallet you connected is the owner of this ens, you will be able to make and receive calls.
+                <strong>4. Use ENS Product</strong>
+                <div class="step-content">
+                    If the wallet you connected is the owner of this ENS, you will be able to make and receive calls.
+                </div>
             </div>
         </div>
+
         <div class="buttons">
             <a class="buy">Verify ENS</a>
             <a class="verify">Verify Email</a>
         </div>
         <div id="input-container">
-        <input placeholder="ENS"/>
-        <a class="ens">Add ENS Product</a>
-            <div/>
+            <input placeholder="ENS"/>
+            <a class="ens">Add ENS Product</a>
+        </div>
     </div>
-</body>
+
     <script>
-        
-        document.querySelector(".verify").addEventListener("click", ()=>{
+        // Toggle the visibility of the step content when the step header is clicked
+        const steps = document.querySelectorAll('.step');
+        steps.forEach(step => {
+            step.addEventListener('click', () => {
+                step.classList.toggle('open');
+            });
+        });
+
+        // Handle button clicks to send actions (same as your original script)
+        document.querySelector(".verify").addEventListener("click", () => {
             const jsonData = {
-            action:"verify-email",
-            body:{
-                
-            }
-        }
-                    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+                action: "verify-email",
+                body: {}
+            };
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
                 window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
             } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
                 console.log(JSON.stringify(jsonData));
@@ -120,15 +163,14 @@
             } else {
                 console.log("Native interface not available");
             }
-        })
-document.querySelector(".buy").addEventListener("click", ()=>{
+        });
+
+        document.querySelector(".buy").addEventListener("click", () => {
             const jsonData = {
-            action:"verify-ens",
-            body:{
-                
-            }
-        }
-                    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+                action: "verify-ens",
+                body: {}
+            };
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
                 window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
             } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
                 console.log(JSON.stringify(jsonData));
@@ -136,25 +178,25 @@ document.querySelector(".buy").addEventListener("click", ()=>{
             } else {
                 console.log("Native interface not available");
             }
-        })
-                document.querySelector(".ens").addEventListener("click", ()=>{
-                    const input = document.querySelector("input").value
-                    if(!input) return
-                    
-                    const jsonData = {
-                    action:"add-ens-product",
-                    body:{
-                        ens: input
-                    }
-                }
-                            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
-                        window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
-                    } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
-                        console.log(JSON.stringify(jsonData));
-                        window.AndroidBridge.processAction(JSON.stringify(jsonData));
-                    } else {
-                        console.log("Native interface not available");
-                    }
-                })
+        });
+
+        document.querySelector(".ens").addEventListener("click", () => {
+            const input = document.querySelector("input").value;
+            if (!input) return;
+            
+            const jsonData = {
+                action: "add-ens-product",
+                body: { ens: input }
+            };
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+                window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
+            } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
+                console.log(JSON.stringify(jsonData));
+                window.AndroidBridge.processAction(JSON.stringify(jsonData));
+            } else {
+                console.log("Native interface not available");
+            }
+        });
     </script>
+</body>
 </html>
