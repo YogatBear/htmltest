@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>WhatsApp-style Chat Room</title>
+  <!-- Keep your existing Material Icons link -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
   <style>
@@ -192,8 +193,9 @@
      * @param {string|number} time - The timestamp of the message.
      * @param {string} [type='text'] - The message type (text, image, etc.).
      * @param {number} [status=null] - The status code of the message (0,1,2,4).
+     * @param {string|number} [messageId=null] - (ADDED) The unique ID of the message.
      */
-    function addMessage(content, author, time, type = 'text', status = null) {
+    function addMessage(content, author, time, type = 'text', status = null, messageId = null) {
       const currentDate = formatDate(time);
 
       // Add date separator if new day
@@ -207,10 +209,12 @@
 
       // Create message element
       const messageElement = document.createElement('div');
-      // We interpret "author === sessionId ? 'received' : 'sent'"
-      // as: if it's from the user we're chatting with, it is "received".
-      // If it's from me, it is "sent". Adjust logic as per your usage.
       messageElement.classList.add('message', author === sessionId ? 'received' : 'sent');
+
+      // (ADDED) Store messageId in data attribute, so we can find it later if updated
+      if (messageId !== null) {
+        messageElement.dataset.messageId = messageId;
+      }
 
       // Show author if it's the first message in a series from them
       if (author === sessionId && author !== lastAuthor) {
@@ -331,7 +335,7 @@
           console.log("Received single message data:", data.message);
           const [messageId, time, author, content, msgSessionId, msgStatus] = data.message;
           if (msgSessionId === sessionId) {
-            addMessage(content, author, time, "text", msgStatus);
+            addMessage(content, author, time, "text", msgStatus, messageId);
           }
         } 
         // Multiple messages scenario
@@ -339,9 +343,26 @@
           data.messages.forEach(msg => {
             const [messageId, time, author, content, msgSessionId, msgStatus] = msg;
             if (msgSessionId === sessionId) {
-              addMessage(content, author, time, "text", msgStatus);
+              addMessage(content, author, time, "text", msgStatus, messageId);
             }
           });
+        } 
+        // (ADDED) If the server sent an updated message
+        else if (data.updatedMessage) {
+          console.log("Received updatedMessage data:", data.updatedMessage);
+          // Same structure as a single message
+          const [messageId, time, author, content, msgSessionId, msgStatus] = data.updatedMessage;
+          // Only update if it belongs to this session
+          if (msgSessionId === sessionId) {
+            // Find the existing DOM element by matching data-message-id
+            const existingMsgElement = document.querySelector(`[data-message-id="${messageId}"]`);
+            // Remove old message element if found
+            if (existingMsgElement) {
+              existingMsgElement.remove();
+            }
+            // Re-add it with the updated content/status
+            addMessage(content, author, time, "text", msgStatus, messageId);
+          }
         }
       } catch (error) {
         console.error("Error processing message data:", error);
