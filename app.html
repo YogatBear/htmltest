@@ -49,7 +49,6 @@
                 screenFrame.src = "mainScreen.html";
                 break;
             case 'CHAT':
-                history.replaceState({ page: 'main' }, '', '/main');
                 history.pushState({ page: 'chat' }, '', '/chat');
                 screenFrame.src = "mainScreen.html";
                 screenFrame.onload = function() {
