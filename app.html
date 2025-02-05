@@ -49,6 +49,7 @@
                 screenFrame.src = "mainScreen.html";
                 break;
             case 'CHAT':
+                history.pushState({ page: 'chat' }, '', '/chat');
                 screenFrame.src = "mainScreen.html";
                 screenFrame.onload = function() {
                     screenFrame.contentWindow.postMessage({
@@ -141,6 +142,10 @@
         );
 
         window.app = app;
+
+        window.addEventListener('popstate', () => {
+            screenFrame.contentWindow.postMessage({ action: 'closeChat' }, '*');
+        });
 
         window.addEventListener('message', (event) => {
             console.log('Received message:', event.data);
