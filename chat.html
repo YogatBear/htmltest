@@ -314,6 +314,13 @@
       }
     });
 
+    // Close chat on back navigation
+    window.addEventListener('popstate', function(event) {
+      closeChat();
+    });
+    window.onpopstate = function(event) {
+      closeChat();
+    };
     function closeChat() {
       window.parent.postMessage({action: 'closeChat'}, '*');
     }
