@@ -100,13 +100,13 @@
             </div>
         </div>
 
-        <div class="buttons">
+<!--         <div class="buttons">
             <a class="buy">Verify ENS</a>
             <a class="verify">Verify Email</a>
-        </div>
-        <div id="input-container">
+        </div> -->
+        <div id="input-container" class="buttons">
             <input placeholder="ENS"/>
-            <a class="ens">Add ENS Product</a>
+            <a class="ens">Verify</a>
         </div>
     </div>
 
@@ -121,44 +121,45 @@
                 }
             });
         });
-
+        
         // Handle button clicks to send actions (same as your original script)
-        document.querySelector(".verify").addEventListener("click", () => {
-            const jsonData = {
-                action: "verify-email",
-                body: {}
-            };
-            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
-                window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
-            } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
-                console.log(JSON.stringify(jsonData));
-                window.AndroidBridge.processAction(JSON.stringify(jsonData));
-            } else {
-                console.log("Native interface not available");
-            }
-        });
+        // document.querySelector(".verify").addEventListener("click", () => {
+            
+        //     const jsonData = {
+        //         action: "verify-email",
+        //         body: {}
+        //     };
+        //     if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+        //         window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
+        //     } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
+        //         console.log(JSON.stringify(jsonData));
+        //         window.AndroidBridge.processAction(JSON.stringify(jsonData));
+        //     } else {
+        //         console.log("Native interface not available");
+        //     }
+        // });
 
-        document.querySelector(".buy").addEventListener("click", () => {
-            const jsonData = {
-                action: "verify-ens",
-                body: {}
-            };
-            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
-                window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
-            } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
-                console.log(JSON.stringify(jsonData));
-                window.AndroidBridge.processAction(JSON.stringify(jsonData));
-            } else {
-                console.log("Native interface not available");
-            }
-        });
+        // document.querySelector(".buy").addEventListener("click", () => {
+        //     const jsonData = {
+        //         action: "verify-ens",
+        //         body: {}
+        //     };
+        //     if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+        //         window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
+        //     } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
+        //         console.log(JSON.stringify(jsonData));
+        //         window.AndroidBridge.processAction(JSON.stringify(jsonData));
+        //     } else {
+        //         console.log("Native interface not available");
+        //     }
+        // });
 
         document.querySelector(".ens").addEventListener("click", () => {
             const input = document.querySelector("input").value;
             if (!input) return;
-            
+            const action = isEmail(input) ? "verify-email" : "verify-ens"
             const jsonData = {
-                action: "add-ens-product",
+                action: action,
                 body: { ens: input }
             };
             if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
@@ -170,6 +171,11 @@
                 console.log("Native interface not available");
             }
         });
+
+function isEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
     </script>
 </body>
 </html>
