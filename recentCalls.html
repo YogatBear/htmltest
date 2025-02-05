@@ -10,6 +10,8 @@
             margin: 0;
             padding: 0;
             list-style: none;
+            webkit-user-select: none; 
+            user-select: none;
         }
         .call-entry {
             display: flex;
@@ -50,7 +52,7 @@
             }
 
             init() {
-                this.controller.getRecent();
+                this.controller.getRecentCalls();
                 channel.addEventListener("message", this.handleMessage.bind(this));
             }
 
@@ -58,7 +60,7 @@
                 try {
                     const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
                     if (data.RecentCalls) {
-                        console.log("Received recet calls data:", data.RecentCalls);
+                        console.log("Received recent calls data:", data.RecentCalls);
                         this.updateRecentCalls(data.RecentCalls);
                     }
                 } catch (error) {
@@ -69,7 +71,7 @@
             updateRecentCalls(recentCalls) {
                 this.container.innerHTML = ""; // Clear existing logs
                 recentCalls.forEach(call => {
-                    const [contact, timestamp, status] = call;
+                    const [contact, id, timestamp, status] = call;
                     const callDate = new Date(timestamp);
                     const today = new Date();
                     const isToday = callDate.toDateString() === today.toDateString();
@@ -81,19 +83,25 @@
                     li.className = "call-entry";
                     li.innerHTML = `
                         <div class="call-details">
-                            <div class="contact-name">${contact}</div>
+                            <div class="contact-name">${contact ?? id}</div>
                             <div class="call-time">${timeOrDate}</div>
                         </div>
                         <span class="call-icon material-symbols-outlined">${iconSymbol}</span>`;
                     li.addEventListener('click', () => {
-                        window.parent.postMessage({action: 'call', body: {to: contact}}, '*');
+                        console.log('contact:', contact);
+                        console.log('id:', id);
+                        // window.parent.postMessage({action: 'call', body: {contact: contact ?? id, id: id}}, '*');
+                        window.parent.postMessage({action: 'call', body: {to:id}}, '*');
+
                     });
                     this.container.appendChild(li);
                 });
             }
+
         }
 
-        new RecentCallsComponent('recent-calls');
+        const com = new RecentCallsComponent('recent-calls');
+        com.updateRecentCalls([[null,"kaicenat.eth",1733475581000,"OUTGOING"],[null,"matanthegoat.eth",1733475134000,"INCOMING"]])
     </script>
 </body>
 </html>

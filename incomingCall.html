@@ -4,73 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Incoming Call</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
             height: 100vh;
-            background-color: #f0f0f0;
+            background-color: white;
             margin: 0;
+            padding: 0;
         }
         .container {
             text-align: center;
+            width: 100%;
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            flex: 1; /* Makes the container grow and fill the space */
         }
         h2 {
-            margin-bottom: 20px;
+            margin: 10px 0;
+            margin-top: 8vh;
+            font-size: 24px;
+            font-weight: normal;
+        }
+        .identity {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px 0;
         }
         .buttons {
             display: flex;
-            justify-content: center;
-            gap: 20px;
+            justify-content: space-around;
+            margin-top: auto; /* Pushes the buttons to the bottom */
+            margin-bottom: 10vh; /* 10% of the viewport height from the bottom */
         }
-        button {
-            padding: 10px 20px;
+        .call-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            color: #f0f0f0;
+            font-size: 30px;
         }
-        .accept {
-            background-color: #28a745;
-            color: white;
+        .material-icons {
+            font-size: 24px;
+            background-color: #f0f0f0;
+            border-radius: 50%;
+            padding: 12px;
+            margin-bottom: 5px;
         }
-        .accept:hover {
-            background-color: #218838;
+        .call-button#acceptButton .material-icons {
+            background-color: #34c759; /* Accept button green */
         }
-        .reject {
-            background-color: #dc3545;
-            color: white;
-        }
-        .reject:hover {
-            background-color: #c82333;
+        .call-button#declineButton .material-icons {
+            background-color: #ff3b30; /* Decline button red */
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Incoming call</h2>
-        <h2 id="name"></h2>
+        <h2>Call from</h2>
+        <div class="identity">Caller ID</div>
         <div class="buttons">
-            <button class="accept">Accept</button>
-            <button class="reject">Reject</button>
+            <button class="call-button" id="acceptButton">
+                <i class="material-icons">check</i>
+            </button>
+            <button class="call-button" id="declineButton">
+                <i class="material-icons">close</i>
+            </button>
         </div>
     </div>
     <script>
         const controller = window.top.controller;
         const urlParams = new URLSearchParams(window.location.search);
-        const from = urlParams.get('from');
-        if(from){
-            document.querySelector("#name").textContent = from;
+        const remoteId = decodeURIComponent(urlParams.get('from'));
+        if(remoteId){
+            document.querySelector(".identity").textContent = remoteId;
         }
-        const acceptButton = document.querySelector(".accept")
-        const rejectButton = document.querySelector(".reject")
+        const acceptButton = document.getElementById("acceptButton");
+        const declineButton = document.getElementById("declineButton");
 
         acceptButton.addEventListener("click", ()=>{
-            controller.acceptCall(from);
+            controller.acceptCall(remoteId);
+            window.location.href = 'inCall.html?to=' + remoteId;
         })
-        rejectButton.addEventListener("click", ()=>{
-            controller.rejectCall(from);
+        declineButton.addEventListener("click", ()=>{
+            controller.rejectCall(remoteId);
         })
     </script>
 </body>

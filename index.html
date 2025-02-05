@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Native Communication</title>
     <style>
         body {
@@ -12,15 +13,37 @@
             height: 100%;
             background-color: #ffffff;
             margin: 0;
+            width:100%
         }
     </style>
 </head>
 <body>
+    <iframe id="guiFrame" frameBorder="0" style="width:100%; height:100vh;"></iframe>
     <script>
+
+        guiFrame = document.getElementById('guiFrame');
+        pid = getUrlParameter('pid');
+        screen = getUrlParameter('screen');
+        localId = getUrlParameter('localId');
+        remoteId = getUrlParameter('remoteId');
+
+        guiFrame.src = "app.html?screen=" + screen + "&localId=" + encodeURIComponent(localId) + "&remoteId=" + encodeURIComponent(remoteId);
+
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            window.top.controller = new Controller();
+        });
+                
         class Controller {
 
             constructor() {
-                this.guiFrame = document.getElementById('guiFrame');
+                this.guiFrame = guiFrame;
+                this.pid = pid;
+                this.localId = localId;
             }
 
             receiveData(_data) {
@@ -40,62 +63,143 @@
                 }
             }
 
+            // Native actions
+
             call(to) {
                 const callRequest = {
                     action: "call",
-                    body: {to: to}
+                    body: { localId: this.localId, pid: this.pid, to: to }
                 };
                 this.sendMessageToNativeApp(callRequest);
-                //this.setPage('ringing'); // Show ringing screen
             }
-            acceptCall(from) {
+
+            acceptCall(callId) {
                 const request = {
                     action: "accept-call",
-                    body: { from: from }
+                    body: { localId: this.localId, pid: this.pid, callId: callId }
                 };
                 this.sendMessageToNativeApp(request);
-                // this.setPage('inCallScreen'); // Show in-call screen
             }
-            rejectCall(from) {
+            
+            rejectCall(callId) {
                 const request = {
                     action: "reject-call",
-                    body: { from: from }
+                    body: { localId: this.localId, pid: this.pid, callId: callId }
                 };
                 this.sendMessageToNativeApp(request);
-                // this.setPage('mainScreen'); // Show main screen
             }
-            setMute(bool) {
+
+            setMute(callId, bool) {
                 const request = {
                     action: "set-mute",
-                    body: { mute: bool }
+                    body: { localId: this.localId, pid: this.pid, callId: callId, mute: bool}
                 };
                 this.sendMessageToNativeApp(request);
             }
+            
+            setHold(callId, bool) {
+                const request = {
+                    action: "set-hold",
+                    body: { localId: this.localId, pid: this.pid, callId: callId, hold: bool }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            
+            setActiveCall(callId) {
+                const request = {
+                    action: "set-active-call",
+                    body: { localId: this.localId, pid: this.pid, callId: callId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            sendMessage(to, message) {
+                const request = {
+                    action: "send-message",
+                    body: { localId: this.localId, pid: this.pid, to: to, content: message }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
             store(key, value) {
                 const request = {
                     action: "store",
-                    body: { key: key, value: value }
+                    body: { localId: this.localId, pid: this.pid, key: key, value: value }
                 };
                 this.sendMessageToNativeApp(request);
             }
-            fetch(key, d_value) {
+        
+            changeAudioDevice(callId, deviceId) {
                 const request = {
-                    action: "fetch",
-                    body: { key: key, d_value: d_value }
+                    action: "set-audio-device",
+                    body: { localId: this.localId, pid: this.pid, callId: callId, deviceId: deviceId }
                 };
                 this.sendMessageToNativeApp(request);
             }
-            getLogs() {
+            sendDtmf(callId, digit) {
+                const request = {
+                    action: "send-dtmf",
+                    body: { localId: this.localId, pid: this.pid, callId: callId, digit: digit }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            // Fetch data
+
+            getActiveCalls() {
+                const request = {
+                    action: "get-active-calls",
+                    body: { localId: this.localId, pid: this.pid }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getLogs(remoteId = null) {
                 const request = {
                     action: "get-logs",
-                    body: { range: 10}
+                    body: { localId: this.localId, pid: this.pid, remoteId: remoteId, range: 10 }
                 };
                 this.sendMessageToNativeApp(request);
             }
-            getRecent() {
+
+            getRecentCalls() {
                 const request = {
-                    action: "get-recent",
-                    body: { range: 10}
+                    action: "get-recent-calls",
+                    body: { localId: this.localId, pid: this.pid, range: 10 }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getMessages(sessionId, range) {
+                const request = {
+                    action: "get-messages",
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId, range: range }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getRecentMessages(range) {
+                const request = {
+                    action: "get-recent-messages",
+                    body: { localId: this.localId, pid: this.pid, range: range }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getAudioDevices() {
+                const request = {
+                    action: "get-audio-devices",
+                    body: { localId: this.localId, pid: this.pid }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            // Webview capabilities
+
+            displayBackButton(bool) {
+                const request = {
+                    action: "display-back-button",
+                    body: { localId: this.localId, pid: this.pid, display: bool }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -104,13 +208,16 @@
                 const { action, body} = event.data;
                 this.sendMessage(action, body);
             }
+
+            chatOpened(remoteId){
+                const openChatRequest = {
+                    action: "open-chat",
+                    body: { sessionId: remoteId, localId:localId }
+                };
+                this.sendMessageToNativeApp(openChatRequest);
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            window.top.controller = new Controller();
-        });
-
     </script>
-    <iframe id="guiFrame" src="app.html" frameBorder="0" style="width:100%; height:100vh;"></iframe>
 </body>
 </html>

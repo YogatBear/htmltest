@@ -2,21 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Call Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Purple Connect</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide-icons/0.321.0/font/lucide.min.css" rel="stylesheet">
     <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
         .container {
             flex: 1;
             display: flex;
@@ -25,32 +16,149 @@
             padding: 20px;
             box-sizing: border-box;
         }
+        .container, #chat-container {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        #chat-container {
+            position: fixed;
+            top: 0;
+            left: 100%;
+            width: 100%;
+            height: 100%;
+            background: white;
+        }
+
+        .slide-left {
+            transform: translateX(-100%);
+        }
+
+
+        :root {
+            --primary-white: #ffffff;
+            --secondary-purple: #6a5acd;
+            --light-purple: #9370db;
+            --dark-purple: #4b0082;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--primary-white) 0%, var(--light-purple) 100%);
+            color: var(--dark-purple);
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            -webkit-user-select: none; /* Prevent text selection */
+        }
+        .slide-left {
+            transform: translateX(-100%);
+        }
+        .container {
+            width:100%;
+            /* max-width: 600px; */
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            /* border-radius: 20px; */
+            box-shadow: 0 10px 30px rgba(106, 90, 205, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
         .input-container {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
+            position: relative;
+            gap:5px
         }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            color: var(--secondary-purple);
+            z-index: 10;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 15px 15px 50px;
+            border: 2px solid var(--light-purple);
+            border-radius: 15px;
+            font-size: 16px;
+            background-color: var(--primary-white);
+            color: var(--dark-purple);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--secondary-purple);
+            box-shadow: 0 0 10px rgba(106, 90, 205, 0.2);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-button {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            background-color: var(--secondary-purple);
+            color: var(--primary-white);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            gap: 10px;
+        }
+
+        .action-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(106, 90, 205, 0.4);
+        }
+
+        .action-button.message {
+            background-color: var(--light-purple);
+        }
+
         .toggle-container {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            margin-right: 15px;
+            margin-bottom: 15px;
+            gap:10px
         }
-        .toggle-title {
-            font-size: 12px;
-            margin-bottom: 5px;
-        }
+
         .toggle-switch {
             position: relative;
             display: inline-block;
-            width: 200px;
-            height: 28px;
+            width: 60px;
+            height: 34px;
         }
+
         .toggle-switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
+
         .slider {
             position: absolute;
             cursor: pointer;
@@ -58,106 +166,112 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: var(--light-purple);
             transition: .4s;
-            border-radius: 28px;
+            border-radius: 34px;
         }
+
         .slider:before {
             position: absolute;
             content: "";
-            height: 20px;
-            width: 20px;
+            height: 26px;
+            width: 26px;
             left: 4px;
             bottom: 4px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
         }
+
         input:checked + .slider {
-            background-color: #2196F3;
+            background-color: var(--secondary-purple);
         }
+
         input:checked + .slider:before {
-            transform: translateX(22px);
+            transform: translateX(26px);
         }
-        input[type="text"], button {
-            padding: 12px;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        input[type="text"] {
-            border: 1px solid #ccc;
-            flex-grow: 1;
-        }
-        button {
-            border: none;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .call-button {
-            width: 100%;
+
+        .iframe-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
             margin-top: 20px;
+            height: 100%;
         }
+
         iframe {
             flex: 1;
             width: 100%;
-            border: none;
-            margin-top: 20px;
-            border-radius: 5px;
-        }
-        .button-container {
-            display: none;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .button-container button {
-            width: calc(50% - 5px);
-        }
+            height: 100%;
+
+            border: 2px solid var(--light-purple);
+            border-radius: 15px;
+            background: var(--primary-white);
+            margin-bottom: 10px;
+        }  
     </style>
 </head>
 <body>
     <div class="container">
         <div class="input-container">
-            <div class="toggle-container">
-                <span class="toggle-title">Text Mode</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="keyboardToggle">
-                    <span class="slider"></span>
-                </label>
-            </div>
+            <i class="lucide lucide-phone-call input-icon"></i>
             <input type="text" placeholder="Enter number or name" id="numberInput">
+            <button class="action-button message">+</button>
+            </div>
+        <!-- <div class="toggle-container">
+            <span class="toggle-title">Text Mode</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="keyboardToggle">
+                <span class="slider"></span>
+            </label>
+        </div> -->
+        <!-- <div class="action-buttons">
+            <button class="action-button call">
+                <i class="lucide lucide-phone"></i>
+                Call
+            </button>
+            <button class="action-button message">
+                <i class="lucide lucide-message-circle"></i>
+                Message
+            </button>
+        </div> -->
+        <div class="iframe-container">
+            <!-- <iframe src="recentCalls.html" class="shimmer"></iframe> -->
+            <iframe src="recentMessages.html" class="shimmer"></iframe>
         </div>
-        <div class="button-container">
-            <button class="domain-button">.cellact</button>
-            <button class="domain-button">.eth</button>
-        </div>
-        <button class="call-button">Call</button>
-        <iframe src="recentCalls.html"></iframe>
     </div>
+    <div id="chat-container"></div>
     <script>
         const controller = window.top.controller;
         const input = document.querySelector("#numberInput");
-        const callButton = document.querySelector(".call-button");
+        const callButton = document.querySelector(".call");
+        const messageButton = document.querySelector(".message");
         const domainButtons = document.querySelectorAll(".domain-button");
         const keyboardToggle = document.querySelector("#keyboardToggle");
         const buttonContainer = document.querySelector(".button-container");
+        const chatContainer = document.getElementById('chat-container');
 
         // Set initial input type
-        input.inputMode = "tel";
+        // input.inputMode = "tel";
 
         // Convert input to lowercase
         input.addEventListener('input', function(e) {
             this.value = this.value.toLowerCase();
         });
 
-        callButton.addEventListener("click", function() {
-            makeCall({to: input.value});
-        });
+        // callButton.addEventListener("click", function() {
+        //     if (input.value === ""){
+        //         return
+        //     }
+        //     makeCall({to: input.value});
+        // });
+
+        messageButton.addEventListener("click", function() {
+            if (input.value === ""){
+                return
+            }
+            openChat(input.value);
+        })
 
         domainButtons.forEach(button => {
             button.addEventListener("click", function() {
@@ -165,21 +279,52 @@
             });
         });
 
-        keyboardToggle.addEventListener("change", function() {
-            if (this.checked) {
-                input.inputMode = "text";
-                buttonContainer.style.display = "flex";
-            } else {
-                input.inputMode = "tel";
-                buttonContainer.style.display = "none";
-            }
-        });
+        // keyboardToggle.addEventListener("change", function() {
+        //     if (this.checked) {
+        //         input.inputMode = "text";
+        //         buttonContainer.style.display = "flex";
+        //     } else {
+        //         input.inputMode = "tel";
+        //         buttonContainer.style.display = "none";
+        //     }
+        // });
 
         window.addEventListener('message', (event) => {
-            if (event.data.action === 'call') {
-                makeCall(event.data.body);
+            switch (event.data.action) {
+                case 'call':
+                    makeCall(event.data.body);
+                    break;
+                    
+                case 'chat':
+                    openChat(event.data.body.sessionId);
+                    break;
+
+                case 'closeChat':
+                    closeChat();
+                    break;
             }
         });
+        
+        window.addEventListener('popstate', function(event) {
+            closeChat();
+        });
+
+        function openChat(sessionId) {
+            chatContainer.innerHTML = `<iframe src="chat.html?sessionId=${encodeURIComponent(sessionId)}" style="width:100%;height:100%;border:none;"></iframe>`;
+            document.querySelector('.container').classList.add('slide-left');
+            chatContainer.classList.add('slide-left');
+            history.pushState({page: 'chat'}, '', 'chat');
+            controller.displayBackButton(true);
+        }
+
+        function closeChat() {
+            document.querySelector('.container').classList.remove('slide-left');
+            chatContainer.classList.remove('slide-left');
+            setTimeout(() => {
+                chatContainer.innerHTML = '';
+            }, 300); // Clear chat container after animation
+            controller.displayBackButton(false);
+        }
 
         function makeCall(jsonData) {
             if (jsonData != null) {
@@ -187,9 +332,11 @@
                     action: "call-attempt",
                     body: jsonData
                 };
+                console.log(window.parent)
                 window.parent.postMessage(connectRequest, '*');
             }
         }
+
     </script>
 </body>
 </html>

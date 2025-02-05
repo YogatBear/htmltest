@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adjusted Dialer Grid</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+        :root {
+            --primary-white: #ffffff;
+            --secondary-purple: #6a5acd;
+            --light-purple: #9370db;
+            --dark-purple: #4b0082;
+            --transparent-purple: #9470db69;
+        }
+        .dialer-container {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+        }
+        #dialerGrid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 10px;
+            max-width: 240px; /* Adjust based on desired overall width */
+            width: 100%;
+        }
+        .dialerButton {
+            width: 60px; /* Fixed width to match bottom buttons */
+            height: 60px; /* Fixed height to match bottom buttons */
+            font-size: 24px;
+            border: none;
+            border-radius: 50%;
+            background-color: var(--light-purple);
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color:white
+        }
+        .dialerButton:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="dialer-container">
+        <div id="dialerGrid">
+            <button class="dialerButton">1</button>
+            <button class="dialerButton">2</button>
+            <button class="dialerButton">3</button>
+            <button class="dialerButton">4</button>
+            <button class="dialerButton">5</button>
+            <button class="dialerButton">6</button>
+            <button class="dialerButton">7</button>
+            <button class="dialerButton">8</button>
+            <button class="dialerButton">9</button>
+            <button class="dialerButton">*</button>
+            <button class="dialerButton">0</button>
+            <button class="dialerButton">#</button>
+        </div>
+    </div>
+
+    <script>
+        const dialerButtons = document.querySelectorAll(".dialerButton");
+        const controller = window.top.controller;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const callId = urlParams.get('callId');
+
+        dialerButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                const digit = button.textContent;
+                controller.sendDtmf(callId, digit);
+            });
+        });
+    </script>
+</body>
+</html>

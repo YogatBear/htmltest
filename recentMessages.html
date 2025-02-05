@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reusable Recent Message Session Component</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        .recent-messages {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            webkit-user-select: none; 
+            user-select: none;
+        }
+        .message-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .message-details {
+            flex-grow: 1;
+        }
+        .contact-name {
+            font-size: 16px;
+            color: #333;
+        }
+        .message-text {
+            font-size: 12px;
+            color: #999;
+        }
+        .message-time {
+            font-size: 12px;
+            color: #999;
+        }
+        .message-icon {
+            font-family: 'Material Symbols Outlined';
+            font-size: 24px;
+        }
+        .unread-bubble {
+            background-color: rgb(115, 0, 113);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border-radius: 50%;
+            padding: 5px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 5px; /* Adjust based on your layout */
+            right: 5px; /* Adjust based on your layout */
+        }
+        .profile-circle {
+            width: 40px; /* Adjust size as needed */
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px; /* Adjust spacing */
+            color: white; /* Text color for the initial */
+            font-size: 16px; /* Adjust font size */
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+    </style>
+</head>
+<body>
+    <ul id="recent-messages" class="recent-messages"></ul>
+
+    <script>
+
+        const channel = new BroadcastChannel('myChannel');
+        class RecentMessagesComponent {
+            constructor(containerId) {
+                this.container = document.getElementById(containerId);
+                this.controller = window.top.controller;
+                this.init();
+            }
+
+            init() {
+                this.controller.getRecentMessages(10);
+                channel.addEventListener("message", this.handleMessage.bind(this));
+            }
+
+            handleMessage(event) {
+                try {
+                    const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+                    if (data.recentMessages) {
+                        console.log("Received recent messages data:", data.recentMessages);
+                        this.updateRecentMessages(data.recentMessages);
+                    }
+                    else if (data.message) {
+                        this.controller.getRecentMessages(10);
+                    }
+                } catch (error) {
+                    console.error("Error parsing message data:", error);
+                }
+            }
+
+            updateRecentMessages(recentMessages) {
+                this.container.innerHTML = ""; // Clear existing logs
+                recentMessages.forEach(msg => {
+                    const [messageId, time, author, content, msgSessionId, unreadCount] = msg;
+
+                    const messageDate = new Date(time);
+                    const today = new Date();
+                    const isToday = messageDate.toDateString() === today.toDateString();
+                    const timeOrDate = isToday ? messageDate.toLocaleTimeString([], { timeStyle: 'short' }) : messageDate.toLocaleDateString();
+                    const iconSymbol = 'chat';
+                    const name = author === msgSessionId ? "" : "You: ";
+                    const messageinfo = name + content + ' ';
+
+                    // Generate a random color
+                    const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+
+                    const li = document.createElement('li');
+                    li.className = "message-entry";
+
+                    li.innerHTML = `
+                        <div class="profile-circle" style="background-color: ${randomColor};">
+                            <span class="profile-initial">${msgSessionId.charAt(0).toUpperCase()}</span>
+                        </div>
+                        <div class="message-details">
+                            <div class="contact-name">${formatName(msgSessionId)}</div>
+                            <div class="message-text">${messageinfo}</div>
+                        </div>
+                        <p style="margin-right:3px">${timeOrDate}</p>
+                        ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}
+                        <span class="message-icon material-symbols-outlined">${iconSymbol}</span>`;
+
+                    li.addEventListener('click', () => {
+                        window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
+                        this.controller.chatOpened(msgSessionId);
+                    });
+
+                    document.querySelector("#recent-messages").appendChild(li);
+                });
+            }
+
+        }
+
+        const com = new RecentMessagesComponent('recent-messages');
+        com.updateRecentMessages([["2",1733906057000,"gwyneth.eth","Testttt","gwyneth.eth",2]])
+
+function formatName(name) {
+    if (name.length > 25) {
+        return name.substring(0, 22) + "...";
+    }
+    return name;
+}
+
+    </script>
+</body>
+</html>
