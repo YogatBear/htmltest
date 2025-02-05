@@ -49,7 +49,15 @@
                 screenFrame.src = "mainScreen.html";
                 break;
             case 'CHAT':
-                screenFrame.src = "chat.html?sessionId=" + encodeURIComponent(remoteId);
+                screenFrame.src = "mainScreen.html";
+                screenFrame.onload = function() {
+                    screenFrame.contentWindow.postMessage({
+                        action: 'chat',
+                        body: {
+                            sessionId: encodeURIComponent(remoteId)
+                        }
+                    }, '*');
+                };
                 break;
             case 'CALL':
                 screenFrame.src = "inCall.html?to=" + encodeURIComponent(remoteId);
