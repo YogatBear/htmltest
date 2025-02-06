@@ -317,13 +317,23 @@
             closeChat();
         });
 
-        function openChat(sessionId) {
-            chatContainer.innerHTML = `<iframe src="chat.html?sessionId=${encodeURIComponent(sessionId)}" style="width:100%;height:100%;border:none;"></iframe>`;
-            document.querySelector('.container').classList.add('slide-left');
-            chatContainer.classList.add('slide-left');
-            history.pushState({page: 'chat'}, '', 'chat');
-            controller.displayBackButton(true);
-        }
+function openChat(sessionId) {
+    // Check if the history state is already pushed, if not, push the initial state
+    if (window.history.state === null) {
+        history.replaceState({page: 'home'}, '', window.location.pathname);
+    }
+
+    // Open chat iframe and modify the container styles
+    chatContainer.innerHTML = `<iframe src="chat.html?sessionId=${encodeURIComponent(sessionId)}" style="width:100%;height:100%;border:none;"></iframe>`;
+    document.querySelector('.container').classList.add('slide-left');
+    chatContainer.classList.add('slide-left');
+
+    // Push new state to history
+    history.pushState({page: 'chat'}, '', 'chat');
+    
+    // Display the back button
+    controller.displayBackButton(true);
+}
 
         function closeChat() {
             document.querySelector('.container').classList.remove('slide-left');
