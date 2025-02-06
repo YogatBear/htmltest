@@ -48,6 +48,17 @@
             history.replaceState({ page: screen || 'main' }, '', '');
         }
 
+        window.addEventListener('popstate', function(event) {
+            screenFrame.contentWindow.postMessage({
+                action: 'chat'
+            }, '*');
+        });
+        window.onpopstate = function(event) {
+            screenFrame.contentWindow.postMessage({
+                action: 'chat'
+            }, '*');
+        };
+
         switch (screen) {
             case 'MAIN':
                 screenFrame.src = "mainScreen.html";
