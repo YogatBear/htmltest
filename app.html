@@ -47,7 +47,7 @@
         switch (screen) {
             case 'MAIN':
                 screenFrame.src = "mainScreen.html";
-                if (remoteId !== null) {
+                if (remoteId != null) {
                     screenFrame.onload = function() {
                         screenFrame.contentWindow.postMessage({
                             action: 'chat',
