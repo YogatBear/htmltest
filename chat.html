@@ -173,6 +173,11 @@
 
     controller.getMessages(sessionId, 10);
 
+    window.addEventListener('popstate', function(event) {
+        console.log("back button pressed");
+        closeChat();
+    });
+
     function formatTime(timestamp) {
       const date = new Date(parseInt(timestamp));
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
