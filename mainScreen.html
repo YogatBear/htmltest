@@ -305,10 +305,6 @@
             }
         });
         
-        window.addEventListener('popstate', function(event) {
-            console.log("back button pressed");
-            closeChat();
-        });
 
         function openChat(sessionId) {
             chatContainer.innerHTML = `<iframe src="chat.html?sessionId=${encodeURIComponent(sessionId)}" style="width:100%;height:100%;border:none;"></iframe>`;
