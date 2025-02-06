@@ -44,23 +44,6 @@
         const localId = urlParams.get('localId');
         const remoteId = urlParams.get('remoteId');
 
-        if (!history.state) {
-            history.replaceState({ page: screen || 'main' }, '', '');
-        }
-
-        window.addEventListener('popstate', function(event) {
-            console.log('Back Button Pressed');
-            screenFrame.contentWindow.postMessage({
-                action: 'chat'
-            }, '*');
-        });
-        window.onpopstate = function(event) {
-            console.log('Back Button Pressed');
-            screenFrame.contentWindow.postMessage({
-                action: 'chat'
-            }, '*');
-        };
-
         switch (screen) {
             case 'MAIN':
                 screenFrame.src = "mainScreen.html";
@@ -158,6 +141,10 @@
         );
 
         window.app = app;
+
+        window.addEventListener('popstate', () => {
+            screenFrame.contentWindow.postMessage({ action: 'closeChat' }, '*');
+        });
 
         window.addEventListener('message', (event) => {
             console.log('Received message:', event.data);
