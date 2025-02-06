@@ -49,11 +49,13 @@
         }
 
         window.addEventListener('popstate', function(event) {
+            console.log('Back Button Pressed');
             screenFrame.contentWindow.postMessage({
                 action: 'chat'
             }, '*');
         });
         window.onpopstate = function(event) {
+            console.log('Back Button Pressed');
             screenFrame.contentWindow.postMessage({
                 action: 'chat'
             }, '*');
