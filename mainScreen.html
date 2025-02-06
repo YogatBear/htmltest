@@ -289,10 +289,6 @@
         //     }
         // });
 
-        if (!history.state) {
-            history.replaceState({ page: screen || 'main' }, '', '');
-        }
-
         window.addEventListener('message', (event) => {
             switch (event.data.action) {
                 case 'call':
