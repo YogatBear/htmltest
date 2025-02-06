@@ -49,7 +49,6 @@
                 screenFrame.src = "mainScreen.html";
                 break;
             case 'CHAT':
-                history.pushState({}, '', '');
                 screenFrame.src = "mainScreen.html";
                 screenFrame.onload = function() {
                     screenFrame.contentWindow.postMessage({

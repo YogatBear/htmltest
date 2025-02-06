@@ -311,7 +311,6 @@
         });
 
         function openChat(sessionId) {
-            history.pushState({ page: 'main' }, '', '/main');
             chatContainer.innerHTML = `<iframe src="chat.html?sessionId=${encodeURIComponent(sessionId)}" style="width:100%;height:100%;border:none;"></iframe>`;
             document.querySelector('.container').classList.add('slide-left');
             chatContainer.classList.add('slide-left');
