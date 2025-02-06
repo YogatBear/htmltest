@@ -251,6 +251,13 @@
         const buttonContainer = document.querySelector(".button-container");
         const chatContainer = document.getElementById('chat-container');
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const remoteId = urlParams.get('remoteId');
+
+        if(remoteId != null) {
+            openChat(remoteId);
+        }
+
         // Set initial input type
         // input.inputMode = "tel";
 

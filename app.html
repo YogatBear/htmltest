@@ -49,16 +49,16 @@
                 screenFrame.src = "mainScreen.html";
                 break;
             case 'CHAT':
-                history.replaceState({}, '', 'app.html?screen=MAIN&localId='+encodeURIComponent(localId)+'&remoteId=null');
-                screenFrame.src = "mainScreen.html";
-                screenFrame.onload = function() {
-                    screenFrame.contentWindow.postMessage({
-                        action: 'chat',
-                        body: {
-                            sessionId: encodeURIComponent(remoteId)
-                        }
-                    }, '*');
-                };
+            //    history.replaceState({}, '', 'app.html?screen=MAIN&localId='+encodeURIComponent(localId)+'&remoteId=null');
+                screenFrame.src = "mainScreen.html?remoteId="+encodeURIComponent(remoteId);
+            //    screenFrame.onload = function() {
+            //        screenFrame.contentWindow.postMessage({
+            //            action: 'chat',
+            //            body: {
+            //                sessionId: encodeURIComponent(remoteId)
+            //            }
+            //       }, '*');
+            //    };
                 break;
             case 'CALL':
                 screenFrame.src = "inCall.html?to=" + encodeURIComponent(remoteId);
