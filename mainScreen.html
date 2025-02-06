@@ -290,7 +290,7 @@
         // });
 
         if (!history.state) {
-            history.replaceState({ page: 'main' }, '', '');
+            history.replaceState({ page: screen || 'main' }, '', '');
         }
 
         window.addEventListener('message', (event) => {
