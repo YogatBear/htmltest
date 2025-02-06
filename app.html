@@ -44,6 +44,10 @@
         const localId = urlParams.get('localId');
         const remoteId = urlParams.get('remoteId');
 
+        if (!history.state) {
+            history.replaceState({ page: screen || 'main' }, '', '');
+        }
+
         switch (screen) {
             case 'MAIN':
                 screenFrame.src = "mainScreen.html";
