@@ -47,17 +47,16 @@
         switch (screen) {
             case 'MAIN':
                 screenFrame.src = "mainScreen.html";
-                break;
-            case 'CHAT':
-                screenFrame.src = "mainScreen.html";
-                screenFrame.onload = function() {
-                    screenFrame.contentWindow.postMessage({
-                        action: 'chat',
-                        body: {
-                            sessionId: encodeURIComponent(remoteId)
-                        }
-                    }, '*');
-                };
+                if (remoteId !== null) {
+                    screenFrame.onload = function() {
+                        screenFrame.contentWindow.postMessage({
+                            action: 'chat',
+                            body: {
+                                sessionId: encodeURIComponent(remoteId)
+                            }
+                        }, '*');
+                    };
+                }
                 break;
             case 'CALL':
                 screenFrame.src = "inCall.html?to=" + encodeURIComponent(remoteId);
