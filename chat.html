@@ -6,7 +6,6 @@
   <title>WhatsApp-style Chat Room</title>
   <!-- Keep your existing Material Icons link -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
   <style>
     :root {
       --primary-white: #ffffff;
@@ -24,30 +23,39 @@
       background-color: var(--primary-white);
       overflow-x: hidden;
     }
-    #call-button {
-      padding: 15px;
-      border: none;
-      border-radius: 15px;
-      background-color: var(--secondary-purple);
-      color: var(--primary-white);
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      gap: 10px;
-    }
-    #title {
-      flex: 1;
-      color: white;
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%);
-      margin: 0;
-    }
+    /* Updated top bar styling */
     #top-bar {
       background-color: var(--secondary-purple);
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
+      border-radius: 0;  /* Ensures no rounded corners */
+      padding: 0 10px;
+    }
+    /* Back button styling */
+    #back-button {
+      padding: 15px;
+      border: none;
+      background-color: transparent; /* or use var(--secondary-purple) to match */
+      color: var(--primary-white);
+      cursor: pointer;
+      outline: none;
+    }
+    /* Title styling adjusted for centered text */
+    #title {
+      flex: 1;
+      color: white;
+      text-align: center;
+      margin: 0;
+    }
+    /* Updated call button styling with no rounded corners */
+    #call-button {
+      padding: 15px;
+      border: none;
+      background-color: transparent; /* or var(--secondary-purple) if you prefer a button background */
+      color: var(--primary-white);
+      cursor: pointer;
+      outline: none;
     }
     #chat-container {
       flex: 1;
@@ -130,7 +138,7 @@
       right: 7px;
       display: flex;
       align-items: center;
-      gap: 5px; /* space between time and icon */
+      gap: 5px;
       white-space: nowrap;
     }
     .message-time {
@@ -149,11 +157,17 @@
     }
   </style>
 </head>
-
 <body>
   <div id="top-bar">
+    <!-- New back button on the far left -->
+    <button id="back-button">
+      <span class="material-icons">arrow_back</span>
+    </button>
     <h5 id="title"></h5>
-    <button id="call-button">Call</button>
+    <!-- Call button now displays an icon instead of text -->
+    <button id="call-button">
+      <span class="material-icons">call</span>
+    </button>
   </div>
   <div id="chat-container"></div>
   <div class="message-input">
@@ -191,19 +205,8 @@
     let lastDisplayedDate = null;
     let lastAuthor = null;
 
-    /**
-     * Add a message to the chat UI.
-     * @param {string} content - The message content.
-     * @param {string} author - The author of the message.
-     * @param {string|number} time - The timestamp of the message.
-     * @param {string} [type='text'] - The message type (text, image, etc.).
-     * @param {number} [status=null] - The status code of the message (0,1,2,4).
-     * @param {string|number} [messageId=null] - (ADDED) The unique ID of the message.
-     */
     function addMessage(content, author, time, type = 'text', status = null, messageId = null) {
       const currentDate = formatDate(time);
-
-      // Add date separator if new day
       if (currentDate !== lastDisplayedDate) {
         const dateElement = document.createElement('div');
         dateElement.classList.add('date-separator');
@@ -212,16 +215,13 @@
         lastDisplayedDate = currentDate;
       }
 
-      // Create message element
       const messageElement = document.createElement('div');
       messageElement.classList.add('message', author === sessionId ? 'received' : 'sent');
 
-      // (ADDED) Store messageId in data attribute, so we can find it later if updated
       if (messageId !== null) {
         messageElement.dataset.messageId = messageId;
       }
 
-      // Show author if it's the first message in a series from them
       if (author === sessionId && author !== lastAuthor) {
         const authorElement = document.createElement('div');
         authorElement.classList.add('message-author');
@@ -229,7 +229,6 @@
         messageElement.appendChild(authorElement);
       }
 
-      // Message content
       if (type === 'text') {
         const contentElement = document.createElement('div');
         contentElement.classList.add('message-content');
@@ -242,44 +241,34 @@
         messageElement.appendChild(img);
       }
 
-      // Footer container for time and possibly status icon
       const footerElement = document.createElement('div');
       footerElement.classList.add('message-footer');
 
-      // Time element
       const timeElement = document.createElement('div');
       timeElement.classList.add('message-time');
       timeElement.textContent = formatTime(time);
       footerElement.appendChild(timeElement);
 
-      // If outgoing message (class 'sent'), show status icon
       if (messageElement.classList.contains('sent') && status !== null) {
         const statusIcon = document.createElement('span');
         statusIcon.classList.add('material-icons', 'message-status-icon');
-
-        // Map the numeric status to a Material Icon (adjust as you like)
         switch (status) {
           case 0:
-            // e.g., pending to send
             statusIcon.textContent = 'schedule';
             break;
           case 1:
-            // e.g., sent
             statusIcon.textContent = 'done';
             break;
           case 2:
-            // e.g., delivered
             statusIcon.textContent = 'error';
             break;
           case 4:
-            // e.g., error or read receipt
             statusIcon.textContent = 'done_all';
             break;
           default:
             statusIcon.textContent = '';
             break;
         }
-
         footerElement.appendChild(statusIcon);
       }
 
@@ -302,7 +291,9 @@
       window.parent.parent.postMessage(connectRequest, '*');
     });
 
-    // Send button logic
+    // You can add your own onclick functionality for the back button here:
+    // document.getElementById("back-button").addEventListener("click", function() { ... });
+
     sendButton.addEventListener('click', () => {
       const message = messageText.value.trim();
       if (message) {
@@ -312,49 +303,36 @@
       }
     });
 
-    // Send on Enter key
     messageText.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         sendButton.click();
       }
     });
 
-    // Listen for incoming messages or message history
     channel.addEventListener('message', (event) => {
       try {
         const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-        
-        // Single message scenario
         if (data.message) {
           console.log("Received single message data:", data.message);
           const [messageId, time, author, content, msgSessionId, msgStatus] = data.message;
           if (msgSessionId === sessionId) {
             addMessage(content, author, time, "text", msgStatus, messageId);
           }
-        } 
-        // Multiple messages scenario
-        else if (data.messages) {
+        } else if (data.messages) {
           data.messages.forEach(msg => {
             const [messageId, time, author, content, msgSessionId, msgStatus] = msg;
             if (msgSessionId === sessionId) {
               addMessage(content, author, time, "text", msgStatus, messageId);
             }
           });
-        } 
-        // (ADDED) If the server sent an updated message
-        else if (data.updatedMessage) {
+        } else if (data.updatedMessage) {
           console.log("Received updatedMessage data:", data.updatedMessage);
-          // Same structure as a single message
           const [messageId, time, author, content, msgSessionId, msgStatus] = data.updatedMessage;
-          // Only update if it belongs to this session
           if (msgSessionId === sessionId) {
-            // Find the existing DOM element by matching data-message-id
             const existingMsgElement = document.querySelector(`[data-message-id="${messageId}"]`);
-            // Remove old message element if found
             if (existingMsgElement) {
               existingMsgElement.remove();
             }
-            // Re-add it with the updated content/status
             addMessage(content, author, time, "text", msgStatus, messageId);
           }
         }
