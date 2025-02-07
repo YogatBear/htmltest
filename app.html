@@ -134,6 +134,8 @@
 
         window.app = app;
 
+        history.replaceState({ page: 'main' }, '', 'main');
+
         window.addEventListener('popstate', (event) => {
             if (event.state && event.state.page === 'chat') {
                 screenFrame.contentWindow.postMessage({ action: 'closeChat' }, '*');
