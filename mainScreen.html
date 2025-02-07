@@ -208,7 +208,11 @@
             border-radius: 15px;
             background: var(--primary-white);
             margin-bottom: 10px;
-        }  
+        }
+        
+        .chat-iframe {
+            border-radius: 0;
+        }
     </style>
 </head>
 <body>
@@ -318,7 +322,7 @@
         });
 
         function openChat(sessionId) {
-            chatContainer.innerHTML = `<iframe src="chat.html?sessionId=${encodeURIComponent(sessionId)}" style="width:100%;height:100%;border:none;"></iframe>`;
+            chatContainer.innerHTML = `<iframe src="chat.html?sessionId=${encodeURIComponent(sessionId)}" class="chat-iframe" style="width:100%;height:100%;border:none;"></iframe>`;
             document.querySelector('.container').classList.add('slide-left');
             chatContainer.classList.add('slide-left');
             history.pushState({page: 'chat'}, '', 'chat');
