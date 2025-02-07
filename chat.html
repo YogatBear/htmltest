@@ -23,45 +23,55 @@
       background-color: var(--primary-white);
       overflow-x: hidden;
     }
-    /* Updated top bar styling */
+    /* Fixed top bar with no rounded corners */
     #top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px; /* Set a fixed height */
       background-color: var(--secondary-purple);
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      border-radius: 0;  /* Ensures no rounded corners */
+      justify-content: space-between;
+      border-radius: 0;
       padding: 0 10px;
+      z-index: 1000;
     }
     /* Back button styling */
     #back-button {
       padding: 15px;
       border: none;
-      background-color: transparent; /* or use var(--secondary-purple) to match */
+      background-color: transparent;
       color: var(--primary-white);
       cursor: pointer;
       outline: none;
     }
-    /* Title styling adjusted for centered text */
+    /* Title styling with truncation if too long */
     #title {
       flex: 1;
       color: white;
       text-align: center;
       margin: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-    /* Updated call button styling with no rounded corners */
+    /* Call button now with an icon */
     #call-button {
       padding: 15px;
       border: none;
-      background-color: transparent; /* or var(--secondary-purple) if you prefer a button background */
+      background-color: transparent;
       color: var(--primary-white);
       cursor: pointer;
       outline: none;
     }
+    /* Chat container with margin-top matching the fixed top bar */
     #chat-container {
       flex: 1;
       overflow-y: auto;
       padding: 10px;
-      margin-top: 60px;
+      margin-top: 50px; /* Equal to the top bar height */
       margin-bottom: 60px;
     }
     .message {
@@ -131,7 +141,6 @@
       margin-bottom: 15px;
       font-size: 14px;
     }
-    /* Footer for time + status icon */
     .message-footer {
       position: absolute;
       bottom: 3px;
@@ -157,6 +166,7 @@
     }
   </style>
 </head>
+
 <body>
   <div id="top-bar">
     <!-- New back button on the far left -->
@@ -164,7 +174,7 @@
       <span class="material-icons">arrow_back</span>
     </button>
     <h5 id="title"></h5>
-    <!-- Call button now displays an icon instead of text -->
+    <!-- Call button now displays an icon -->
     <button id="call-button">
       <span class="material-icons">call</span>
     </button>
@@ -291,7 +301,7 @@
       window.parent.parent.postMessage(connectRequest, '*');
     });
 
-    // You can add your own onclick functionality for the back button here:
+    // Add your own onclick functionality for the back button here:
     // document.getElementById("back-button").addEventListener("click", function() { ... });
 
     sendButton.addEventListener('click', () => {
