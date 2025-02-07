@@ -305,8 +305,9 @@
       window.parent.parent.postMessage(connectRequest, '*');
     });
 
-    // Add your own onclick functionality for the back button here:
-    // document.getElementById("back-button").addEventListener("click", function() { ... });
+    document.getElementById("back-button").addEventListener("click", () => {
+        window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
+    });
 
     sendButton.addEventListener('click', () => {
       const message = messageText.value.trim();

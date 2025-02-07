@@ -322,7 +322,7 @@
             document.querySelector('.container').classList.add('slide-left');
             chatContainer.classList.add('slide-left');
             history.pushState({page: 'chat'}, '', 'chat');
-            controller.displayBackButton(true);
+            //controller.displayBackButton(true);
         }
 
         function closeChat() {
@@ -331,7 +331,7 @@
             setTimeout(() => {
                 chatContainer.innerHTML = '';
             }, 300); // Clear chat container after animation
-            controller.displayBackButton(false);
+            //controller.displayBackButton(false);
         }
 
         function makeCall(jsonData) {
