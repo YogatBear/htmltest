@@ -29,6 +29,8 @@
       animation: gradientAnimation 15s ease infinite;
       height: 100vh;
       overflow: hidden;
+      transform: translateX(0);
+      transition: transform 0.3s ease-in-out;
     }
     /* Enhanced top bar */
     #top-bar {
@@ -290,17 +292,50 @@
 
     function addMessage(content, author, time, type = 'text', status = null, messageId = null) {
       const currentDate = formatDate(time);
+      
+      // If updating an existing message, remove the old one first
+      if (messageId !== null) {
+        const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (existingMsg) {
+          // Store the position of the existing message
+          const nextElement = existingMsg.nextElementSibling;
+          existingMsg.remove();
+          
+          // Create the updated message
+          const updatedMessage = createMessageElement(content, author, time, type, status, messageId);
+          
+          // Insert at the same position
+          if (nextElement) {
+            chatContainer.insertBefore(updatedMessage, nextElement);
+          } else {
+            chatContainer.appendChild(updatedMessage);
+          }
+          return;
+        }
+      }
+
+      // Add date separator if needed
       if (currentDate !== lastDisplayedDate) {
         const dateElement = document.createElement('div');
         dateElement.classList.add('date-separator');
-        dateElement.textContent = currentDate;
+        const dateSpan = document.createElement('span');
+        dateSpan.textContent = currentDate;
+        dateElement.appendChild(dateSpan);
         chatContainer.appendChild(dateElement);
         lastDisplayedDate = currentDate;
       }
 
+      const messageElement = createMessageElement(content, author, time, type, status, messageId);
+      chatContainer.appendChild(messageElement);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      lastAuthor = author;
+    }
+
+    // Helper function to create message elements
+    function createMessageElement(content, author, time, type, status, messageId) {
       const messageElement = document.createElement('div');
       messageElement.classList.add('message', author === sessionId ? 'received' : 'sent');
-
+      
       if (messageId !== null) {
         messageElement.dataset.messageId = messageId;
       }
@@ -312,17 +347,18 @@
         messageElement.appendChild(authorElement);
       }
 
+      const contentElement = document.createElement('div');
+      contentElement.classList.add('message-content');
+      
       if (type === 'text') {
-        const contentElement = document.createElement('div');
-        contentElement.classList.add('message-content');
         contentElement.textContent = content;
-        messageElement.appendChild(contentElement);
       } else if (type === 'image') {
-        messageElement.classList.add('image-message');
         const img = document.createElement('img');
         img.src = content;
-        messageElement.appendChild(img);
+        contentElement.appendChild(img);
       }
+      
+      messageElement.appendChild(contentElement);
 
       const footerElement = document.createElement('div');
       footerElement.classList.add('message-footer');
@@ -336,30 +372,17 @@
         const statusIcon = document.createElement('span');
         statusIcon.classList.add('material-icons', 'message-status-icon');
         switch (status) {
-          case 0:
-            statusIcon.textContent = 'schedule';
-            break;
-          case 1:
-            statusIcon.textContent = 'done';
-            break;
-          case 2:
-            statusIcon.textContent = 'error';
-            break;
-          case 4:
-            statusIcon.textContent = 'done_all';
-            break;
-          default:
-            statusIcon.textContent = '';
-            break;
+          case 0: statusIcon.textContent = 'schedule'; break;
+          case 1: statusIcon.textContent = 'done'; break;
+          case 2: statusIcon.textContent = 'error'; break;
+          case 4: statusIcon.textContent = 'done_all'; break;
+          default: statusIcon.textContent = ''; break;
         }
         footerElement.appendChild(statusIcon);
       }
 
       messageElement.appendChild(footerElement);
-      chatContainer.appendChild(messageElement);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-
-      lastAuthor = author;
+      return messageElement;
     }
 
     // Set the chat title
@@ -374,8 +397,18 @@
       window.parent.parent.postMessage(connectRequest, '*');
     });
 
+    function closeChat() {
+        // First animate the chat screen sliding right
+        document.body.style.transform = 'translateX(100%)';
+        
+        // After animation completes, send message to parent
+        setTimeout(() => {
+            window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
+        }, 300); // Match animation duration
+    }
+
     document.getElementById("back-button").addEventListener("click", () => {
-        window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
+        closeChat();
     });
 
     sendButton.addEventListener('click', () => {
