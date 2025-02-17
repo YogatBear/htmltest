@@ -114,7 +114,7 @@
             border-radius: 0;
             font-size: 16px;
             background: transparent;
-            color: var(--dark-purple);
+            /* color: var(--dark-purple); */
             outline: none;
             min-width: 0; /* Prevents input from overflowing */
         }
@@ -248,11 +248,14 @@
             
             input[type="text"] {
                 background: rgba(255, 255, 255, 0.05);
-                color: var(--primary-white);
+                color: var(--dark-purple);
+            }
+            
+            input[type="text"]::placeholder {
+                color: rgba(255, 255, 255, 0.5);
             }
             
             .action-button {
-                background: var(--secondary-purple);
             }
         }
 
