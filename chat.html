@@ -245,6 +245,7 @@
       border-radius: 12px;
       font-size: 12px;
       color: var(--dark-purple);
+      margin-top: 20px; /* Add top margin to create space from previous message */
     }
     .system-message-time {
       font-size: 11px;
@@ -343,7 +344,7 @@
       // Check if the message is a system message
       if (author === 'SYSTEM') {
         const systemMessageElement = document.createElement('div');
-        systemMessageElement.classList.add('system-message'); // Use the system-message class
+        systemMessageElement.classList.add('date-separator'); // Reuse the date-separator style
 
         const systemMessageSpan = document.createElement('span');
         systemMessageSpan.textContent = content;
@@ -352,7 +353,7 @@
         // Add time for system messages
         const systemMessageTime = document.createElement('div');
         systemMessageTime.classList.add('message-time'); // Reuse the message-time style
-        systemMessageTime.style.marginTop = '8px'; // Ensure it appears below the content
+        systemMessageTime.style.marginTop = '8px'; // Increase margin to add more space
         systemMessageTime.textContent = formatTime(time);
         systemMessageElement.appendChild(systemMessageTime);
 
