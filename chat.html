@@ -324,6 +324,17 @@
         lastDisplayedDate = currentDate;
       }
 
+      // Check if the message is a system message
+      if (author === 'SYSTEM') {
+        const systemMessageElement = document.createElement('div');
+        systemMessageElement.classList.add('date-separator'); // Reuse the date-separator style
+        const systemMessageSpan = document.createElement('span');
+        systemMessageSpan.textContent = content;
+        systemMessageElement.appendChild(systemMessageSpan);
+        chatContainer.appendChild(systemMessageElement);
+        return;
+      }
+
       const messageElement = createMessageElement(content, author, time, type, status, messageId);
       chatContainer.appendChild(messageElement);
       chatContainer.scrollTop = chatContainer.scrollHeight;
