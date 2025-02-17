@@ -252,6 +252,10 @@
       color: rgba(0, 0, 0, 0.5);
       margin-top: 8px; /* Ensure it appears below the content */
     }
+    /* Add a wrapper around system messages to ensure space */
+    .system-message-wrapper {
+      margin-top: 20px; /* Ensure space above system messages */
+    }
   </style>
 </head>
 
@@ -343,8 +347,11 @@
 
       // Check if the message is a system message
       if (author === 'SYSTEM') {
+        const systemMessageWrapper = document.createElement('div');
+        systemMessageWrapper.classList.add('system-message-wrapper');
+
         const systemMessageElement = document.createElement('div');
-        systemMessageElement.classList.add('date-separator'); // Reuse the date-separator style
+        systemMessageElement.classList.add('system-message');
 
         const systemMessageSpan = document.createElement('span');
         systemMessageSpan.textContent = content;
@@ -357,7 +364,8 @@
         systemMessageTime.textContent = formatTime(time);
         systemMessageElement.appendChild(systemMessageTime);
 
-        chatContainer.appendChild(systemMessageElement);
+        systemMessageWrapper.appendChild(systemMessageElement);
+        chatContainer.appendChild(systemMessageWrapper);
         return;
       }
 
