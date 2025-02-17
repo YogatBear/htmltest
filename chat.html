@@ -343,7 +343,7 @@
       // Check if the message is a system message
       if (author === 'SYSTEM') {
         const systemMessageElement = document.createElement('div');
-        systemMessageElement.classList.add('system-message'); // Use a new class for system messages
+        systemMessageElement.classList.add('date-separator'); // Reuse the date-separator style
 
         const systemMessageSpan = document.createElement('span');
         systemMessageSpan.textContent = content;
@@ -351,7 +351,8 @@
 
         // Add time for system messages
         const systemMessageTime = document.createElement('div');
-        systemMessageTime.classList.add('system-message-time');
+        systemMessageTime.classList.add('message-time'); // Reuse the message-time style
+        systemMessageTime.style.marginTop = '4px'; // Ensure it appears below the content
         systemMessageTime.textContent = formatTime(time);
         systemMessageElement.appendChild(systemMessageTime);
 
