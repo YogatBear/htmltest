@@ -26,7 +26,7 @@
             position: relative;
             width: 100%;
             box-sizing: border-box;
-            align-items: center;
+            align-items: flex-start;
         }
         
         .message-entry:active {
@@ -50,14 +50,27 @@
         .message-details {
             flex: 1;
             min-width: 0;
-            padding-right: 40px; /* Make space for unread bubble */
+            padding-right: 10px;
         }
         
         .message-header {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
+            align-items: center;
             margin-bottom: 4px;
+            width: 100%;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .message-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             width: 100%;
         }
         
@@ -65,7 +78,6 @@
             font-size: 16px;
             font-weight: 500;
             color: #202020;
-            margin-right: 8px;
         }
         
         .message-text {
@@ -74,6 +86,8 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            flex: 1;
+            padding-right: 8px;
         }
         
         .message-time {
@@ -83,7 +97,7 @@
         }
         
         .unread-bubble {
-            background-color: var(--secondary-purple); /* Changed from green to purple */
+            background-color: var(--secondary-purple);
             color: white;
             font-size: 12px;
             font-weight: 500;
@@ -94,10 +108,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            position: absolute;
-            top: 50%;
-            right: 15px;
-            transform: translateY(-50%);
         }
         
         body {
@@ -142,7 +152,7 @@
             }
 
             updateRecentMessages(recentMessages) {
-                this.container.innerHTML = ""; // Clear existing logs
+                this.container.innerHTML = "";
                 recentMessages.forEach(msg => {
                     const [messageId, time, author, content, msgSessionId, unreadCount] = msg;
 
@@ -166,12 +176,16 @@
                         </div>
                         <div class="message-details">
                             <div class="message-header">
-                                <span class="contact-name">${formatName(msgSessionId)}</span>
+                                <div class="header-left">
+                                    <span class="contact-name">${formatName(msgSessionId)}</span>
+                                    ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}
+                                </div>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-text">${messageinfo}</div>
                                 <span class="message-time">${timeOrDate}</span>
                             </div>
-                            <div class="message-text">${messageinfo}</div>
-                        </div>
-                        ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}`;
+                        </div>`;
 
                     li.addEventListener('click', () => {
                         window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
