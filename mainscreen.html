@@ -134,7 +134,9 @@
             flex-shrink: 0;
             user-select: none;
             -webkit-user-select: none;
-
+            -webkit-tap-highlight-color: transparent; /* Removes tap highlight on iOS */
+            -webkit-touch-callout: none; /* Prevents callout to copy image, etc on iOS */
+            outline: none; /* Removes focus outline */
         }
 
         .action-button i {
@@ -281,6 +283,10 @@
 
         ::-webkit-scrollbar-thumb:hover {
             background: var(--light-purple);
+        }
+
+        .action-button:focus {
+            outline: none; /* Removes focus outline */
         }
     </style>
 </head>
