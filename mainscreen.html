@@ -346,12 +346,12 @@
             this.value = this.value.toLowerCase();
         });
 
-        // callButton.addEventListener("click", function() {
-        //     if (input.value === ""){
-        //         return
-        //     }
-        //     makeCall({to: input.value});
-        // });
+        callButton.addEventListener("click", function() {
+            if (input.value === ""){
+                return
+            }
+            makeCall({to: input.value});
+        });
 
         messageButton.addEventListener("click", function() {
             if (input.value === ""){
