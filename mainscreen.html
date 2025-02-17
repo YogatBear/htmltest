@@ -87,83 +87,50 @@
             align-items: center;
             margin-bottom: 20px;
             position: relative;
-            gap:5px
+            gap: 10px;
+            background: white;
+            padding: 8px;
+            border-radius: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         .input-icon {
-            position: absolute;
-            left: 15px;
+            position: static;
             color: var(--secondary-purple);
-            z-index: 10;
+            padding: 0 5px;
         }
 
         input[type="text"] {
-            width: 100%;
-            padding: 15px 15px 15px 50px;
-            border: 1px solid var(--glass-border);
-            border-radius: 15px;
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 0;
             font-size: 16px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
+            background: transparent;
             color: var(--dark-purple);
             outline: none;
-            transition: all 0.3s ease;
-        }
-
-        input[type="text"]:focus {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(106, 90, 205, 0.2);
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
         }
 
         .action-button {
-            flex: 1;
+            background: transparent;
+            color: var(--secondary-purple);
+            padding: 8px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 15px;
-            border: none;
-            border-radius: 15px;
-            background-color: var(--secondary-purple);
-            color: var(--primary-white);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            gap: 10px;
-            position: relative;
-            overflow: hidden;
+            min-width: 40px;
+            height: 40px;
+        }
+
+        .action-button:active {
+            background-color: rgba(106, 90, 205, 0.1);
         }
 
         .action-button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s ease, height 0.6s ease;
-        }
-
-        .action-button:hover::before {
-            width: 300%;
-            height: 300%;
-        }
-
-        .action-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(106, 90, 205, 0.3);
-        }
-
-        .action-button.message {
-            background-color: var(--light-purple);
+            display: none;
         }
 
         .toggle-container {
@@ -318,10 +285,15 @@
 <body>
     <div class="container">
         <div class="input-container">
-            <i class="lucide lucide-phone-call input-icon"></i>
-            <input type="text" placeholder="Enter number or namee" id="numberInput">
-            <button class="action-button message">+</button>
-            </div>
+            <i class="lucide lucide-search input-icon"></i>
+            <input type="text" placeholder="Search or start new chat" id="numberInput">
+            <button class="action-button message">
+                <i class="lucide lucide-message-circle"></i>
+            </button>
+            <button class="action-button call">
+                <i class="lucide lucide-phone"></i>
+            </button>
+        </div>
         <!-- <div class="toggle-container">
             <span class="toggle-title">Text Mode</span>
             <label class="toggle-switch">

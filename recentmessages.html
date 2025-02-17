@@ -10,65 +10,86 @@
             margin: 0;
             padding: 0;
             list-style: none;
-            webkit-user-select: none; 
             user-select: none;
+            -webkit-user-select: none;
         }
+        
         .message-entry {
             display: flex;
-            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            background: white;
+            position: relative;
+        }
+        
+        .message-entry:active {
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        .profile-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
             align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+            flex-shrink: 0;
         }
+        
         .message-details {
-            flex-grow: 1;
+            flex: 1;
+            min-width: 0; /* Enables text truncation */
         }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 4px;
+        }
+        
         .contact-name {
             font-size: 16px;
-            color: #333;
+            font-weight: 500;
+            color: #202020;
+            margin-right: 8px;
         }
+        
         .message-text {
-            font-size: 12px;
-            color: #999;
+            font-size: 14px;
+            color: #667781;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+        
         .message-time {
             font-size: 12px;
-            color: #999;
+            color: #667781;
+            white-space: nowrap;
         }
-        .message-icon {
-            font-family: 'Material Symbols Outlined';
-            font-size: 24px;
-        }
+        
         .unread-bubble {
-            background-color: rgb(115, 0, 113);
+            background-color: #25D366;
             color: white;
-            font-size: 0.75rem;
-            font-weight: bold;
-            border-radius: 50%;
-            padding: 5px;
-            width: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 20px;
+            min-width: 20px;
             height: 20px;
+            padding: 0 6px;
             display: flex;
             justify-content: center;
             align-items: center;
             position: absolute;
-            top: 5px; /* Adjust based on your layout */
-            right: 5px; /* Adjust based on your layout */
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
         }
-        .profile-circle {
-            width: 40px; /* Adjust size as needed */
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 10px; /* Adjust spacing */
-            color: white; /* Text color for the initial */
-            font-size: 16px; /* Adjust font size */
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
     </style>
 </head>
 <body>
@@ -128,12 +149,13 @@
                             <span class="profile-initial">${msgSessionId.charAt(0).toUpperCase()}</span>
                         </div>
                         <div class="message-details">
-                            <div class="contact-name">${formatName(msgSessionId)}</div>
+                            <div class="message-header">
+                                <span class="contact-name">${formatName(msgSessionId)}</span>
+                                <span class="message-time">${timeOrDate}</span>
+                            </div>
                             <div class="message-text">${messageinfo}</div>
                         </div>
-                        <p style="margin-right:3px">${timeOrDate}</p>
-                        ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}
-                        <span class="message-icon material-symbols-outlined">${iconSymbol}</span>`;
+                        ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}`;
 
                     li.addEventListener('click', () => {
                         window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
