@@ -285,6 +285,7 @@
     const messageText = document.getElementById('message-text');
     const sendButton = document.getElementById('send-button');
 
+    controller.chatOpened(sessionId);
     controller.getMessages(sessionId, 10);
 
     window.addEventListener('popstate', function(event) {

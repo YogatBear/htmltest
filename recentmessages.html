@@ -201,7 +201,6 @@
 
                     li.addEventListener('click', () => {
                         window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
-                        this.controller.chatOpened(msgSessionId);
                     });
 
                     document.querySelector("#recent-messages").appendChild(li);
