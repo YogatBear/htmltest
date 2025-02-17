@@ -16,6 +16,10 @@
             background-color: white;
             margin: 0;
             padding: 0;
+            background: var(--purple-gradient);
+            background-size: 200% 200%;
+            animation: gradientAnimation 15s ease infinite;
+            color: white;
         }
         .container {
             text-align: center;
@@ -24,45 +28,53 @@
             display: flex;
             flex-direction: column;
             flex: 1; /* Makes the container grow and fill the space */
-        }
-        h2 {
-            margin: 10px 0;
-            margin-top: 8vh;
-            font-size: 24px;
-            font-weight: normal;
-        }
-        .identity {
-            font-size: 28px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .buttons {
-            display: flex;
-            justify-content: space-around;
-            margin-top: auto; /* Pushes the buttons to the bottom */
-            margin-bottom: 10vh; /* 10% of the viewport height from the bottom */
-        }
-        .call-button {
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: none;
+            height: 100vh;
+            padding: 20px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        h2 {
+            margin: 10px 0;
+            margin-top: 15vh;
+            font-size: 24px;
+            font-weight: normal;
+            animation: slideDown 0.3s ease-out;
+        }
+        .identity {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 20px 0;
+            animation: slideDown 0.4s ease-out;
+        }
+        .buttons {
+            position: fixed;
+            bottom: 10vh;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            padding: 0 40px;
+        }
+        .call-button {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
             border: none;
-            color: #f0f0f0;
-            font-size: 30px;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            animation: scaleIn 0.3s ease-out;
+        }
+        .call-button#acceptButton {
+            background: #34c759;
+        }
+        .call-button#rejectButton {
+            background: #ff3b30;
         }
         .material-icons {
-            font-size: 24px;
-            background-color: #f0f0f0;
-            border-radius: 50%;
-            padding: 12px;
-            margin-bottom: 5px;
-        }
-        .call-button#acceptButton .material-icons {
-            background-color: #34c759; /* Accept button green */
-        }
-        .call-button#declineButton .material-icons {
-            background-color: #ff3b30; /* Decline button red */
+            font-size: 30px;
+            color: white;
         }
     </style>
 </head>
@@ -74,7 +86,7 @@
             <button class="call-button" id="acceptButton">
                 <i class="material-icons">check</i>
             </button>
-            <button class="call-button" id="declineButton">
+            <button class="call-button" id="rejectButton">
                 <i class="material-icons">close</i>
             </button>
         </div>
@@ -87,13 +99,13 @@
             document.querySelector(".identity").textContent = remoteId;
         }
         const acceptButton = document.getElementById("acceptButton");
-        const declineButton = document.getElementById("declineButton");
+        const rejectButton = document.getElementById("rejectButton");
 
         acceptButton.addEventListener("click", ()=>{
             controller.acceptCall(remoteId);
             window.location.href = 'inCall.html?to=' + remoteId;
         })
-        declineButton.addEventListener("click", ()=>{
+        rejectButton.addEventListener("click", ()=>{
             controller.rejectCall(remoteId);
         })
     </script>
