@@ -299,8 +299,9 @@
           const nextElement = existingMsg.nextElementSibling;
           existingMsg.remove();
           
-          // Create the updated message
+          // Create the updated message without animation
           const updatedMessage = createMessageElement(content, author, time, type, status, messageId);
+          updatedMessage.style.animation = 'none'; // Disable animation for updated messages
           
           // Insert at the same position
           if (nextElement) {
