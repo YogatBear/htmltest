@@ -125,6 +125,7 @@
     }
     #send-button i {
       font-size: 20px;
+
     }
     /* Scrollbar styling */
     #chat-container::-webkit-scrollbar {
@@ -251,6 +252,29 @@
       font-size: 11px;
       color: rgba(0, 0, 0, 0.5);
       margin-top: 8px; /* Ensure it appears below the content */
+    }
+    @media (prefers-color-scheme: dark) {
+      #top-bar {            
+        background-color: var(--purple-gradient);
+        background: rgba(20, 20, 30, 1);
+
+      }
+      #chat-container {
+        background-color: var(--purple-gradient);
+        background: rgba(20, 20, 30, 0.8);
+      }
+      .message-input {
+        background-color: var(--purple-gradient);
+        background: rgba(20, 20, 30, 1);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+      }
+      #send-button {
+        background-color: var(--purple-gradient);
+        background: rgba(20, 20, 30, 1);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+    }
+      
     }
   </style>
 </head>
@@ -456,7 +480,7 @@
         sendButton.click();
       }
     });
-
+addMessage("test", "test", 2, "text", 4, 3)
     function updateMessage(messageId, content, status) {
         const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
         if (messageElement) {
