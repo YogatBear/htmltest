@@ -212,7 +212,7 @@
             chatOpened(remoteId){
                 const openChatRequest = {
                     action: "chat-opened",
-                    body: { sessionId: remoteId, localId:localId }
+                    body: { localId:localId, pid: this.pid,sessionId: remoteId }
                 };
                 this.sendMessageToNativeApp(openChatRequest);
             }
