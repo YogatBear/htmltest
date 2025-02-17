@@ -29,8 +29,6 @@
       animation: gradientAnimation 15s ease infinite;
       height: 100vh;
       overflow: hidden;
-      transform: translateX(0);
-      transition: transform 0.3s ease-in-out;
     }
     /* Enhanced top bar */
     #top-bar {
@@ -398,17 +396,11 @@
     });
 
     function closeChat() {
-        // First animate the chat screen sliding right
-        document.body.style.transform = 'translateX(100%)';
-        
-        // After animation completes, send message to parent
-        setTimeout(() => {
-            window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
-        }, 300); // Match animation duration
+        window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
     }
 
     document.getElementById("back-button").addEventListener("click", () => {
-        closeChat();
+        window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
     });
 
     sendButton.addEventListener('click', () => {
@@ -425,6 +417,29 @@
         sendButton.click();
       }
     });
+
+    function updateMessage(messageId, content, status) {
+        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (messageElement) {
+            // Update the message content
+            const contentElement = messageElement.querySelector('.message-content');
+            if (contentElement) {
+                contentElement.textContent = content;
+            }
+            
+            // Update the status icon if it exists
+            const statusIcon = messageElement.querySelector('.message-status-icon');
+            if (statusIcon) {
+                switch (status) {
+                    case 0: statusIcon.textContent = 'schedule'; break;
+                    case 1: statusIcon.textContent = 'done'; break;
+                    case 2: statusIcon.textContent = 'error'; break;
+                    case 4: statusIcon.textContent = 'done_all'; break;
+                    default: statusIcon.textContent = ''; break;
+                }
+            }
+        }
+    }
 
     channel.addEventListener('message', (event) => {
       try {
@@ -446,11 +461,7 @@
           console.log("Received updatedMessage data:", data.updatedMessage);
           const [messageId, time, author, content, msgSessionId, msgStatus] = data.updatedMessage;
           if (msgSessionId === sessionId) {
-            const existingMsgElement = document.querySelector(`[data-message-id="${messageId}"]`);
-            if (existingMsgElement) {
-              existingMsgElement.remove();
-            }
-            addMessage(content, author, time, "text", msgStatus, messageId);
+            updateMessage(messageId, content, msgStatus);
           }
         }
       } catch (error) {
