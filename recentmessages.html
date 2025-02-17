@@ -68,7 +68,12 @@
         .header-left {
             display: flex;
             align-items: center;
-            gap: 8px;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            margin-left: auto; /* Push to right */
         }
         
         .message-content {
@@ -101,7 +106,7 @@
         }
         
         .unread-bubble {
-            background-color: #6a5acd; /* Hardcoded color as fallback */
+            background-color: #6a5acd;
             background-color: var(--secondary-purple);
             color: white;
             font-size: 12px;
@@ -112,8 +117,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-left: 4px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Added subtle shadow */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
         
         body {
@@ -184,6 +188,8 @@
                             <div class="message-header">
                                 <div class="header-left">
                                     <span class="contact-name">${formatName(msgSessionId)}</span>
+                                </div>
+                                <div class="header-right">
                                     ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}
                                 </div>
                             </div>
