@@ -237,17 +237,15 @@
     }
     .system-message {
       text-align: center;
-      margin: 16px 0;
+      margin: 0; /* Reset margins to avoid collapsing */
       position: relative;
       clear: both;
       background: rgba(255, 255, 255, 0.9);
-      padding: 6px 12px;
+      padding: 16px 12px; /* Use padding to create space */
       border-radius: 12px;
       font-size: 12px;
       color: var(--dark-purple);
-      margin-top: 20px; /* Add top margin to create space from previous message */
-      padding-top: 10px; /* Add padding to ensure space is maintained */
-      padding-bottom: 10px; /* Add padding to ensure space is maintained */
+      border-top: 10px solid transparent; /* Use border to ensure space is maintained */
     }
     .system-message-time {
       font-size: 11px;
