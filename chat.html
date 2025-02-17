@@ -328,9 +328,17 @@
       if (author === 'SYSTEM') {
         const systemMessageElement = document.createElement('div');
         systemMessageElement.classList.add('date-separator'); // Reuse the date-separator style
+
         const systemMessageSpan = document.createElement('span');
         systemMessageSpan.textContent = content;
         systemMessageElement.appendChild(systemMessageSpan);
+
+        // Add time for system messages
+        const systemMessageTime = document.createElement('div');
+        systemMessageTime.classList.add('message-time');
+        systemMessageTime.textContent = formatTime(time);
+        systemMessageElement.appendChild(systemMessageTime);
+
         chatContainer.appendChild(systemMessageElement);
         return;
       }
