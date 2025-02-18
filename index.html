@@ -170,10 +170,10 @@
                 this.sendMessageToNativeApp(request);
             }
 
-            getMessages(sessionId, range) {
+            getMessages(sessionId, range, start) {
                 const request = {
                     action: "get-messages",
-                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId, range: range }
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId, range: range, startMessage: start }
                 };
                 this.sendMessageToNativeApp(request);
             }
