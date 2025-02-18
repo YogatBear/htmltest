@@ -235,7 +235,7 @@
     }
     .system-message {
       text-align: center;
-      margin: 4px 0;  /* Reduced base margin */
+      margin: 6px 0;  /* Slightly increased base margin */
       position: relative;
       clear: both;
     }
@@ -249,7 +249,7 @@
     .system-message-time {
       font-size: 11px;
       color: rgba(0, 0, 0, 0.5);
-      margin-top: 2px;  /* Minimal spacing between content and timestamp */
+      margin-top: 4px;  /* Consistent spacing between content and timestamp */
     }
     @media (prefers-color-scheme: dark) {
       #top-bar {            
@@ -280,7 +280,7 @@
     /* Spacing between different message types */
     .message + .system-message,
     .system-message + .message {
-      margin-top: 8px;  /* Consistent spacing between different message types */
+      margin-top: 6px;  /* Match the base margin for consistency */
     }
   </style>
 </head>
@@ -366,7 +366,6 @@
         messageElement.appendChild(systemMessageSpan);
         const systemMessageTime = document.createElement('div');
         systemMessageTime.classList.add('system-message-time');
-        systemMessageTime.style.marginTop = '8px';
         systemMessageTime.textContent = formatTime(time);
         messageElement.appendChild(systemMessageTime);
       } else {
