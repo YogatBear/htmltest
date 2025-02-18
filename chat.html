@@ -526,6 +526,13 @@
         console.error("Error processing message data:", error);
       }
     });
+
+    window.onload = function() {
+        // Ensure the chat container is properly sized and positioned before animation starts
+        chatContainer.style.opacity = '1';
+        // Signal to parent that chat is ready
+        window.parent.postMessage({ action: 'chatReady' }, '*');
+    };
   </script>
 </body>
 </html>
