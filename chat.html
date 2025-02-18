@@ -309,7 +309,7 @@
     const messageText = document.getElementById('message-text');
     const sendButton = document.getElementById('send-button');
 
-    controller.getMessages(sessionId, 20, -1);
+    controller.getMessages(sessionId, 20, "");
 
     window.addEventListener('popstate', function(event) {
         console.log("back button pressed");
