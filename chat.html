@@ -531,6 +531,7 @@
             controller.updateSessionTimestamp(sessionId);
           }
         } else if (data.messages) {
+          console.log("Received multiple messages data:", data.messages);
           // Store current scroll height before adding new messages
           const scrollHeightBefore = chatContainer.scrollHeight;
           
