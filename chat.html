@@ -350,42 +350,35 @@
         }
       }
 
-      // Handle system messages
+      // Create system message element if it's a system message
+      let messageElement;
       if (author === 'SYSTEM') {
-        const systemMessageElement = document.createElement('div');
-        systemMessageElement.classList.add('system-message');
+        messageElement = document.createElement('div');
+        messageElement.classList.add('system-message');
+        messageElement.dataset.time = time; // Add timestamp for sorting
         const systemMessageSpan = document.createElement('span');
         systemMessageSpan.textContent = content;
-        systemMessageElement.appendChild(systemMessageSpan);
+        messageElement.appendChild(systemMessageSpan);
         const systemMessageTime = document.createElement('div');
         systemMessageTime.classList.add('system-message-time');
         systemMessageTime.style.marginTop = '8px';
         systemMessageTime.textContent = formatTime(time);
-        systemMessageElement.appendChild(systemMessageTime);
-        
-        if (time < Date.now() - 1000) {
-          chatContainer.insertBefore(systemMessageElement, chatContainer.firstChild);
-        } else {
-          chatContainer.appendChild(systemMessageElement);
-        }
-        return;
+        messageElement.appendChild(systemMessageTime);
+      } else {
+        messageElement = createMessageElement(content, author, time, type, status, messageId, animate);
       }
 
-      const messageElement = createMessageElement(content, author, time, type, status, messageId, animate);
-      
-      // For older messages (scrolling up)
-      if (time < Date.now() - 1000) {
+      // For older messages (scrolling up) or chronological insertion
+      if (time < Date.now() - 1000 || author === 'SYSTEM') {
         // Find the appropriate position for the message
         let insertPosition = null;
         const messages = Array.from(chatContainer.children);
         
         for (const msg of messages) {
-          if (msg.dataset.messageId) {
-            const msgTime = parseInt(msg.dataset.time);
-            if (msgTime > time) {
-              insertPosition = msg;
-              break;
-            }
+          const msgTime = parseInt(msg.dataset.time || msg.dataset.messageId);
+          if (msgTime > time) {
+            insertPosition = msg;
+            break;
           }
         }
 
@@ -427,7 +420,9 @@
         chatContainer.scrollTop = chatContainer.scrollHeight;
       }
       
-      lastAuthor = author;
+      if (author !== 'SYSTEM') {
+        lastAuthor = author;
+      }
     }
 
     // Helper function to create message elements
