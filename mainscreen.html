@@ -411,6 +411,7 @@
         function closeChat() {
             document.querySelector('.container').classList.remove('slide-left');
             chatContainer.classList.remove('slide-left');
+            controller.getRecentMessages(10);
             setTimeout(() => {
                 chatContainer.innerHTML = '';
             }, 300); // Clear chat container after animation
