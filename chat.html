@@ -56,7 +56,6 @@
       border-radius: 12px;
       position: relative;
       clear: both;
-      animation: messageAppear 0.3s ease-out;
       word-wrap: break-word;
     }
     .message.sent {
@@ -70,6 +69,9 @@
       background: rgba(255, 255, 255, 0.9);
       color: var(--dark-purple);
       border-bottom-left-radius: 4px;
+    }
+    .message.animate {
+      animation: messageAppear 0.3s ease-out;
     }
     @keyframes messageAppear {
       from {
@@ -324,7 +326,7 @@
     let lastDisplayedDate = null;
     let lastAuthor = null;
 
-    function addMessage(content, author, time, type = 'text', status = null, messageId = null) {
+    function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false) {
       const currentDate = formatDate(time);
       
       // If updating an existing message, remove the old one first
@@ -336,8 +338,7 @@
           existingMsg.remove();
           
           // Create the updated message without animation
-          const updatedMessage = createMessageElement(content, author, time, type, status, messageId);
-          updatedMessage.style.animation = 'none'; // Disable animation for updated messages
+          const updatedMessage = createMessageElement(content, author, time, type, status, messageId, false);
           
           // Insert at the same position
           if (nextElement) {
@@ -380,16 +381,19 @@
         return;
       }
 
-      const messageElement = createMessageElement(content, author, time, type, status, messageId);
+      const messageElement = createMessageElement(content, author, time, type, status, messageId, animate);
       chatContainer.appendChild(messageElement);
       chatContainer.scrollTop = chatContainer.scrollHeight;
       lastAuthor = author;
     }
 
     // Helper function to create message elements
-    function createMessageElement(content, author, time, type, status, messageId) {
+    function createMessageElement(content, author, time, type, status, messageId, animate) {
       const messageElement = document.createElement('div');
       messageElement.classList.add('message', author === sessionId ? 'received' : 'sent');
+      if (animate) {
+        messageElement.classList.add('animate');
+      }
       
       if (messageId !== null) {
         messageElement.dataset.messageId = messageId;
@@ -505,14 +509,14 @@
           console.log("Received single message data:", data.message);
           const [messageId, time, author, content, msgSessionId, msgStatus] = data.message;
           if (msgSessionId === sessionId) {
-            addMessage(content, author, time, "text", msgStatus, messageId);
+            addMessage(content, author, time, "text", msgStatus, messageId, true);
             controller.updateSessionTimestamp(sessionId);
           }
         } else if (data.messages) {
           data.messages.forEach(msg => {
             const [messageId, time, author, content, msgSessionId, msgStatus] = msg;
             if (msgSessionId === sessionId) {
-              addMessage(content, author, time, "text", msgStatus, messageId);
+              addMessage(content, author, time, "text", msgStatus, messageId, false);
             }
           });
           controller.updateSessionTimestamp(sessionId);
