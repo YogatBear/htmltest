@@ -22,6 +22,7 @@
             --dark-purple: #4b0082;
             --transparent-purple: #9470db69;
             --purple-gradient: linear-gradient(135deg, var(--secondary-purple) 0%, var(--dark-purple) 100%);
+            --glass-effect: rgba(255, 255, 255, 0.15);
         }
         body {
             background: var(--purple-gradient);
@@ -39,6 +40,7 @@
         .call-info {
             text-align: center;
             margin-top: 15vh;
+            animation: slideDown 0.3s ease-out;
         }
         .phone-number {
             font-size: 32px;
@@ -60,7 +62,7 @@
             margin-bottom: 30px;
         }
         .call-button {
-            background: rgba(255, 255, 255, 0.15);
+            background: var(--glass-effect);
             backdrop-filter: blur(5px);
             border: none;
             border-radius: 50%;
@@ -71,9 +73,19 @@
             align-items: center;
             justify-content: center;
             animation: scaleIn 0.3s ease-out;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+        .call-button:hover {
+            transform: scale(1.05);
+        }
+        .call-button:active {
+            transform: scale(0.95);
         }
         .call-button.end-call {
             background: #ff3b30;
+        }
+        .call-button.active {
+            background: var(--secondary-purple);
         }
         .call-button .material-icons {
             font-size: 34px;
@@ -93,6 +105,11 @@
             justify-content: center;
             align-items: center;
             margin-top: 20px;
+            animation: scaleIn 0.3s ease-out;
+            transition: transform 0.2s ease;
+        }
+        .end-call-button:hover {
+            transform: scale(1.05);
         }
         .end-call-button .material-icons {
             color: white;
@@ -119,7 +136,7 @@
             right: 0;
             background-color: white;
             border-radius: 20px;
-            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             transform: translateY(20px);
             opacity: 0;
             pointer-events: none;

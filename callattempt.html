@@ -3,55 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CallAttempt</title>
+    <title>Call Attempt</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
+        :root {
+            --primary-white: #ffffff;
+            --secondary-purple: #6a5acd;
+            --light-purple: #9370db;
+            --dark-purple: #4b0082;
+            --purple-gradient: linear-gradient(135deg, var(--secondary-purple) 0%, var(--dark-purple) 100%);
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-            margin: 0;
-            webkit-user-select: none; 
-            user-select: none;
+            min-height: 100vh;
+            background: var(--purple-gradient);
+            background-size: 200% 200%;
+            animation: gradientAnimation 15s ease infinite;
+            color: white;
+            -webkit-tap-highlight-color: transparent;
         }
+
         .container {
             text-align: center;
+            animation: fadeIn 0.3s ease-out;
         }
+
         h2 {
-            margin-bottom: 20px;
+            font-size: 24px;
+            margin-bottom: 40px;
+            font-weight: normal;
+            animation: slideDown 0.4s ease-out;
         }
-        button {
-            padding: 10px 20px;
+
+        #name {
+            display: block;
+            font-size: 32px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .hang-up-button {
+            background: #ff3b30;
             border: none;
-            border-radius: 5px;
-            background-color: #dc3545;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
             color: white;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            animation: scaleIn 0.3s ease-out;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease;
         }
-        button:hover {
-            background-color: #c82333;
+
+        .hang-up-button:hover {
+            transform: scale(1.05);
+        }
+
+        .material-icons {
+            font-size: 30px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Attempting to call <span id="name"></span></h2>
-        <button>Hang Up</button>
+        <h2>Calling<span id="name"></span></h2>
+        <button class="hang-up-button">
+            <i class="material-icons">call_end</i>
+        </button>
     </div>
     <script>
         const controller = window.top.controller;
-
         const urlParams = new URLSearchParams(window.location.search);
-        
         const to = urlParams.get('to');
-        if(to){
+        
+        if(to) {
             document.querySelector("#name").textContent = to;
         }
-        document.querySelector("button").addEventListener("click", ()=>{
+        
+        document.querySelector(".hang-up-button").addEventListener("click", () => {
             controller.rejectCall(to);
-        })      
+        });
     </script>
 </body>
 </html>
