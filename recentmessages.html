@@ -76,6 +76,7 @@
             display: flex;
             align-items: center;
             margin-left: auto; /* Push to right */
+            padding-right: 8px; /* Push unread bubble right */
         }
         
         .message-content {
@@ -90,13 +91,14 @@
             align-items: center;
             gap: 10px;
             margin-left: 10px;
+            align-self: center; /* Center vertically */
         }
 
         .call-button {
             background: transparent;
             border: none;
             color: var(--secondary-purple);
-            padding: 8px;
+            padding: 10px;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
@@ -110,7 +112,7 @@
         }
 
         .material-icons {
-            font-size: 20px;
+            font-size: 24px;
         }
         
         .contact-name {
@@ -284,6 +286,11 @@
                             action: 'call', 
                             body: { to: msgSessionId }
                         }, '*');
+                    });
+
+                    // Restore chat click handler
+                    li.addEventListener('click', () => {
+                        window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
                     });
 
                     document.querySelector("#recent-messages").appendChild(li);
