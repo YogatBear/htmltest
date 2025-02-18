@@ -254,6 +254,7 @@
       #top-bar {            
         background-color: var(--purple-gradient);
         background: rgba(20, 20, 30, 1);
+
       }
       #chat-container {
         background-color: var(--purple-gradient);
@@ -270,7 +271,7 @@
         background: rgba(20, 20, 30, 1);
         border: 2px solid rgba(255, 255, 255, 0.5);
       }
-      .message-time {
+      .system-message-time {
         color: rgba(255, 255, 255, 0.7);
       }
     }
@@ -374,7 +375,7 @@
 
         // Add time for system messages
         const systemMessageTime = document.createElement('div');
-        systemMessageTime.classList.add('message-time'); // Reuse the message-time style
+        systemMessageTime.classList.add('system-message-time'); // Reuse the message-time style
         systemMessageTime.style.marginTop = '8px'; // Increase margin to add more space
         systemMessageTime.textContent = formatTime(time);
         systemMessageElement.appendChild(systemMessageTime);
