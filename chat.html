@@ -324,6 +324,7 @@
   </div>
 
   <script>
+    console.log("Script starting...");
     const controller = window.top.controller;
     const urlParams = new URLSearchParams(window.location.search);
     const channel = new BroadcastChannel('myChannel');
@@ -584,18 +585,11 @@
     channel.addEventListener('message', (event) => {
       try {
         const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-        if (data.message) {
-          console.log("Received single message data:", data.message);
-          const [messageId, time, author, content, msgSessionId, msgStatus] = data.message;
-          if (msgSessionId === sessionId) {
-            addMessage(content, author, time, "text", msgStatus, messageId, true);
-            controller.updateSessionTimestamp(sessionId);
-          }
-        } else if (data.messages) {
-          console.log("Received multiple messages data:", data.messages);
+        if (data.action === "data-retrieved" && data.body && data.body.messages) {
+          console.log("Received messages data:", data.body.messages);
           
           // If we receive an empty messages array, disable infinite scrolling
-          if (!data.messages || data.messages.length === 0) {
+          if (!data.body.messages || data.body.messages.length === 0) {
             hasMoreMessages = false;
             return;
           }
@@ -603,7 +597,7 @@
           const scrollHeightBefore = chatContainer.scrollHeight;
           
           // Sort messages by time in reverse order for older messages
-          const sortedMessages = [...data.messages].sort((a, b) => b[1] - a[1]);
+          const sortedMessages = [...data.body.messages].sort((a, b) => b[1] - a[1]);
           
           sortedMessages.forEach(msg => {
             const [messageId, time, author, content, msgSessionId, msgStatus] = msg;
@@ -612,17 +606,22 @@
             }
           });
 
-          // If these are older messages (loaded from scrolling up)
-          if (data.messages[0][1] < Date.now() - 1000) {
-            // Maintain scroll position
+          // Handle scroll position
+          if (data.body.messages[0][1] < Date.now() - 1000) {
             const scrollHeightDiff = chatContainer.scrollHeight - scrollHeightBefore;
             chatContainer.scrollTop = scrollHeightDiff;
           } else {
-            // For new messages, scroll to bottom
             chatContainer.scrollTop = chatContainer.scrollHeight;
           }
           
           controller.updateSessionTimestamp(sessionId);
+        } else if (data.message) {
+          console.log("Received single message data:", data.message);
+          const [messageId, time, author, content, msgSessionId, msgStatus] = data.message;
+          if (msgSessionId === sessionId) {
+            addMessage(content, author, time, "text", msgStatus, messageId, true);
+            controller.updateSessionTimestamp(sessionId);
+          }
         } else if (data.updatedMessage) {
           console.log("Received updatedMessage data:", data.updatedMessage);
           const [messageId, time, author, content, msgSessionId, msgStatus] = data.updatedMessage;
