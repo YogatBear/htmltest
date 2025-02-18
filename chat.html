@@ -294,6 +294,12 @@
       font-size: 12px;
       color: var(--dark-purple);
     }
+
+    /* Add new specific rule for system message timestamp spacing */
+    .system-message-time + .message,
+    .system-message-time + .system-message {
+      margin-top: 4px;  /* Reduced margin after timestamp */
+    }
   </style>
 </head>
 
