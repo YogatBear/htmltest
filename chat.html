@@ -328,6 +328,7 @@
 
     let lastDisplayedDate = null;
     let lastAuthor = null;
+    let hasMoreMessages = true;
 
     function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false) {
       const currentDate = formatDate(time);
@@ -492,15 +493,14 @@
 
     // Add scroll event listener for infinite scrolling
     chatContainer.addEventListener('scroll', () => {
-      if (chatContainer.scrollTop === 0) {
+      if (chatContainer.scrollTop === 0 && hasMoreMessages) {
         const messages = document.querySelectorAll('[data-message-id]');
         if (messages.length > 0) {
-          // Get the first (oldest) message's ID and parse it as a number
           const oldestMessage = messages[0];
           const oldestMessageId = oldestMessage.dataset.messageId;
           if (oldestMessageId) {
             console.log("Fetching older messages with ID:", oldestMessageId);
-            controller.getMessages(sessionId, 20, oldestMessageId); // Ensure it's passed as a string
+            controller.getMessages(sessionId, 20, oldestMessageId);
           }
         }
       }
@@ -542,32 +542,35 @@
         } else if (data.messages) {
           console.log("Received multiple messages data:", data.messages);
           
-          // Only proceed if there are actually messages
-          if (data.messages && data.messages.length > 0) {
-            const scrollHeightBefore = chatContainer.scrollHeight;
-            
-            // Sort messages by time in reverse order for older messages
-            const sortedMessages = [...data.messages].sort((a, b) => b[1] - a[1]);
-            
-            sortedMessages.forEach(msg => {
-              const [messageId, time, author, content, msgSessionId, msgStatus] = msg;
-              if (msgSessionId === sessionId) {
-                addMessage(content, author, time, "text", msgStatus, messageId, false);
-              }
-            });
-
-            // If these are older messages (loaded from scrolling up)
-            if (data.messages[0][1] < Date.now() - 1000) {
-              // Maintain scroll position
-              const scrollHeightDiff = chatContainer.scrollHeight - scrollHeightBefore;
-              chatContainer.scrollTop = scrollHeightDiff;
-            } else {
-              // For new messages, scroll to bottom
-              chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-            
-            controller.updateSessionTimestamp(sessionId);
+          // If we receive an empty messages array, disable infinite scrolling
+          if (!data.messages || data.messages.length === 0) {
+            hasMoreMessages = false;
+            return;
           }
+
+          const scrollHeightBefore = chatContainer.scrollHeight;
+          
+          // Sort messages by time in reverse order for older messages
+          const sortedMessages = [...data.messages].sort((a, b) => b[1] - a[1]);
+          
+          sortedMessages.forEach(msg => {
+            const [messageId, time, author, content, msgSessionId, msgStatus] = msg;
+            if (msgSessionId === sessionId) {
+              addMessage(content, author, time, "text", msgStatus, messageId, false);
+            }
+          });
+
+          // If these are older messages (loaded from scrolling up)
+          if (data.messages[0][1] < Date.now() - 1000) {
+            // Maintain scroll position
+            const scrollHeightDiff = chatContainer.scrollHeight - scrollHeightBefore;
+            chatContainer.scrollTop = scrollHeightDiff;
+          } else {
+            // For new messages, scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+          }
+          
+          controller.updateSessionTimestamp(sessionId);
         } else if (data.updatedMessage) {
           console.log("Received updatedMessage data:", data.updatedMessage);
           const [messageId, time, author, content, msgSessionId, msgStatus] = data.updatedMessage;
