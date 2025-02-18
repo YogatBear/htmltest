@@ -257,7 +257,7 @@
                     const isToday = messageDate.toDateString() === today.toDateString();
                     const timeOrDate = isToday ? messageDate.toLocaleTimeString([], { timeStyle: 'short' }) : messageDate.toLocaleDateString();
                     const iconSymbol = 'chat';
-                    const name = author === msgSessionId ? "" : "You: ";
+                    const name = (author === msgSessionId || author === "SYSTEM") ? "" : "You: ";
                     const messageinfo = name + content + ' ';
 
                     // Replace random color with consistent hash-based color
