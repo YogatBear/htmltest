@@ -19,13 +19,6 @@
             width: 100%;
             max-height: 100vh;
             overflow-y: auto;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            transform: translateX(0);
-            transition: transform 0.3s ease-in-out;
         }
         .container, #chat-container {
             transition: transform 0.3s ease-in-out;
@@ -38,17 +31,12 @@
             width: 100%;
             height: 100%;
             background: white;
-            transform: translateX(0);
-            transition: transform 0.3s ease-in-out;
         }
 
         .slide-left {
-            transform: translateX(-100%) !important;
+            transform: translateX(-100%);
         }
 
-        .slide-right {
-            transform: translateX(0) !important;
-        }
 
         :root {
             --primary-white: #ffffff;
@@ -414,23 +402,20 @@
 
         function openChat(sessionId) {
             chatContainer.innerHTML = `<iframe src="chat.html?sessionId=${encodeURIComponent(sessionId)}" class="chat-iframe" style="width:100%;height:100%;border:none;"></iframe>`;
-            // Wait for iframe to load before sliding
-            chatContainer.querySelector('iframe').onload = () => {
-                document.querySelector('.container').classList.add('slide-left');
-                chatContainer.classList.add('slide-left');
-                history.pushState({page: 'chat'}, '', 'chat');
-            };
+            document.querySelector('.container').classList.add('slide-left');
+            chatContainer.classList.add('slide-left');
+            history.pushState({page: 'chat'}, '', 'chat');
+            //controller.displayBackButton(true);
         }
 
         function closeChat() {
             document.querySelector('.container').classList.remove('slide-left');
             chatContainer.classList.remove('slide-left');
-            // Refresh messages list while transitioning
             controller.getRecentMessages(10);
-            // Remove chat iframe after animation completes
             setTimeout(() => {
                 chatContainer.innerHTML = '';
-            }, 300);
+            }, 300); // Clear chat container after animation
+            //controller.displayBackButton(false);
         }
 
         function makeCall(jsonData) {

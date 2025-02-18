@@ -463,17 +463,7 @@
     }
 
     document.getElementById("back-button").addEventListener("click", () => {
-        // Trigger the slide animation first
-        window.parent.document.querySelector('.container').classList.remove('slide-left');
-        window.parent.document.querySelector('#chat-container').classList.remove('slide-left');
-        
-        // Refresh messages list while transitioning
-        controller.getRecentMessages(10);
-        
-        // Remove chat iframe after animation completes
-        setTimeout(() => {
-            window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
-        }, 300);
+        window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
     });
 
     sendButton.addEventListener('click', () => {
