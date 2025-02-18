@@ -164,7 +164,7 @@
             }
         }
 
-        /* Add new styles for call button */
+        /* Update call button styles */
         .call-button {
             display: flex;
             align-items: center;
@@ -184,10 +184,23 @@
             -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
             outline: none;
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                        background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .call-button:hover {
             background-color: rgba(106, 90, 205, 0.1);
+        }
+
+        .call-button:active {
+            transform: scale(0.9);
+            background-color: rgba(106, 90, 205, 0.2);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .call-button:active {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
         }
     </style>
 </head>
