@@ -267,15 +267,18 @@
                                 <span class="message-time">${timeOrDate}</span>
                             </div>
                         </div>
-                        <button class="call-button" data-session-id="${msgSessionId}">
+                        <button class="call-button">
                             <span class="material-symbols-outlined">call</span>
                         </button>`;
 
-                    // Update click handlers
-                    li.querySelector('.call-button').addEventListener('click', (e) => {
+                    // Add click handler for call button
+                    const callButton = li.querySelector('.call-button');
+                    callButton.addEventListener('click', (e) => {
                         e.stopPropagation(); // Prevent triggering the chat open
-                        const sessionId = e.currentTarget.getAttribute('data-session-id');
-                        window.parent.postMessage({ action: 'call', body: { sessionId: sessionId } }, '*');
+                        window.parent.postMessage({ 
+                            action: 'call', 
+                            body: { to: msgSessionId }
+                        }, '*');
                     });
 
                     li.addEventListener('click', () => {
