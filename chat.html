@@ -56,7 +56,6 @@
       border-radius: 12px;
       position: relative;
       clear: both;
-      animation: messageAppear 0.3s ease-out;
       word-wrap: break-word;
     }
     .message.sent {
@@ -71,16 +70,7 @@
       color: var(--dark-purple);
       border-bottom-left-radius: 4px;
     }
-    @keyframes messageAppear {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+    
     /* Input area */
     .message-input {
       position: fixed;
