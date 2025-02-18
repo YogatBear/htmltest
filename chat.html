@@ -522,6 +522,7 @@
               addMessage(content, author, time, "text", msgStatus, messageId, false);
             }
           });
+          chatContainer.scrollTop = chatContainer.scrollHeight;
           controller.updateSessionTimestamp(sessionId);
         } else if (data.updatedMessage) {
           console.log("Received updatedMessage data:", data.updatedMessage);
@@ -538,6 +539,8 @@
     window.onload = function() {
         // Ensure the chat container is properly sized and positioned before animation starts
         chatContainer.style.opacity = '1';
+        // Scroll to bottom on load
+        chatContainer.scrollTop = chatContainer.scrollHeight;
         // Signal to parent that chat is ready
         window.parent.postMessage({ action: 'chatReady' }, '*');
     };
