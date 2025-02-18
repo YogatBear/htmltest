@@ -30,24 +30,25 @@
             background-size: 200% 200%;
             animation: gradientAnimation 15s ease infinite;
             color: white;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
         }
         .container {
-            position: relative;
-            flex: 1;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 100%;
+            height: 100%;
+            max-width: 400px;
             animation: fadeIn 0.3s ease-out;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
         .call-info {
             text-align: center;
             margin-top: 15vh;
             animation: slideDown 0.3s ease-out;
-            width: 100%;
         }
         .phone-number {
             font-size: 32px;
@@ -66,22 +67,19 @@
             animation: slideDown 0.4s ease-out;
         }
         .button-container {
-            width: 100%;
-            position: fixed;
+            position: absolute;
             bottom: 5vh;
-            left: 0;
-            right: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
         }
         .button-row {
             display: flex;
             justify-content: space-around;
             margin-bottom: 30px;
             gap: 20px;
-            width: 100%;
-            max-width: 300px;
+            padding: 0 20px;
+            margin: 0 auto 30px;
         }
         .call-button {
             background: var(--glass-effect);
