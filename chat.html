@@ -352,13 +352,10 @@
       // Handle system messages
       if (author === 'SYSTEM') {
         const systemMessageElement = document.createElement('div');
-        systemMessageElement.classList.add('system-message');
-        systemMessageElement.dataset.time = time;
-        
+        systemMessageElement.classList.add('date-separator');
         const systemMessageSpan = document.createElement('span');
         systemMessageSpan.textContent = content;
         systemMessageElement.appendChild(systemMessageSpan);
-        
         const systemMessageTime = document.createElement('div');
         systemMessageTime.classList.add('system-message-time');
         systemMessageTime.style.marginTop = '8px';
@@ -370,7 +367,7 @@
         const messages = Array.from(chatContainer.children);
         
         for (const msg of messages) {
-          if (msg.dataset.time) {
+          if (msg.dataset.messageId) {
             const msgTime = parseInt(msg.dataset.time);
             if (msgTime > time) {
               insertPosition = msg;
