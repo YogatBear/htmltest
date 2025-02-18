@@ -489,9 +489,10 @@
         if (messages.length > 0) {
           // Get the first (oldest) message's ID and parse it as a number
           const oldestMessage = messages[0];
-          const oldestMessageId = parseInt(oldestMessage.dataset.messageId);
-          if (!isNaN(oldestMessageId)) {
-            controller.getMessages(sessionId, 20, oldestMessageId);
+          const oldestMessageId = oldestMessage.dataset.messageId;
+          if (oldestMessageId) {
+            console.log("Fetching older messages with ID:", oldestMessageId);
+            controller.getMessages(sessionId, 20, oldestMessageId); // Ensure it's passed as a string
           }
         }
       }
