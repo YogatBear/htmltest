@@ -194,11 +194,25 @@
         }
         #audioDevicesDropdown {
             position: absolute;
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             z-index: 1000;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            width: 280px;
+            padding: 10px;
+        }
+
+        #audioDevicesDropdown.open {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
         }
 
         #deviceList {
@@ -208,18 +222,27 @@
         }
 
         #deviceList li {
-            padding: 10px;
+            padding: 15px 20px;
             cursor: pointer;
             display: flex;
             align-items: center;
+            color: white;
+            transition: background-color 0.2s ease;
+            border-radius: 15px;
+            margin: 5px 0;
         }
 
         #deviceList li:hover {
-            background-color: #f0f0f0;
+            background: var(--glass-effect);
         }
 
-        #deviceList .material-symbols-outlined {
-            margin-right: 10px;
+        #deviceList li.active {
+            background: var(--secondary-purple);
+        }
+
+        #deviceList .material-icons {
+            margin-right: 15px;
+            font-size: 24px;
         }
 
         @keyframes fadeIn {
@@ -369,7 +392,7 @@
         }
 
         speakerButton.addEventListener("click", () => {
-            audioDevicesDropdown.style.display = audioDevicesDropdown.style.display === "none" ? "block" : "none";
+            audioDevicesDropdown.classList.toggle('open');
         });
 
         function updateAudioDevices(devices) {
@@ -378,12 +401,14 @@
             for (const [key, value] of Object.entries(devices)) {
                 const li = document.createElement("li");
                 li.innerHTML = `
-                    <span class="material-icons">${getIconForDevice(value)}</span>
+                    <i class="material-icons">${getIconForDevice(value)}</i>
                     <span>${value}</span>
                 `;
                 li.addEventListener("click", () => {
                     controller.changeAudioDevice(callId, parseInt(key));
-                    audioDevicesDropdown.style.display = "none";
+                    audioDevicesDropdown.classList.remove('open');
+                    deviceList.querySelectorAll('li').forEach(item => item.classList.remove('active'));
+                    li.classList.add('active');
                 });
                 deviceList.appendChild(li);
             }
@@ -458,6 +483,13 @@
 
         controller.getActiveCalls();
         controller.getAudioDevices();
+
+        document.addEventListener('click', (event) => {
+            if (!audioDevicesDropdown.contains(event.target) && 
+                !speakerButton.contains(event.target)) {
+                audioDevicesDropdown.classList.remove('open');
+            }
+        });
     </script>
 </body>
 </html>
