@@ -81,28 +81,31 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
+            padding-left: 45px; /* Make space for call button */
         }
         
         .message-actions {
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 5px;
+            align-items: center;
+            gap: 10px;
             margin-left: 10px;
-            min-width: 70px; /* Ensure consistent width for time/call alignment */
         }
 
         .call-button {
             background: transparent;
             border: none;
             color: var(--secondary-purple);
-            padding: 12px;
+            padding: 8px;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background-color 0.2s;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         .call-button:active {
@@ -110,7 +113,7 @@
         }
 
         .material-icons {
-            font-size: 28px;
+            font-size: 24px;
         }
         
         .contact-name {
@@ -263,6 +266,9 @@
                         <div class="profile-circle" style="background-color: ${profileColor};">
                             <span class="profile-initial">${msgSessionId.charAt(0).toUpperCase()}</span>
                         </div>
+                        <button class="call-button">
+                            <i class="material-icons">phone</i>
+                        </button>
                         <div class="message-details">
                             <div class="message-header">
                                 <div class="header-left">
@@ -274,15 +280,7 @@
                             </div>
                             <div class="message-content">
                                 <div class="message-text">${messageinfo}</div>
-                                <div class="message-actions">
-                                    <div class="time-container">
-                                        ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}
-                                        <span class="message-time">${timeOrDate}</span>
-                                    </div>
-                                    <button class="call-button">
-                                        <i class="material-icons">phone</i>
-                                    </button>
-                                </div>
+                                <span class="message-time">${timeOrDate}</span>
                             </div>
                         </div>`;
 
