@@ -73,7 +73,10 @@
         }
         
         .header-right {
-            display: none; /* Hide the original unread bubble location */
+            display: flex;
+            align-items: center;
+            margin-left: auto; /* Push to right */
+            padding-right: 8px; /* Push unread bubble right */
         }
         
         .message-content {
@@ -85,18 +88,17 @@
         
         .message-actions {
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 5px;
+            align-items: center;
+            gap: 10px;
             margin-left: 10px;
-            min-width: 70px; /* Ensure consistent width for time/call alignment */
+            align-self: center; /* Center vertically */
         }
 
         .call-button {
             background: transparent;
             border: none;
             color: var(--secondary-purple);
-            padding: 12px;
+            padding: 10px;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
@@ -110,7 +112,7 @@
         }
 
         .material-icons {
-            font-size: 28px;
+            font-size: 24px;
         }
         
         .contact-name {
@@ -174,13 +176,6 @@
                 color: white;
             }
 
-        }
-
-        .time-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 2px;
         }
     </style>
 </head>
@@ -275,10 +270,7 @@
                             <div class="message-content">
                                 <div class="message-text">${messageinfo}</div>
                                 <div class="message-actions">
-                                    <div class="time-container">
-                                        ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}
-                                        <span class="message-time">${timeOrDate}</span>
-                                    </div>
+                                    <span class="message-time">${timeOrDate}</span>
                                     <button class="call-button">
                                         <i class="material-icons">phone</i>
                                     </button>
