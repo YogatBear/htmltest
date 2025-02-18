@@ -51,7 +51,7 @@
     /* Message bubbles */
     .message {
       max-width: 75%;
-      margin: 8px 8px;  /* Consistent base margin for all messages */
+      margin: 4px 8px;  /* Reduced base margin for regular messages */
       padding: 8px 12px;
       border-radius: 12px;
       position: relative;
@@ -235,7 +235,7 @@
     }
     .system-message {
       text-align: center;
-      margin: 8px 0;  /* Match the base margin of regular messages */
+      margin: 8px 0;  /* Base margin for system messages */
       position: relative;
       clear: both;
     }
@@ -249,7 +249,8 @@
     .system-message-time {
       font-size: 11px;
       color: rgba(0, 0, 0, 0.5);
-      margin-top: 8px; /* Ensure it appears below the content */
+      margin-top: 4px;  /* Reduced margin between content and timestamp */
+      margin-bottom: 4px;  /* Added bottom margin to balance spacing */
     }
     @media (prefers-color-scheme: dark) {
       #top-bar {            
@@ -277,14 +278,18 @@
       }
     }
     
-    /* Add margin after messages when followed by a system message */
+    /* Spacing between regular messages and system messages */
     .message + .system-message {
-      margin-top: 16px;
+      margin-top: 12px;  /* Adjusted spacing */
     }
 
-    /* Add margin after system messages when followed by regular messages */
     .system-message + .message {
-      margin-top: 16px;
+      margin-top: 12px;  /* Adjusted spacing */
+    }
+
+    /* Consistent spacing between consecutive messages */
+    .message + .message {
+      margin-top: 4px;  /* Reduced spacing between regular messages */
     }
   </style>
 </head>
