@@ -32,6 +32,7 @@
             width: 100%;
             box-sizing: border-box;
             align-items: flex-start;
+            gap: 15px;
         }
 
         .message-entry:active {
@@ -55,7 +56,7 @@
         .message-details {
             flex: 1;
             min-width: 0;
-            padding-right: 10px;
+            padding-right: 0;
         }
         
         .message-header {
@@ -144,7 +145,32 @@
             .message-time {
                 color: white;
             }
+            .call-button {
+                color: white;
+            }
+            
+            .call-button:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+        }
 
+        /* Add new styles for call button */
+        .call-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--secondary-purple);
+            margin-left: 5px;
+        }
+
+        .call-button:hover {
+            background-color: rgba(106, 90, 205, 0.1);
         }
     </style>
 </head>
@@ -240,7 +266,16 @@
                                 <div class="message-text">${messageinfo}</div>
                                 <span class="message-time">${timeOrDate}</span>
                             </div>
-                        </div>`;
+                        </div>
+                        <button class="call-button">
+                            <span class="material-symbols-outlined">call</span>
+                        </button>`;
+
+                    // Update click handlers
+                    li.querySelector('.call-button').addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent triggering the chat open
+                        window.parent.postMessage({ action: 'call', body: { sessionId: msgSessionId } }, '*');
+                    });
 
                     li.addEventListener('click', () => {
                         window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
