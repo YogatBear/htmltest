@@ -481,7 +481,20 @@
         sendButton.click();
       }
     });
-// addMessage("test", "test", 2, "text", 4, 3)
+
+    // Add scroll event listener for infinite scrolling
+    chatContainer.addEventListener('scroll', () => {
+      if (chatContainer.scrollTop === 0) {
+        const messages = chatContainer.getElementsByClassName('message');
+        if (messages.length > 0) {
+          // Get the first (oldest) message's ID
+          const oldestMessage = messages[0];
+          const oldestMessageId = oldestMessage.dataset.messageId;
+          controller.getMessages(sessionId, 20, oldestMessageId);
+        }
+      }
+    });
+
     function updateMessage(messageId, content, status) {
         const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
         if (messageElement) {
@@ -516,13 +529,30 @@
             controller.updateSessionTimestamp(sessionId);
           }
         } else if (data.messages) {
-          data.messages.forEach(msg => {
+          // Store current scroll height before adding new messages
+          const scrollHeightBefore = chatContainer.scrollHeight;
+          
+          // Sort messages by time to ensure correct order
+          const sortedMessages = [...data.messages].sort((a, b) => a[1] - b[1]);
+          
+          sortedMessages.forEach(msg => {
             const [messageId, time, author, content, msgSessionId, msgStatus] = msg;
             if (msgSessionId === sessionId) {
+              // Don't animate older messages
               addMessage(content, author, time, "text", msgStatus, messageId, false);
             }
           });
-          chatContainer.scrollTop = chatContainer.scrollHeight;
+
+          // If these are older messages (loaded from scrolling up)
+          if (data.messages.length > 0 && data.messages[0][1] < Date.now() - 1000) {
+            // Maintain scroll position
+            const scrollHeightDiff = chatContainer.scrollHeight - scrollHeightBefore;
+            chatContainer.scrollTop = scrollHeightDiff;
+          } else {
+            // For new messages, scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+          }
+          
           controller.updateSessionTimestamp(sessionId);
         } else if (data.updatedMessage) {
           console.log("Received updatedMessage data:", data.updatedMessage);
