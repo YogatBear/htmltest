@@ -9,11 +9,12 @@
         body, html {
             margin: 0;
             padding: 0;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Poppins', sans-serif;
             height: 100%;
             background-color: white;
             user-select: none;
             -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            overflow: hidden;
         }
         :root {
             --primary-white: #ffffff;
@@ -29,13 +30,17 @@
             background-size: 200% 200%;
             animation: gradientAnimation 15s ease infinite;
             color: white;
-        }
-        .container {
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            min-height: 100vh;
+        }
+        .container {
+            position: relative;
+            flex: 1;
             padding: 20px;
             animation: fadeIn 0.3s ease-out;
+            display: grid;
+            grid-template-rows: 1fr auto;
         }
         .call-info {
             text-align: center;
@@ -46,6 +51,12 @@
             font-size: 32px;
             margin-bottom: 15px;
             animation: slideDown 0.3s ease-out;
+            max-width: 90vw;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 0 auto;
+            padding: 0 20px;
         }
         .call-duration {
             font-size: 18px;
@@ -53,13 +64,14 @@
             animation: slideDown 0.4s ease-out;
         }
         .button-container {
-            margin-top: auto;
-            margin-bottom: 10vh;
+            padding-bottom: 5vh;
         }
         .button-row {
             display: flex;
             justify-content: space-around;
             margin-bottom: 30px;
+            gap: 20px;
+            padding: 0 20px;
         }
         .call-button {
             background: var(--glass-effect);
@@ -74,6 +86,7 @@
             justify-content: center;
             animation: scaleIn 0.3s ease-out;
             transition: transform 0.2s ease, background-color 0.2s ease;
+            position: relative;
         }
         .call-button:hover {
             transform: scale(1.05);
@@ -88,15 +101,11 @@
             background: var(--secondary-purple);
         }
         .call-button .material-icons {
-            font-size: 34px;
-            background-color: var(--light-purple);
+            font-size: 24px;
             color: var(--primary-white);
-            border-radius: 50%;
-            padding: 12px;
-            margin-bottom: 5px;
         }
         .end-call-button {
-            background-color: #ff0000;
+            background-color: #ff3b30;
             border: none;
             border-radius: 50%;
             width: 70px;
@@ -104,7 +113,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 20px;
+            margin: 0 auto;
             animation: scaleIn 0.3s ease-out;
             transition: transform 0.2s ease;
         }
@@ -142,6 +151,7 @@
             pointer-events: none;
             z-index: 1;
             padding: 0;
+            height: 300px;
         }
         #dialerContainer.open {
             transform: translateY(0);
@@ -152,6 +162,7 @@
             width: 100%;
             height: 300px;
             border: none;
+            border-radius: 20px;
         }
         #topRow {
             display: flex;
@@ -258,6 +269,9 @@
             <button class="end-call-button" id="hangUpButton">
                 <i class="material-icons">call_end</i>
             </button>
+        </div>
+        <div id="audioDevicesDropdown" style="display: none;">
+            <ul id="deviceList"></ul>
         </div>
     </div>
 
