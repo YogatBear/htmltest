@@ -84,6 +84,34 @@
             width: 100%;
         }
         
+        .message-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 10px;
+        }
+
+        .call-button {
+            background: transparent;
+            border: none;
+            color: var(--secondary-purple);
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .call-button:active {
+            background-color: rgba(106, 90, 205, 0.1);
+        }
+
+        .material-icons {
+            font-size: 20px;
+        }
+        
         .contact-name {
             font-size: 16px;
             font-weight: 500;
@@ -238,12 +266,23 @@
                             </div>
                             <div class="message-content">
                                 <div class="message-text">${messageinfo}</div>
-                                <span class="message-time">${timeOrDate}</span>
+                                <div class="message-actions">
+                                    <span class="message-time">${timeOrDate}</span>
+                                    <button class="call-button">
+                                        <i class="material-icons">call</i>
+                                    </button>
+                                </div>
                             </div>
                         </div>`;
 
-                    li.addEventListener('click', () => {
-                        window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
+                    // Add click handler for call button
+                    const callButton = li.querySelector('.call-button');
+                    callButton.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent triggering the chat open
+                        window.parent.postMessage({ 
+                            action: 'call', 
+                            body: { to: msgSessionId }
+                        }, '*');
                     });
 
                     document.querySelector("#recent-messages").appendChild(li);
