@@ -154,6 +154,29 @@
     <script>
 
         const channel = new BroadcastChannel('myChannel');
+        function hashStringToColor(str) {
+            // Generate a hash of the string
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            
+            // Convert hash to RGB values
+            const r = (hash & 0xFF0000) >> 16;
+            const g = (hash & 0x00FF00) >> 8;
+            const b = hash & 0x0000FF;
+            
+            // Ensure colors aren't too dark or too light
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            if (brightness < 128) {
+                return `hsl(${hash % 360}, 70%, 60%)`; // Lighter version
+            } else if (brightness > 200) {
+                return `hsl(${hash % 360}, 70%, 45%)`; // Darker version
+            }
+            
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
         class RecentMessagesComponent {
             constructor(containerId) {
                 this.container = document.getElementById(containerId);
@@ -194,14 +217,14 @@
                     const name = author === msgSessionId ? "" : "You: ";
                     const messageinfo = name + content + ' ';
 
-                    // Generate a random color
-                    const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+                    // Replace random color with consistent hash-based color
+                    const profileColor = hashStringToColor(msgSessionId);
 
                     const li = document.createElement('li');
                     li.className = "message-entry";
 
                     li.innerHTML = `
-                        <div class="profile-circle" style="background-color: ${randomColor};">
+                        <div class="profile-circle" style="background-color: ${profileColor};">
                             <span class="profile-initial">${msgSessionId.charAt(0).toUpperCase()}</span>
                         </div>
                         <div class="message-details">
