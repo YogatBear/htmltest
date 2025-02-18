@@ -37,15 +37,17 @@
         .container {
             position: relative;
             flex: 1;
-            padding: 20px;
+            width: 100%;
             animation: fadeIn 0.3s ease-out;
-            display: grid;
-            grid-template-rows: 1fr auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .call-info {
             text-align: center;
             margin-top: 15vh;
             animation: slideDown 0.3s ease-out;
+            width: 100%;
         }
         .phone-number {
             font-size: 32px;
@@ -64,14 +66,22 @@
             animation: slideDown 0.4s ease-out;
         }
         .button-container {
-            padding-bottom: 5vh;
+            width: 100%;
+            position: fixed;
+            bottom: 5vh;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .button-row {
             display: flex;
             justify-content: space-around;
             margin-bottom: 30px;
             gap: 20px;
-            padding: 0 20px;
+            width: 100%;
+            max-width: 300px;
         }
         .call-button {
             background: var(--glass-effect);
@@ -140,11 +150,13 @@
         }
         #dialerContainer {
             position: absolute;
-            bottom: 200px;
+            bottom: 150px;
             left: 0;
             right: 0;
             background-color: white;
             border-radius: 20px;
+            margin: 0 auto;
+            max-width: 300px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             transform: translateY(20px);
             opacity: 0;
@@ -168,6 +180,7 @@
             display: flex;
             justify-content: center;
             width: 100%;
+            max-width: 300px;
             margin-bottom: 20px;
             transition: transform 0.3s ease-out, opacity 0.3s ease-out;
             transform: translateY(20px);
