@@ -32,7 +32,7 @@
             position: relative;
             width: 100%;
             box-sizing: border-box;
-            align-items: center;
+            align-items: flex-start;
         }
 
         .message-entry:active {
@@ -72,9 +72,7 @@
         }
         
         .header-right {
-            display: flex;
-            align-items: center;
-            margin-left: auto;
+            display: none; /* Hide the original unread bubble location */
         }
         
         .message-content {
