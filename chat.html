@@ -51,7 +51,7 @@
     /* Message bubbles */
     .message {
       max-width: 75%;
-      margin: 2px 8px;
+      margin: 8px 8px;  /* Consistent base margin for all messages */
       padding: 8px 12px;
       border-radius: 12px;
       position: relative;
@@ -235,10 +235,9 @@
     }
     .system-message {
       text-align: center;
-      margin: 16px 0;  /* Ensure consistent vertical spacing */
+      margin: 8px 0;  /* Match the base margin of regular messages */
       position: relative;
       clear: both;
-      padding: 8px 0;  /* Add padding for better spacing */
     }
     .system-message span {
       background: rgba(255, 255, 255, 0.9);
@@ -278,6 +277,15 @@
       }
     }
     
+    /* Add margin after messages when followed by a system message */
+    .message + .system-message {
+      margin-top: 16px;
+    }
+
+    /* Add margin after system messages when followed by regular messages */
+    .system-message + .message {
+      margin-top: 16px;
+    }
   </style>
 </head>
 
