@@ -72,7 +72,9 @@
         }
         
         .header-right {
-            display: none; /* Hide the original unread bubble location */
+            display: flex;
+            align-items: center;
+            margin-left: auto;
         }
         
         .message-content {
@@ -80,7 +82,7 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            padding-right: 5px;
+            padding-right: 5px; /* Give some space for the call button */
         }
         
         .message-actions {
@@ -90,13 +92,6 @@
             gap: 5px;
             margin-left: 10px;
             min-width: 70px; /* Ensure consistent width for time/call alignment */
-        }
-
-        .time-and-unread {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 2px;
         }
 
         .call-button {
@@ -181,6 +176,13 @@
                 color: white;
             }
 
+        }
+
+        .time-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
         }
     </style>
 </head>
@@ -275,10 +277,7 @@
                             <div class="message-content">
                                 <div class="message-text">${messageinfo}</div>
                                 <div style="display: flex; align-items: center;">
-                                    <div class="time-and-unread">
-                                        ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}
-                                        <span class="message-time">${timeOrDate}</span>
-                                    </div>
+                                    <span class="message-time">${timeOrDate}</span>
                                     <button class="call-button">
                                         <i class="material-icons">phone</i>
                                     </button>
