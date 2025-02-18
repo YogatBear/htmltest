@@ -349,22 +349,6 @@
         }
       }
 
-      // Add date separator if needed
-      if (currentDate !== lastDisplayedDate) {
-        const dateElement = document.createElement('div');
-        dateElement.classList.add('date-separator');
-        const dateSpan = document.createElement('span');
-        dateSpan.textContent = currentDate;
-        dateElement.appendChild(dateSpan);
-        // Insert date separator at the beginning for older messages
-        if (time < Date.now() - 1000) {
-          chatContainer.insertBefore(dateElement, chatContainer.firstChild);
-        } else {
-          chatContainer.appendChild(dateElement);
-        }
-        lastDisplayedDate = currentDate;
-      }
-
       // Handle system messages
       if (author === 'SYSTEM') {
         const systemMessageElement = document.createElement('div');
@@ -378,7 +362,6 @@
         systemMessageTime.textContent = formatTime(time);
         systemMessageElement.appendChild(systemMessageTime);
         
-        // Insert system message at appropriate position
         if (time < Date.now() - 1000) {
           chatContainer.insertBefore(systemMessageElement, chatContainer.firstChild);
         } else {
@@ -389,13 +372,59 @@
 
       const messageElement = createMessageElement(content, author, time, type, status, messageId, animate);
       
-      // Insert message at appropriate position
+      // For older messages (scrolling up)
       if (time < Date.now() - 1000) {
-        chatContainer.insertBefore(messageElement, chatContainer.firstChild);
+        // Find the first message from a different date
+        let insertPosition = null;
+        const messages = Array.from(chatContainer.children);
+        
+        for (const msg of messages) {
+          if (msg.dataset.messageId) {
+            const msgTime = parseInt(msg.dataset.time);
+            if (formatDate(msgTime) !== currentDate) {
+              insertPosition = msg;
+              break;
+            }
+          }
+        }
+        
+        // Add date separator if needed
+        if (currentDate !== lastDisplayedDate) {
+          const dateElement = document.createElement('div');
+          dateElement.classList.add('date-separator');
+          const dateSpan = document.createElement('span');
+          dateSpan.textContent = currentDate;
+          dateElement.appendChild(dateSpan);
+          
+          if (insertPosition) {
+            chatContainer.insertBefore(dateElement, insertPosition);
+          } else {
+            chatContainer.appendChild(dateElement);
+          }
+          lastDisplayedDate = currentDate;
+        }
+        
+        // Insert message after its date separator
+        if (insertPosition) {
+          chatContainer.insertBefore(messageElement, insertPosition);
+        } else {
+          chatContainer.appendChild(messageElement);
+        }
       } else {
+        // For new messages
+        if (currentDate !== lastDisplayedDate) {
+          const dateElement = document.createElement('div');
+          dateElement.classList.add('date-separator');
+          const dateSpan = document.createElement('span');
+          dateSpan.textContent = currentDate;
+          dateElement.appendChild(dateSpan);
+          chatContainer.appendChild(dateElement);
+          lastDisplayedDate = currentDate;
+        }
         chatContainer.appendChild(messageElement);
         chatContainer.scrollTop = chatContainer.scrollHeight;
       }
+      
       lastAuthor = author;
     }
 
@@ -409,6 +438,7 @@
       
       if (messageId !== null) {
         messageElement.dataset.messageId = messageId;
+        messageElement.dataset.time = time; // Store the timestamp for date comparison
       }
 
       if (author === sessionId && author !== lastAuthor) {
