@@ -19,9 +19,13 @@
             width: 100%;
             max-height: 100vh;
             overflow-y: auto;
+            /* Add hardware acceleration */
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            will-change: transform;
         }
         .container, #chat-container {
-            transition: transform 0.3s ease-in-out;
+            transition: transform 0.25s cubic-bezier(0.1, 0.7, 0.1, 1);
         }
 
         #chat-container {
@@ -31,10 +35,16 @@
             width: 100%;
             height: 100%;
             background: white;
+            /* Add hardware acceleration */
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            will-change: transform;
         }
 
         .slide-left {
-            transform: translateX(-100%);
+            /* Make animation simpler by only using transform */
+            transform: translateX(-100%) translateZ(0);
+            -webkit-transform: translateX(-100%) translateZ(0);
         }
 
 
@@ -404,7 +414,7 @@
             // Create and load the iframe first
             const iframe = document.createElement('iframe');
             iframe.className = 'chat-iframe';
-            iframe.style.cssText = 'width:100%;height:100%;border:none;';
+            iframe.style.cssText = 'width:100%;height:100%;border:none;visibility:hidden;'; // Hide initially
             iframe.src = `chat.html?sessionId=${encodeURIComponent(sessionId)}`;
             
             // Clear any existing content and add the new iframe
@@ -413,9 +423,13 @@
             
             // Wait for iframe to load before starting animation
             iframe.onload = () => {
-                document.querySelector('.container').classList.add('slide-left');
-                chatContainer.classList.add('slide-left');
-                history.pushState({page: 'chat'}, '', 'chat');
+                // Show iframe and start animation in next frame
+                setTimeout(() => {
+                    iframe.style.visibility = 'visible';
+                    document.querySelector('.container').classList.add('slide-left');
+                    chatContainer.classList.add('slide-left');
+                    history.pushState({page: 'chat'}, '', 'chat');
+                }, 50); // Small delay to ensure smooth transition
             };
         }
 
