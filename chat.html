@@ -332,18 +332,13 @@
     function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false) {
       const currentDate = formatDate(time);
       
-      // If updating an existing message, remove the old one first
+      // If updating an existing message, handle as before
       if (messageId !== null) {
         const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
         if (existingMsg) {
-          // Store the position of the existing message
           const nextElement = existingMsg.nextElementSibling;
           existingMsg.remove();
-          
-          // Create the updated message without animation
           const updatedMessage = createMessageElement(content, author, time, type, status, messageId, false);
-          
-          // Insert at the same position
           if (nextElement) {
             chatContainer.insertBefore(updatedMessage, nextElement);
           } else {
@@ -360,33 +355,46 @@
         const dateSpan = document.createElement('span');
         dateSpan.textContent = currentDate;
         dateElement.appendChild(dateSpan);
-        chatContainer.appendChild(dateElement);
+        // Insert date separator at the beginning for older messages
+        if (time < Date.now() - 1000) {
+          chatContainer.insertBefore(dateElement, chatContainer.firstChild);
+        } else {
+          chatContainer.appendChild(dateElement);
+        }
         lastDisplayedDate = currentDate;
       }
 
-      // Check if the message is a system message
+      // Handle system messages
       if (author === 'SYSTEM') {
         const systemMessageElement = document.createElement('div');
-        systemMessageElement.classList.add('date-separator'); // Reuse the date-separator style
-
+        systemMessageElement.classList.add('date-separator');
         const systemMessageSpan = document.createElement('span');
         systemMessageSpan.textContent = content;
         systemMessageElement.appendChild(systemMessageSpan);
-
-        // Add time for system messages
         const systemMessageTime = document.createElement('div');
-        systemMessageTime.classList.add('system-message-time'); // Reuse the message-time style
-        systemMessageTime.style.marginTop = '8px'; // Increase margin to add more space
+        systemMessageTime.classList.add('system-message-time');
+        systemMessageTime.style.marginTop = '8px';
         systemMessageTime.textContent = formatTime(time);
         systemMessageElement.appendChild(systemMessageTime);
-
-        chatContainer.appendChild(systemMessageElement);
+        
+        // Insert system message at appropriate position
+        if (time < Date.now() - 1000) {
+          chatContainer.insertBefore(systemMessageElement, chatContainer.firstChild);
+        } else {
+          chatContainer.appendChild(systemMessageElement);
+        }
         return;
       }
 
       const messageElement = createMessageElement(content, author, time, type, status, messageId, animate);
-      chatContainer.appendChild(messageElement);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
+      
+      // Insert message at appropriate position
+      if (time < Date.now() - 1000) {
+        chatContainer.insertBefore(messageElement, chatContainer.firstChild);
+      } else {
+        chatContainer.appendChild(messageElement);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
       lastAuthor = author;
     }
 
@@ -533,16 +541,14 @@
           }
         } else if (data.messages) {
           console.log("Received multiple messages data:", data.messages);
-          // Store current scroll height before adding new messages
           const scrollHeightBefore = chatContainer.scrollHeight;
           
-          // Sort messages by time to ensure correct order
-          const sortedMessages = [...data.messages].sort((a, b) => a[1] - b[1]);
+          // Sort messages by time in reverse order for older messages
+          const sortedMessages = [...data.messages].sort((a, b) => b[1] - a[1]);
           
           sortedMessages.forEach(msg => {
             const [messageId, time, author, content, msgSessionId, msgStatus] = msg;
             if (msgSessionId === sessionId) {
-              // Don't animate older messages
               addMessage(content, author, time, "text", msgStatus, messageId, false);
             }
           });
