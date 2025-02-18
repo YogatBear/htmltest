@@ -514,8 +514,8 @@
             if (msgSessionId === sessionId) {
               addMessage(content, author, time, "text", msgStatus, messageId);
             }
-            controller.updateSessionTimestamp(sessionId);
           });
+          controller.updateSessionTimestamp(sessionId);
         } else if (data.updatedMessage) {
           console.log("Received updatedMessage data:", data.updatedMessage);
           const [messageId, time, author, content, msgSessionId, msgStatus] = data.updatedMessage;
