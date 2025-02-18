@@ -485,12 +485,14 @@
     // Add scroll event listener for infinite scrolling
     chatContainer.addEventListener('scroll', () => {
       if (chatContainer.scrollTop === 0) {
-        const messages = chatContainer.getElementsByClassName('message');
+        const messages = document.querySelectorAll('[data-message-id]');
         if (messages.length > 0) {
-          // Get the first (oldest) message's ID
+          // Get the first (oldest) message's ID and parse it as a number
           const oldestMessage = messages[0];
-          const oldestMessageId = oldestMessage.dataset.messageId;
-          controller.getMessages(sessionId, 20, oldestMessageId);
+          const oldestMessageId = parseInt(oldestMessage.dataset.messageId);
+          if (!isNaN(oldestMessageId)) {
+            controller.getMessages(sessionId, 20, oldestMessageId);
+          }
         }
       }
     });
