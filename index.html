@@ -209,9 +209,9 @@
                 this.sendMessage(action, body);
             }
 
-            chatOpened(remoteId){
+            updateSessionTimestamp(remoteId){
                 const openChatRequest = {
-                    action: "chat-opened",
+                    action: "update-session-timestamp",
                     body: { localId:localId, pid: this.pid,sessionId: remoteId }
                 };
                 this.sendMessageToNativeApp(openChatRequest);

@@ -304,7 +304,6 @@
     const messageText = document.getElementById('message-text');
     const sendButton = document.getElementById('send-button');
 
-    controller.chatOpened(sessionId);
     controller.getMessages(sessionId, 10);
 
     window.addEventListener('popstate', function(event) {
@@ -507,6 +506,7 @@
           const [messageId, time, author, content, msgSessionId, msgStatus] = data.message;
           if (msgSessionId === sessionId) {
             addMessage(content, author, time, "text", msgStatus, messageId);
+            controller.updateSessionTimestamp(sessionId);
           }
         } else if (data.messages) {
           data.messages.forEach(msg => {
@@ -514,6 +514,7 @@
             if (msgSessionId === sessionId) {
               addMessage(content, author, time, "text", msgStatus, messageId);
             }
+            controller.updateSessionTimestamp(sessionId);
           });
         } else if (data.updatedMessage) {
           console.log("Received updatedMessage data:", data.updatedMessage);
