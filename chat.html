@@ -238,12 +238,13 @@
       margin: 16px 0;
       position: relative;
       clear: both;
+    }
+    .system-message span {
       background: rgba(255, 255, 255, 0.9);
       padding: 6px 12px;
       border-radius: 12px;
       font-size: 12px;
       color: var(--dark-purple);
-      margin-top: 20px; /* Add top margin to create space from previous message */
     }
     .system-message-time {
       font-size: 11px;
@@ -352,7 +353,7 @@
       // Handle system messages
       if (author === 'SYSTEM') {
         const systemMessageElement = document.createElement('div');
-        systemMessageElement.classList.add('date-separator');
+        systemMessageElement.classList.add('system-message');
         const systemMessageSpan = document.createElement('span');
         systemMessageSpan.textContent = content;
         systemMessageElement.appendChild(systemMessageSpan);
