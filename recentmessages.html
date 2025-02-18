@@ -56,6 +56,7 @@
         .message-details {
             flex: 1;
             min-width: 0;
+            padding-right: 10px;
         }
         
         .message-header {
@@ -80,16 +81,14 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            padding-right: 5px; /* Give some space for the call button */
+            padding-left: 45px; /* Make space for call button */
         }
         
         .message-actions {
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 5px;
+            align-items: center;
+            gap: 10px;
             margin-left: 10px;
-            min-width: 70px; /* Ensure consistent width for time/call alignment */
         }
 
         .call-button {
@@ -102,7 +101,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-left: 10px;
+            transition: background-color 0.2s;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         .call-button:active {
@@ -263,6 +266,9 @@
                         <div class="profile-circle" style="background-color: ${profileColor};">
                             <span class="profile-initial">${msgSessionId.charAt(0).toUpperCase()}</span>
                         </div>
+                        <button class="call-button">
+                            <i class="material-icons">phone</i>
+                        </button>
                         <div class="message-details">
                             <div class="message-header">
                                 <div class="header-left">
@@ -274,12 +280,7 @@
                             </div>
                             <div class="message-content">
                                 <div class="message-text">${messageinfo}</div>
-                                <div style="display: flex; align-items: center;">
-                                    <span class="message-time">${timeOrDate}</span>
-                                    <button class="call-button">
-                                        <i class="material-icons">phone</i>
-                                    </button>
-                                </div>
+                                <span class="message-time">${timeOrDate}</span>
                             </div>
                         </div>`;
 
