@@ -24,7 +24,7 @@
     }
     body {
       font-family: 'Poppins', sans-serif;
-      background: transparent;
+      background: var(--purple-gradient);
       background-size: 200% 200%;
       animation: gradientAnimation 15s ease infinite;
       height: 100vh;
@@ -47,8 +47,6 @@
       padding: 10px;
       background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(5px);
-      opacity: 0;
-      transition: opacity 0.3s ease-out;
     }
     /* Message bubbles */
     .message {
@@ -272,12 +270,6 @@
         border: 2px solid rgba(255, 255, 255, 0.5);
     }
       
-    }
-    /* Add this to ensure the entire chat iframe starts with proper background */
-    html {
-      background: var(--purple-gradient);
-      background-size: 200% 200%;
-      height: 100%;
     }
   </style>
 </head>
