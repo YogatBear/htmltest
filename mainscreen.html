@@ -332,7 +332,7 @@
         </div> -->
         <div class="iframe-container">
             <!-- <iframe src="recentCalls.html" class="shimmer"></iframe> -->
-            <iframe src="recentmessages.html" class="shimmer"></iframe>
+            <iframe src="recentsessions.html" class="shimmer"></iframe>
         </div>
     </div>
     <div id="chat-container"></div>
@@ -438,7 +438,7 @@
         function closeChat() {
             document.querySelector('.container').classList.remove('slide-left');
             chatContainer.classList.remove('slide-left');
-            controller.getRecentMessages(10);
+            controller.getRecentSessions(20);
             setTimeout(() => {
                 chatContainer.innerHTML = '';
             }, 300); // Clear chat container after animation

@@ -178,9 +178,9 @@
                 this.sendMessageToNativeApp(request);
             }
 
-            getRecentMessages(range) {
+            getRecentSessions(range) {
                 const request = {
-                    action: "get-recent-messages",
+                    action: "get-recent-sessions",
                     body: { localId: this.localId, pid: this.pid, range: range }
                 };
                 this.sendMessageToNativeApp(request);
@@ -212,7 +212,7 @@
             updateSessionTimestamp(remoteId){
                 const openChatRequest = {
                     action: "update-session-timestamp",
-                    body: { localId:localId, pid: this.pid,sessionId: remoteId }
+                    body: { localId:this.localId, pid: this.pid,sessionId: this.remoteId }
                 };
                 this.sendMessageToNativeApp(openChatRequest);
             }

@@ -11,7 +11,7 @@
             --secondary-purple: #6a5acd;
         }
 
-        .recent-messages {
+        .recent-sessions {
             margin: 0;
             padding: 0;
             list-style: none;
@@ -205,7 +205,7 @@
     </style>
 </head>
 <body>
-    <ul id="recent-messages" class="recent-messages"></ul>
+    <ul id="recent-sessions" class="recent-sessions"></ul>
 
     <script>
 
@@ -233,7 +233,7 @@
             return `rgb(${r}, ${g}, ${b})`;
         }
 
-        class RecentMessagesComponent {
+        class RecentSessionsComponent {
             constructor(containerId) {
                 this.container = document.getElementById(containerId);
                 this.controller = window.top.controller;
@@ -241,28 +241,28 @@
             }
 
             init() {
-                this.controller.getRecentMessages(10);
+                this.controller.getRecentSessions(20);
                 channel.addEventListener("message", this.handleMessage.bind(this));
             }
 
             handleMessage(event) {
                 try {
                     const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-                    if (data.recentMessages) {
-                        console.log("Received recent messages data:", data.recentMessages);
-                        this.updateRecentMessages(data.recentMessages);
+                    if (data.recentSessions) {
+                        console.log("Received recent sessions data:", data.recentSessions);
+                        this.updateRecentSessions(data.recentSessions);
                     }
                     else if (data.message) {
-                        this.controller.getRecentMessages(10);
+                        this.controller.getRecentSessions(20);
                     }
                 } catch (error) {
                     console.error("Error parsing message data:", error);
                 }
             }
 
-            updateRecentMessages(recentMessages) {
+            updateRecentSessions(recentSessions) {
                 this.container.innerHTML = "";
-                recentMessages.forEach(msg => {
+                recentSessions.forEach(msg => {
                     const [messageId, time, author, content, msgSessionId, unreadCount] = msg;
 
                     const messageDate = new Date(time);
@@ -315,15 +315,15 @@
                         window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
                     });
 
-                    document.querySelector("#recent-messages").appendChild(li);
+                    document.querySelector("#recent-sessions").appendChild(li);
                 });
 
             }
         }
 
 
-        const com = new RecentMessagesComponent('recent-messages');
-        // com.updateRecentMessages([[1, 2, "test", "test", "test", 1]]);
+        const com = new RecentSessionsComponent('recent-sessions');
+        
 function formatName(name) {
     if (name.length > 25) {
         return name.substring(0, 22) + "...";
