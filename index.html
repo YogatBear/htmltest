@@ -212,7 +212,7 @@
             updateSessionTimestamp(remoteId){
                 const openChatRequest = {
                     action: "update-session-timestamp",
-                    body: { localId:this.localId, pid: this.pid,sessionId: this.remoteId }
+                    body: { localId:this.localId, pid: this.pid, sessionId: remoteId }
                 };
                 this.sendMessageToNativeApp(openChatRequest);
             }
