@@ -476,12 +476,7 @@
                         }
                     };
 
-                    // Remove click listener from li element
-                    li.removeEventListener('click', () => {
-                        window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
-                    });
-
-                    // Add separate click handler
+                    // Add click handler
                     li.addEventListener('click', (e) => {
                         if (!this.deleteMode) {
                             window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
