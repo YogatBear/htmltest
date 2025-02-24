@@ -251,6 +251,9 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             z-index: 1000;
             text-align: center;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .modal-buttons {
@@ -268,7 +271,8 @@
             font-weight: 500;
             user-select: none;
             -webkit-user-select: none;
-            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
         }
 
         .confirm-button {
@@ -368,7 +372,7 @@
                 const modal = document.createElement('div');
                 modal.className = 'confirm-delete-modal';
                 modal.innerHTML = `
-                    <div>Are you sure you want to delete this conversation?</div>
+                    <div>Are you sure you want to delete this conversation? This will delete all of it's messages.</div>
                     <div class="modal-buttons">
                         <button class="modal-button confirm-button">Delete</button>
                         <button class="modal-button cancel-button">Cancel</button>
