@@ -209,12 +209,20 @@
                 this.sendMessage(action, body);
             }
 
-            updateSessionTimestamp(remoteId){
+            updateSessionTimestamp(sessionId){
                 const openChatRequest = {
                     action: "update-session-timestamp",
-                    body: { localId:this.localId, pid: this.pid, sessionId: remoteId }
+                    body: { localId:this.localId, pid: this.pid, sessionId: sessionId }
                 };
                 this.sendMessageToNativeApp(openChatRequest);
+            }
+
+            deleteSession(sessionId) {
+                const deleteSessionRequest = {
+                    action: "delete-session",
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId }
+                };
+                this.sendMessageToNativeApp(deleteSessionRequest);
             }
         }
 

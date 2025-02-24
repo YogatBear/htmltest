@@ -375,7 +375,7 @@
                 document.body.appendChild(modal);
 
                 modal.querySelector('.confirm-button').addEventListener('click', () => {
-                    // TODO: Add deletion logic here
+                    controller.deleteSession(sessionId);
                     console.log('Delete session:', sessionId);
                     const entry = document.querySelector('.delete-mode');
                     if (entry) {
