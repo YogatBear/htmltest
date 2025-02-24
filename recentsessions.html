@@ -197,9 +197,33 @@
             background-color: rgba(106, 90, 205, 0.2);
         }
 
+        /* Add these new styles */
+        .message-entry.delete-mode .call-button {
+            border-color: #dc3545;
+            color: #dc3545;
+            animation: fadeSwap 0.3s ease-in-out;
+        }
+
+        .message-entry.delete-mode .call-button:hover {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        .message-entry.delete-mode .call-button:active {
+            background-color: rgba(220, 53, 69, 0.2);
+        }
+
+        @keyframes fadeSwap {
+            0% { transform: rotate(0deg) scale(1); opacity: 1; }
+            50% { transform: rotate(90deg) scale(0); opacity: 0; }
+            51% { transform: rotate(-90deg) scale(0); opacity: 0; }
+            100% { transform: rotate(0deg) scale(1); opacity: 1; }
+        }
+
+        /* Dark mode updates */
         @media (prefers-color-scheme: dark) {
-            .call-button:active {
-                background-color: rgba(255, 255, 255, 0.2);
+            .message-entry.delete-mode .call-button {
+                border-color: #ff4d4d;
+                color: #ff4d4d;
             }
         }
     </style>
@@ -303,21 +327,78 @@
 
                     // Add click handler for call button
                     const callButton = li.querySelector('.call-button');
+
+                    let longPressTimer;
+                    let isLongPress = false;
+
+                    li.addEventListener('touchstart', handleTouchStart);
+                    li.addEventListener('mousedown', handleTouchStart);
+                    li.addEventListener('touchend', handleTouchEnd);
+                    li.addEventListener('mouseup', handleTouchEnd);
+                    li.addEventListener('touchmove', handleTouchMove);
+                    li.addEventListener('mouseleave', handleTouchEnd);
+
+                    function handleTouchStart(e) {
+                        isLongPress = false;
+                        longPressTimer = setTimeout(() => {
+                            isLongPress = true;
+                            li.classList.add('delete-mode');
+                            const icon = callButton.querySelector('i');
+                            icon.textContent = 'delete';
+                        }, 500);
+                    }
+
+                    function handleTouchMove(e) {
+                        clearTimeout(longPressTimer);
+                    }
+
+                    function handleTouchEnd(e) {
+                        clearTimeout(longPressTimer);
+                        
+                        // If it's a short press and not in delete mode, handle normal click
+                        if (!isLongPress && !li.classList.contains('delete-mode')) {
+                            if (e.target !== callButton && !callButton.contains(e.target)) {
+                                window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
+                            }
+                        }
+                    }
+
+                    // Update call button click handler
                     callButton.addEventListener('click', (e) => {
-                        e.stopPropagation(); // Prevent triggering the chat open
-                        window.parent.postMessage({ 
-                            action: 'call', 
-                            body: { to: msgSessionId }
-                        }, '*');
+                        e.stopPropagation();
+                        if (li.classList.contains('delete-mode')) {
+                            // Handle delete action
+                            console.log('Delete session:', msgSessionId);
+                            // TODO: Implement delete logic
+                            li.style.height = li.offsetHeight + 'px';
+                            requestAnimationFrame(() => {
+                                li.style.height = '0';
+                                li.style.opacity = '0';
+                                li.style.padding = '0';
+                                li.style.margin = '0';
+                                li.style.transition = 'all 0.3s ease-in-out';
+                                setTimeout(() => li.remove(), 300);
+                            });
+                        } else {
+                            // Normal call action
+                            window.parent.postMessage({ 
+                                action: 'call', 
+                                body: { to: msgSessionId }
+                            }, '*');
+                        }
                     });
 
-                    li.addEventListener('click', () => {
-                        window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
+                    document.addEventListener('click', (e) => {
+                        // Exit delete mode when clicking outside
+                        if (!li.contains(e.target)) {
+                            li.classList.remove('delete-mode');
+                            const icon = callButton.querySelector('i');
+                            icon.textContent = 'call';
+                        }
                     });
 
                     document.querySelector("#recent-sessions").appendChild(li);
                 });
-
             }
         }
 
