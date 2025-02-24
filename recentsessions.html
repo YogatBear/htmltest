@@ -486,10 +486,8 @@
                     deleteButton.addEventListener('click', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        if (this.deleteMode === msgSessionId) {
-                            this.showDeleteConfirmation(msgSessionId);
-                        }
-                    });
+                        this.showDeleteConfirmation(msgSessionId);
+                    }, true); // Use capture phase to handle click first
 
                     // Call button click handler
                     callButton.addEventListener('click', (e) => {
