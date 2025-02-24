@@ -202,6 +202,46 @@
                 background-color: rgba(255, 255, 255, 0.2);
             }
         }
+
+        .delete-button {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid red;
+            background: transparent;
+            cursor: pointer;
+            color: red;
+            margin-left: 5px;
+            padding: 8px;
+            flex-shrink: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            outline: none;
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                        background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .delete-button:hover {
+            background-color: rgba(255, 0, 0, 0.1);
+        }
+
+        .delete-button:active {
+            transform: scale(0.9);
+            background-color: rgba(255, 0, 0, 0.2);
+        }
+
+        .delete-mode .call-button {
+            display: none;
+        }
+
+        .delete-mode .delete-button {
+            display: flex;
+        }
     </style>
 </head>
 <body>
@@ -299,6 +339,9 @@
                         </div>
                         <button class="call-button">
                             <i class="material-icons">call</i>
+                        </button>
+                        <button class="delete-button">
+                            <i class="material-icons">delete</i>
                         </button>`;
 
                     // Add click handler for call button
@@ -311,8 +354,39 @@
                         }, '*');
                     });
 
+                    // Add click handler for delete button
+                    const deleteButton = li.querySelector('.delete-button');
+                    deleteButton.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent triggering the chat open
+                        if (confirm('Are you sure you want to delete this session?')) {
+                            // Add logic to delete the session
+                            li.remove(); // Temporary removal for demonstration
+                        }
+                    });
+
+                    // Add long press handler to toggle delete mode
+                    let pressTimer;
+                    li.addEventListener('mousedown', (e) => {
+                        pressTimer = setTimeout(() => {
+                            li.classList.toggle('delete-mode');
+                        }, 1000);
+                    });
+
+                    li.addEventListener('mouseup', () => {
+                        clearTimeout(pressTimer);
+                    });
+
+                    li.addEventListener('mouseleave', () => {
+                        clearTimeout(pressTimer);
+                    });
+
+                    // Add click handler to exit delete mode
                     li.addEventListener('click', () => {
-                        window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
+                        if (li.classList.contains('delete-mode')) {
+                            li.classList.remove('delete-mode');
+                        } else {
+                            window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
+                        }
                     });
 
                     document.querySelector("#recent-sessions").appendChild(li);
