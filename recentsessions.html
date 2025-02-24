@@ -486,8 +486,9 @@
                     deleteButton.addEventListener('click', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        this.showDeleteConfirmation(msgSessionId);
-                        return false; // Prevent any other handlers
+                        if (this.deleteMode === msgSessionId) {
+                            this.showDeleteConfirmation(msgSessionId);
+                        }
                     });
 
                     // Call button click handler
@@ -500,15 +501,18 @@
                                 body: { to: msgSessionId }
                             }, '*');
                         }
-                        return false; // Prevent any other handlers
                     });
 
                     // List item click handler - must be last
                     li.addEventListener('click', (e) => {
-                        if (e.target.closest('.delete-button') || e.target.closest('.call-button')) {
-                            return; // Don't handle clicks on buttons
+                        // Don't handle clicks on buttons or their children
+                        if (e.target.closest('.button-container')) {
+                            return;
                         }
-                        if (!this.deleteMode) {
+                        
+                        if (this.deleteMode === msgSessionId) {
+                            this.exitDeleteMode();
+                        } else if (!this.deleteMode) {
                             window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
                         }
                     });
