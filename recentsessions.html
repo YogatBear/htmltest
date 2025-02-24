@@ -266,6 +266,9 @@
             border: none;
             cursor: pointer;
             font-weight: 500;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
 
         .confirm-button {
@@ -375,7 +378,7 @@
                 document.body.appendChild(modal);
 
                 modal.querySelector('.confirm-button').addEventListener('click', () => {
-                    controller.deleteSession(sessionId);
+                    this.controller.deleteSession(sessionId);
                     console.log('Delete session:', sessionId);
                     const entry = document.querySelector('.delete-mode');
                     if (entry) {
