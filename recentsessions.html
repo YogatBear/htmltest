@@ -307,9 +307,6 @@
             }
 
             updateRecentSessions(recentSessions) {
-                // Clear existing event listeners before emptying container
-                document.removeEventListener('click', this.handleOutsideClick);
-                
                 this.container.innerHTML = "";
                 recentSessions.forEach(msg => {
                     const [messageId, time, author, content, msgSessionId, unreadCount] = msg;
@@ -350,39 +347,12 @@
                             <i class="material-icons">call</i>
                         </button>`;
 
+                    // Add click handler for call button
                     const callButton = li.querySelector('.call-button');
+
                     let longPressTimer;
                     let isLongPress = false;
 
-                    const handleTouchStart = (e) => {
-                        isLongPress = false;
-                        longPressTimer = setTimeout(() => {
-                            isLongPress = true;
-                            li.classList.add('delete-mode');
-                            const icon = callButton.querySelector('i');
-                            icon.textContent = 'delete';
-                        }, 500);
-                    };
-
-                    const handleTouchMove = (e) => {
-                        clearTimeout(longPressTimer);
-                    };
-
-                    const handleTouchEnd = (e) => {
-                        clearTimeout(longPressTimer);
-                        
-                        if (!isLongPress && !li.classList.contains('delete-mode')) {
-                            if (e.target !== callButton && !callButton.contains(e.target)) {
-                                window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
-                            }
-                        } else if (!isLongPress && e.target !== callButton && !callButton.contains(e.target)) {
-                            li.classList.remove('delete-mode');
-                            const icon = callButton.querySelector('i');
-                            icon.textContent = 'call';
-                        }
-                    };
-
-                    // Add touch/mouse event listeners
                     li.addEventListener('touchstart', handleTouchStart);
                     li.addEventListener('mousedown', handleTouchStart);
                     li.addEventListener('touchend', handleTouchEnd);
@@ -390,10 +360,41 @@
                     li.addEventListener('touchmove', handleTouchMove);
                     li.addEventListener('mouseleave', handleTouchEnd);
 
-                    // Call button click handler
+                    function handleTouchStart(e) {
+                        isLongPress = false;
+                        longPressTimer = setTimeout(() => {
+                            isLongPress = true;
+                            li.classList.add('delete-mode');
+                            const icon = callButton.querySelector('i');
+                            icon.textContent = 'delete';
+                        }, 500);
+                    }
+
+                    function handleTouchMove(e) {
+                        clearTimeout(longPressTimer);
+                    }
+
+                    function handleTouchEnd(e) {
+                        clearTimeout(longPressTimer);
+                        
+                        // If it's a short press and not in delete mode, handle normal click
+                        if (!isLongPress && !li.classList.contains('delete-mode')) {
+                            if (e.target !== callButton && !callButton.contains(e.target)) {
+                                window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
+                            }
+                        } else if (!isLongPress && e.target !== callButton && !callButton.contains(e.target)) {
+                            // Only exit delete mode if clicking on the session, not the delete button
+                            li.classList.remove('delete-mode');
+                            const icon = callButton.querySelector('i');
+                            icon.textContent = 'call';
+                        }
+                    }
+
+                    // Update call button click handler
                     callButton.addEventListener('click', (e) => {
                         e.stopPropagation();
                         if (li.classList.contains('delete-mode')) {
+                            // Show confirmation dialog
                             const dialog = document.createElement('div');
                             dialog.className = 'delete-confirm-dialog';
                             dialog.innerHTML = `
@@ -404,12 +405,15 @@
                                 </div>
                             `;
 
-                            const handleCancel = () => {
+                            // Handle dialog buttons
+                            dialog.querySelector('.cancel').addEventListener('click', () => {
                                 dialog.remove();
-                            };
+                            });
 
-                            const handleConfirm = () => {
+                            dialog.querySelector('.confirm').addEventListener('click', () => {
+                                // Handle delete action
                                 console.log('Delete session:', msgSessionId);
+                                // TODO: Implement delete logic
                                 li.style.height = li.offsetHeight + 'px';
                                 requestAnimationFrame(() => {
                                     li.style.height = '0';
@@ -422,13 +426,11 @@
                                         dialog.remove();
                                     }, 300);
                                 });
-                            };
-
-                            dialog.querySelector('.cancel').addEventListener('click', handleCancel);
-                            dialog.querySelector('.confirm').addEventListener('click', handleConfirm);
+                            });
 
                             document.body.appendChild(dialog);
                         } else {
+                            // Normal call action
                             window.parent.postMessage({ 
                                 action: 'call', 
                                 body: { to: msgSessionId }
@@ -436,22 +438,17 @@
                         }
                     });
 
-                    this.container.appendChild(li);
-                });
-
-                // Add single document click listener for handling outside clicks
-                this.handleOutsideClick = (e) => {
-                    const deleteModeLis = this.container.querySelectorAll('.delete-mode');
-                    deleteModeLis.forEach(li => {
+                    document.addEventListener('click', (e) => {
+                        // Exit delete mode when clicking outside
                         if (!li.contains(e.target)) {
                             li.classList.remove('delete-mode');
-                            const icon = li.querySelector('.call-button i');
+                            const icon = callButton.querySelector('i');
                             icon.textContent = 'call';
                         }
                     });
-                };
 
-                document.addEventListener('click', this.handleOutsideClick);
+                    document.querySelector("#recent-sessions").appendChild(li);
+                });
             }
         }
 
