@@ -283,13 +283,12 @@
             constructor(containerId) {
                 this.container = document.getElementById(containerId);
                 this.controller = window.top.controller;
-                this.boundHandleMessage = this.handleMessage.bind(this);
                 this.init();
             }
 
             init() {
                 this.controller.getRecentSessions(20);
-                channel.addEventListener("message", this.boundHandleMessage);
+                channel.addEventListener("message", this.handleMessage.bind(this));
             }
 
             handleMessage(event) {
@@ -307,17 +306,11 @@
                 }
             }
 
-            cleanup() {
-                channel.removeEventListener("message", this.boundHandleMessage);
-                if (this.handleOutsideClick) {
-                    document.removeEventListener('click', this.handleOutsideClick);
-                }
-                this.container.innerHTML = "";
-            }
-
             updateRecentSessions(recentSessions) {
-                this.cleanup();
+                // Clear existing event listeners before emptying container
+                document.removeEventListener('click', this.handleOutsideClick);
                 
+                this.container.innerHTML = "";
                 recentSessions.forEach(msg => {
                     const [messageId, time, author, content, msgSessionId, unreadCount] = msg;
 
@@ -446,6 +439,7 @@
                     this.container.appendChild(li);
                 });
 
+                // Add single document click listener for handling outside clicks
                 this.handleOutsideClick = (e) => {
                     const deleteModeLis = this.container.querySelectorAll('.delete-mode');
                     deleteModeLis.forEach(li => {
@@ -461,23 +455,15 @@
             }
         }
 
-        function formatName(name) {
-            if (name.length > 25) {
-                return name.substring(0, 22) + "...";
-            }
-            return name;
-        }
 
-        let component = null;
-        window.addEventListener('load', () => {
-            component = new RecentSessionsComponent('recent-sessions');
-        });
-
-        window.addEventListener('unload', () => {
-            if (component) {
-                component.cleanup();
-            }
-        });
+        const com = new RecentSessionsComponent('recent-sessions');
+        
+function formatName(name) {
+    if (name.length > 25) {
+        return name.substring(0, 22) + "...";
+    }
+    return name;
+}
 
     </script>
 </body>

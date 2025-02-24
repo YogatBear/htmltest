@@ -438,15 +438,11 @@
         function closeChat() {
             document.querySelector('.container').classList.remove('slide-left');
             chatContainer.classList.remove('slide-left');
-            
-            // Wait for animation to complete before clearing and refreshing
+            controller.getRecentSessions(20);
             setTimeout(() => {
                 chatContainer.innerHTML = '';
-                // Force a clean reload of recent sessions
-                const channel = new BroadcastChannel('myChannel');
-                channel.postMessage({ recentSessions: [] }); // Clear current list
-                controller.getRecentSessions(20); // Request fresh data
-            }, 300);
+            }, 300); // Clear chat container after animation
+            //controller.displayBackButton(false);
         }
 
         function makeCall(jsonData) {
