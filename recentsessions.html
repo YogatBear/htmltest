@@ -380,9 +380,8 @@
                     const entry = document.querySelector('.delete-mode');
                     if (entry) {
                         entry.style.transition = 'all 0.3s ease';
-                        entry.style.height = '0';
+                        entry.style.transform = 'translateX(-100%)';
                         entry.style.opacity = '0';
-                        entry.style.padding = '0';
                         setTimeout(() => entry.remove(), 300);
                     }
                     modal.remove();
