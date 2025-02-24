@@ -449,7 +449,6 @@
                     let isLongPress = false;
 
                     const startLongPress = (e) => {
-                        e.preventDefault(); // Prevent default touch/mouse behaviors
                         isLongPress = false;
                         longPressTimer = setTimeout(() => {
                             isLongPress = true;
@@ -457,66 +456,48 @@
                             li.classList.add('delete-mode');
                             this.deleteMode = msgSessionId;
                             const callButton = li.querySelector('.call-button');
-                            const deleteButton = li.querySelector('.delete-button');
                             callButton.style.display = 'none';
                             deleteButton.style.display = 'flex';
                         }, 500);
                     };
 
                     const endLongPress = (e) => {
-                        if (e.type === 'click' || (e.type === 'touchend' && !isLongPress)) {
-                            clearTimeout(longPressTimer);
+                        clearTimeout(longPressTimer);
+                        if (!isLongPress) {
                             if (this.deleteMode === msgSessionId) {
                                 this.exitDeleteMode();
                             } else if (this.deleteMode) {
                                 this.exitDeleteMode();
-                            } else if (!isLongPress) {
+                            } else {
                                 window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
                             }
                         }
                     };
 
-                    // Remove click listener from li element
-                    li.removeEventListener('click', () => {
-                        window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
-                    });
-
-                    // Add separate click handler
-                    li.addEventListener('click', (e) => {
-                        if (!this.deleteMode) {
-                            window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
-                        }
-                    });
-
-                    li.addEventListener('touchstart', startLongPress, { passive: false });
+                    li.addEventListener('touchstart', startLongPress);
                     li.addEventListener('mousedown', startLongPress);
                     li.addEventListener('touchend', endLongPress);
                     li.addEventListener('mouseup', endLongPress);
-                    li.addEventListener('touchmove', () => {
-                        clearTimeout(longPressTimer);
-                        isLongPress = false;
-                    });
-                    li.addEventListener('mouseleave', () => {
-                        clearTimeout(longPressTimer);
-                        isLongPress = false;
-                    });
+                    li.addEventListener('touchmove', () => clearTimeout(longPressTimer));
+                    li.addEventListener('mouseleave', () => clearTimeout(longPressTimer));
 
                     deleteButton.addEventListener('click', (e) => {
-                        e.preventDefault();
                         e.stopPropagation();
                         this.showDeleteConfirmation(msgSessionId);
                     });
 
-                    // Update call button click handler
+                    // Add click handler for call button
+                    const callButton = li.querySelector('.call-button');
                     callButton.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (!this.deleteMode) {
-                            window.parent.postMessage({ 
-                                action: 'call', 
-                                body: { to: msgSessionId }
-                            }, '*');
-                        }
+                        e.stopPropagation(); // Prevent triggering the chat open
+                        window.parent.postMessage({ 
+                            action: 'call', 
+                            body: { to: msgSessionId }
+                        }, '*');
+                    });
+
+                    li.addEventListener('click', () => {
+                        window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
                     });
 
                     document.querySelector("#recent-sessions").appendChild(li);
