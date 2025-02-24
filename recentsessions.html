@@ -441,10 +441,39 @@
                             </button>
                         </div>`;
 
-                    // Get references to buttons
+                    // Create button container and add its listeners FIRST
                     const buttonContainer = li.querySelector('.button-container');
                     const deleteButton = li.querySelector('.delete-button');
                     const callButton = li.querySelector('.call-button');
+
+                    // Delete button click handler
+                    deleteButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.showDeleteConfirmation(msgSessionId);
+                    });
+
+                    // Call button click handler
+                    callButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (!this.deleteMode) {
+                            window.parent.postMessage({ 
+                                action: 'call', 
+                                body: { to: msgSessionId }
+                            }, '*');
+                        }
+                    });
+
+                    // Add click listener to the message content area ONLY, not the entire li
+                    const messageContent = li.querySelector('.message-details');
+                    messageContent.addEventListener('click', () => {
+                        if (this.deleteMode === msgSessionId) {
+                            this.exitDeleteMode();
+                        } else if (!this.deleteMode) {
+                            window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
+                        }
+                    });
 
                     // Long press handler
                     let longPressTimer;
@@ -481,39 +510,6 @@
                     li.addEventListener('mouseup', endLongPress);
                     li.addEventListener('touchmove', () => clearTimeout(longPressTimer));
                     li.addEventListener('mouseleave', () => clearTimeout(longPressTimer));
-
-                    // Delete button click handler
-                    deleteButton.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        this.showDeleteConfirmation(msgSessionId);
-                    }, true); // Use capture phase to handle click first
-
-                    // Call button click handler
-                    callButton.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (!this.deleteMode) {
-                            window.parent.postMessage({ 
-                                action: 'call', 
-                                body: { to: msgSessionId }
-                            }, '*');
-                        }
-                    });
-
-                    // List item click handler - must be last
-                    li.addEventListener('click', (e) => {
-                        // Don't handle clicks on buttons or their children
-                        if (e.target.closest('.button-container')) {
-                            return;
-                        }
-                        
-                        if (this.deleteMode === msgSessionId) {
-                            this.exitDeleteMode();
-                        } else if (!this.deleteMode) {
-                            window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
-                        }
-                    });
 
                     document.querySelector("#recent-sessions").appendChild(li);
                 });
