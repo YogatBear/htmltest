@@ -481,30 +481,35 @@
                     li.addEventListener('touchmove', () => clearTimeout(longPressTimer));
                     li.addEventListener('mouseleave', () => clearTimeout(longPressTimer));
 
-                    // Move this click handler before the delete button click handler
-                    li.addEventListener('click', () => {
-                        if (!this.deleteMode) {
-                            window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
-                        }
-                    });
-
+                    // Delete button click handler
                     deleteButton.addEventListener('click', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        if (this.deleteMode) {
-                            this.showDeleteConfirmation(msgSessionId);
-                        }
+                        this.showDeleteConfirmation(msgSessionId);
+                        return false; // Prevent any other handlers
                     });
 
-                    // Add click handler for call button
+                    // Call button click handler
                     const callButton = li.querySelector('.call-button');
                     callButton.addEventListener('click', (e) => {
-                        e.stopPropagation(); // Prevent triggering the chat open
+                        e.preventDefault();
+                        e.stopPropagation();
                         if (!this.deleteMode) {
                             window.parent.postMessage({ 
                                 action: 'call', 
                                 body: { to: msgSessionId }
                             }, '*');
+                        }
+                        return false; // Prevent any other handlers
+                    });
+
+                    // List item click handler - must be last
+                    li.addEventListener('click', (e) => {
+                        if (e.target.closest('.delete-button') || e.target.closest('.call-button')) {
+                            return; // Don't handle clicks on buttons
+                        }
+                        if (!this.deleteMode) {
+                            window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
                         }
                     });
 
