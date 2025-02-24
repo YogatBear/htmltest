@@ -493,6 +493,11 @@
 
                     const endLongPress = (e) => {
                         clearTimeout(longPressTimer);
+                        // Don't handle button clicks in endLongPress
+                        if (e.target.closest('.button-container')) {
+                            return;
+                        }
+                        
                         if (!isLongPress) {
                             if (this.deleteMode === msgSessionId) {
                                 this.exitDeleteMode();
