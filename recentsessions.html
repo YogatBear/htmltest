@@ -481,23 +481,31 @@
                     li.addEventListener('touchmove', () => clearTimeout(longPressTimer));
                     li.addEventListener('mouseleave', () => clearTimeout(longPressTimer));
 
+                    // Move this click handler before the delete button click handler
+                    li.addEventListener('click', () => {
+                        if (!this.deleteMode) {
+                            window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
+                        }
+                    });
+
                     deleteButton.addEventListener('click', (e) => {
+                        e.preventDefault();
                         e.stopPropagation();
-                        this.showDeleteConfirmation(msgSessionId);
+                        if (this.deleteMode) {
+                            this.showDeleteConfirmation(msgSessionId);
+                        }
                     });
 
                     // Add click handler for call button
                     const callButton = li.querySelector('.call-button');
                     callButton.addEventListener('click', (e) => {
                         e.stopPropagation(); // Prevent triggering the chat open
-                        window.parent.postMessage({ 
-                            action: 'call', 
-                            body: { to: msgSessionId }
-                        }, '*');
-                    });
-
-                    li.addEventListener('click', () => {
-                        window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
+                        if (!this.deleteMode) {
+                            window.parent.postMessage({ 
+                                action: 'call', 
+                                body: { to: msgSessionId }
+                            }, '*');
+                        }
                     });
 
                     document.querySelector("#recent-sessions").appendChild(li);
