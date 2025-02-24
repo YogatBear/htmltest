@@ -382,8 +382,8 @@
                             if (e.target !== callButton && !callButton.contains(e.target)) {
                                 window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
                             }
-                        } else if (!isLongPress && e.target !== callButton && !callButton.contains(e.target)) {
-                            // Only exit delete mode if clicking on the session, not the delete button
+                        } else if (!isLongPress) {
+                            // If it's a short press and in delete mode, exit delete mode
                             li.classList.remove('delete-mode');
                             const icon = callButton.querySelector('i');
                             icon.textContent = 'call';
