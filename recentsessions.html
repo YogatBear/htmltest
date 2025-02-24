@@ -432,17 +432,19 @@
                                 <span class="message-time">${timeOrDate}</span>
                             </div>
                         </div>
-                        <button class="call-button">
-                            <i class="material-icons">call</i>
-                        </button>`;
+                        <div class="button-container">
+                            <button class="call-button">
+                                <i class="material-icons">call</i>
+                            </button>
+                            <button class="delete-button" style="display: none;">
+                                <i class="material-icons">delete</i>
+                            </button>
+                        </div>`;
 
-                    // Add delete button (initially hidden)
-                    const buttonContainer = li.querySelector('.call-button').parentElement;
-                    const deleteButton = document.createElement('button');
-                    deleteButton.className = 'delete-button';
-                    deleteButton.style.display = 'none';
-                    deleteButton.innerHTML = '<i class="material-icons">delete</i>';
-                    buttonContainer.appendChild(deleteButton);
+                    // Get references to buttons
+                    const buttonContainer = li.querySelector('.button-container');
+                    const deleteButton = li.querySelector('.delete-button');
+                    const callButton = li.querySelector('.call-button');
 
                     // Long press handler
                     let longPressTimer;
@@ -455,7 +457,6 @@
                             this.exitDeleteMode();
                             li.classList.add('delete-mode');
                             this.deleteMode = msgSessionId;
-                            const callButton = li.querySelector('.call-button');
                             callButton.style.display = 'none';
                             deleteButton.style.display = 'flex';
                         }, 500);
@@ -490,7 +491,6 @@
                     });
 
                     // Call button click handler
-                    const callButton = li.querySelector('.call-button');
                     callButton.addEventListener('click', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
