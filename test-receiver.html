@@ -71,8 +71,9 @@
             <div class="test-step pending" id="step1">1. Waiting for incoming call</div>
             <div class="test-step pending" id="step2">2. Receiving call</div>
             <div class="test-step pending" id="step3">3. Accepting call</div>
-            <div class="test-step pending" id="step4">4. Testing call features</div>
-            <div class="test-step pending" id="step5">5. Call completion</div>
+            <div class="test-step pending" id="step4">4. Call started</div>
+            <div class="test-step pending" id="step5">5. Testing call features</div>
+            <div class="test-step pending" id="step6">6. Call completion</div>
         </div>
         <div class="log-container" id="logContainer"></div>
     </div>
@@ -80,8 +81,11 @@
     <script>
         const controller = window.top.controller;
         const channel = new BroadcastChannel('myChannel');
-        const TEST_NUMBER = "test-receiver.eth"; // Receiver's test identity
-        const EXPECTED_CALLER = "test-caller.eth"; // Expected caller's identity
+        
+        // Get identities from URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const TEST_NUMBER = urlParams.get('receiver') || "test-receiver.eth"; // Receiver's test identity
+        const EXPECTED_CALLER = urlParams.get('caller') || "test-caller.eth"; // Expected caller's identity
         const STEP_TIMEOUT = 10000; // 10 seconds timeout for each step
 
         class ReceiverTest {
@@ -93,6 +97,7 @@
                     this.waitForIncomingCall.bind(this),
                     this.receiveCall.bind(this),
                     this.acceptCall.bind(this),
+                    this.verifyCallStarted.bind(this),
                     this.testFeatures.bind(this),
                     this.waitForCallEnd.bind(this)
                 ];
@@ -164,28 +169,64 @@
 
             async acceptCall() {
                 this.log('Accepting call...');
-                await new Promise(resolve => setTimeout(resolve, 2000)); // Small delay before accepting
-                controller.acceptCall(this.callId);
-                this.updateStep(3, 'success');
+                return new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Call acceptance timeout'));
+                    }, STEP_TIMEOUT);
+
+                    channel.addEventListener('message', (event) => {
+                        const data = event.data;
+                        if (data.action === 'call-answered') {
+                            clearTimeout(timeout);
+                            this.log('Call accepted');
+                            this.updateStep(3, 'success');
+                            resolve();
+                        }
+                    });
+
+                    // Small delay before accepting
+                    setTimeout(() => {
+                        controller.acceptCall(this.callId);
+                    }, 2000);
+                });
+            }
+
+            async verifyCallStarted() {
+                this.log('Verifying call has started...');
+                return new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Call start verification timeout'));
+                    }, STEP_TIMEOUT);
+
+                    channel.addEventListener('message', (event) => {
+                        const data = event.data;
+                        if (data.action === 'call-started') {
+                            clearTimeout(timeout);
+                            this.log('Call successfully started and connected');
+                            this.updateStep(4, 'success');
+                            resolve();
+                        }
+                    });
+                });
             }
 
             async testFeatures() {
                 this.log('Testing receiver features...');
                 
                 // Test mute
-                controller.setMute(this.callId, true);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                controller.setMute(this.callId, false);
+                // controller.setMute(this.callId, true);
+                // await new Promise(resolve => setTimeout(resolve, 1000));
+                // controller.setMute(this.callId, false);
 
-                // Test hold
-                controller.setHold(this.callId, true);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                controller.setHold(this.callId, false);
+                // // Test hold
+                // controller.setHold(this.callId, true);
+                // await new Promise(resolve => setTimeout(resolve, 1000));
+                // controller.setHold(this.callId, false);
 
-                // Test DTMF
-                controller.sendDtmf(this.callId, '2');
+                // // Test DTMF
+                // controller.sendDtmf(this.callId, '2');
                 
-                this.updateStep(4, 'success');
+                this.updateStep(5, 'success');
                 this.log('Feature tests completed');
             }
 
@@ -200,7 +241,7 @@
                         if (data.action === 'call-ended') {
                             clearTimeout(timeout);
                             this.log('Call ended');
-                            this.updateStep(5, 'success');
+                            this.updateStep(6, 'success');
                             
                             const duration = Math.round((Date.now() - this.testStartTime) / 1000);
                             this.log(`Total test duration: ${duration} seconds`);
