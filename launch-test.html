@@ -31,7 +31,6 @@
             const urlParams = new URLSearchParams(window.location.search);
             const caller = urlParams.get('caller') || "test-caller.eth";
         const receiver = urlParams.get('receiver') || "test-receiver.eth";
-        document.getElementById('receiverFrame').src = `test-receiver.html?caller=${encodeURIComponent(caller)}&receiver=${encodeURIComponent(receiver)}`;
             const testUrl = 'index.html?screen=TEST&pid=test-pid&localId=test-local-id';
             window.location.href = testUrl;
         }
