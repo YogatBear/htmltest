@@ -30,8 +30,8 @@
         function launchTest() {
             const urlParams = new URLSearchParams(window.location.search);
             const caller = urlParams.get('caller') || "test-caller.eth";
-        const receiver = urlParams.get('receiver') || "test-receiver.eth";
-            const testUrl = 'index.html?screen=TEST&pid=test-pid&localId=test-local-id';
+            const receiver = urlParams.get('receiver') || "test-receiver.eth";
+            const testUrl = `index.html?screen=TEST&caller=${encodeURIComponent(caller)}&receiver=${encodeURIComponent(receiver)}`;
             window.location.href = testUrl;
         }
     </script>
