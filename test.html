@@ -96,6 +96,12 @@
 
     <script>
         const controller = window.top.controller;
+
+        if (!controller) {
+            document.getElementById('testStatus').textContent = 'Error: Controller not initialized. Please load through index.html?screen=TEST';
+            throw new Error('Controller not initialized. Please load through index.html?screen=TEST');
+        }
+
         const channel = new BroadcastChannel('myChannel');
         const TEST_NUMBER = "test.eth"; // Replace with your test number
         const STEP_TIMEOUT = 10000; // 10 seconds timeout for each step

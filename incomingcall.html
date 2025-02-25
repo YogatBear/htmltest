@@ -14,7 +14,6 @@
             --purple-gradient: linear-gradient(135deg, var(--secondary-purple) 0%, var(--dark-purple) 100%);
             --success-green: #34c759;
             --danger-red: #ff3b30;
-            --glass-effect: rgba(255, 255, 255, 0.1);
         }
         
         body {
@@ -150,24 +149,6 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
-        .test-button {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--glass-effect);
-            border: none;
-            border-radius: 8px;
-            padding: 10px 15px;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-
-        .test-button:hover {
-            background: rgba(255, 255, 255, 0.25);
-        }
     </style>
 </head>
 <body>
@@ -186,42 +167,22 @@
             </button>
         </div>
     </div>
-    <button class="test-button" id="testButton">Start Test</button>
     <script>
         const controller = window.top.controller;
         const urlParams = new URLSearchParams(window.location.search);
-        const from = decodeURIComponent(urlParams.get('from'));
-        let canAcceptCall = false;
+        const remoteId = decodeURIComponent(urlParams.get('from'));
         
-        if(from) {
-            document.querySelector("#name").textContent = from;
+        if(remoteId) {
+            document.querySelector(".identity").textContent = remoteId;
         }
         
-        document.querySelector(".hang-up-button").addEventListener("click", () => {
-            controller.rejectCall(from);
+        document.getElementById("acceptButton").addEventListener("click", () => {
+            controller.acceptCall(remoteId);
+            //window.location.href = 'incall.html?to=' + remoteId;
         });
-
-        document.querySelector("#testButton").addEventListener("click", () => {
-            // Simulate native response
-            window.dispatchEvent(new MessageEvent('message', {
-                data: {
-                    action: 'can-accept-call',
-                    body: { callId: from }
-                }
-            }));
-        });
-
-        // Listen for native response
-        window.addEventListener('message', (event) => {
-            const data = event.data;
-            if (data.action === 'can-accept-call' && data.body.callId === from) {
-                canAcceptCall = true;
-                document.querySelector(".hang-up-button").addEventListener("click", () => {
-                    if (canAcceptCall) {
-                        controller.acceptCall(from);
-                    }
-                });
-            }
+        
+        document.getElementById("rejectButton").addEventListener("click", () => {
+            controller.rejectCall(remoteId);
         });
     </script>
 </body>

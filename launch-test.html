@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Launch Tests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .launch-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #6a5acd;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Launcher</h1>
+    <p>Click the button below to launch the test suite:</p>
+    <button class="launch-button" onclick="launchTest()">Launch Test</button>
+
+    <script>
+        function launchTest() {
+            const testUrl = 'index.html?screen=TEST&pid=test-pid&localId=test-local-id';
+            window.location.href = testUrl;
+        }
+    </script>
+</body>
+</html> 
