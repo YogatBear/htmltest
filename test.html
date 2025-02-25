@@ -106,7 +106,11 @@
         
         // Get test number from URL params
         const urlParams = new URLSearchParams(window.location.search);
-        const TEST_NUMBER = urlParams.get('receiver') || "test.eth"; // Default fallback
+        const caller = urlParams.get('caller') || "test-caller.eth";
+        const receiver = urlParams.get('receiver') || "test-receiver.eth";
+        document.getElementById('receiverFrame').src = `test-receiver.html?caller=${encodeURIComponent(caller)}&receiver=${encodeURIComponent(receiver)}`;
+        const TEST_NUMBER = receiver;
+        
         const STEP_TIMEOUT = 10000; // 10 seconds timeout for each step
 
         class CallTest {
