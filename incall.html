@@ -421,13 +421,6 @@
             }
         }
 
-        moreButton.addEventListener('click', () => {
-            if (dialerContainer.classList.contains('open')) {
-                dialerContainer.classList.remove('open');
-            }
-            topRow.classList.toggle('open');
-        });
-
         dialerButton.addEventListener('click', () => {
             if (topRow.classList.contains('open')) {
                 topRow.classList.remove('open');
