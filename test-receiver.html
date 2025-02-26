@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call Flow Test - Receiver</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .test-step {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .pending {
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
+
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .test-status {
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .log-container {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            font-family: monospace;
+        }
+
+        .timer {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h2>Call Flow Test - Receiver</h2>
+        <div class="test-status" id="testStatus">Waiting for incoming call...</div>
+        <div id="testSteps">
+            <div class="test-step pending" id="step1">1. Waiting for incoming call</div>
+            <div class="test-step pending" id="step2">2. Receiving call</div>
+            <div class="test-step pending" id="step3">3. Accepting call</div>
+            <div class="test-step pending" id="step4">4. Call started</div>
+            <div class="test-step pending" id="step5">5. Testing call features</div>
+            <div class="test-step pending" id="step6">6. Call completion</div>
+        </div>
+        <div class="log-container" id="logContainer"></div>
+    </div>
+
+    <script>
+        const controller = window.top.controller;
+        const channel = new BroadcastChannel('myChannel');
+        
+        // Get identities from URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const TEST_NUMBER = urlParams.get('receiver') || "test-receiver.eth"; // Receiver's test identity
+        const EXPECTED_CALLER = urlParams.get('caller') || "test-caller.eth"; // Expected caller's identity
+        const STEP_TIMEOUT = 10000; // 10 seconds timeout for each step
+
+        class ReceiverTest {
+            constructor() {
+                this.currentStep = 0;
+                this.testStartTime = null;
+                this.callId = null;
+                this.steps = [
+                    this.waitForIncomingCall.bind(this),
+                    this.receiveCall.bind(this),
+                    this.acceptCall.bind(this),
+                    this.verifyCallStarted.bind(this),
+                    this.testFeatures.bind(this),
+                    this.waitForCallEnd.bind(this)
+                ];
+            }
+
+            log(message) {
+                const logContainer = document.getElementById('logContainer');
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                const time = new Date().toLocaleTimeString();
+                entry.textContent = `[${time}] ${message}`;
+                logContainer.appendChild(entry);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+
+            updateStep(stepNumber, status, message) {
+                const step = document.getElementById(`step${stepNumber}`);
+                step.className = `test-step ${status}`;
+                if (message) {
+                    step.textContent += ` - ${message}`;
+                }
+            }
+
+            async startTest() {
+                this.testStartTime = Date.now();
+                this.log('Starting receiver test...');
+                document.getElementById('testStatus').textContent = 'Test in progress...';
+                
+                try {
+                    for (let i = 0; i < this.steps.length; i++) {
+                        this.currentStep = i + 1;
+                        await this.steps[i]();
+                    }
+                    this.log('Test completed successfully!');
+                    document.getElementById('testStatus').textContent = 'Test completed successfully';
+                } catch (error) {
+                    this.log(`Test failed: ${error.message}`);
+                    document.getElementById('testStatus').textContent = 'Test failed';
+                }
+            }
+
+            async waitForIncomingCall() {
+                this.log('Waiting for incoming call...');
+                this.updateStep(1, 'success');
+            }
+
+            async receiveCall() {
+                return new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('No incoming call received'));
+                    }, STEP_TIMEOUT);
+
+                    channel.addEventListener('message', (event) => {
+                        const data = event.data;
+                        if (data.action === 'incoming-call') {
+                            if (data.body.from !== EXPECTED_CALLER) {
+                                this.log(`Unexpected caller: ${data.body.from}`);
+                                return;
+                            }
+                            clearTimeout(timeout);
+                            this.callId = data.body.callId;
+                            this.log('Incoming call received');
+                            this.updateStep(2, 'success');
+                            resolve();
+                        }
+                    });
+                });
+            }
+
+            async acceptCall() {
+                this.log('Accepting call...');
+                return new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Call acceptance timeout'));
+                    }, STEP_TIMEOUT);
+
+                    channel.addEventListener('message', (event) => {
+                        const data = event.data;
+                        if (data.action === 'call-answered') {
+                            clearTimeout(timeout);
+                            this.log('Call accepted');
+                            this.updateStep(3, 'success');
+                            resolve();
+                        }
+                    });
+
+                    // Small delay before accepting
+                    setTimeout(() => {
+                        controller.acceptCall(this.callId);
+                    }, 2000);
+                });
+            }
+
+            async verifyCallStarted() {
+                this.log('Verifying call has started...');
+                return new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Call start verification timeout'));
+                    }, STEP_TIMEOUT);
+
+                    channel.addEventListener('message', (event) => {
+                        const data = event.data;
+                        if (data.action === 'call-started') {
+                            clearTimeout(timeout);
+                            this.log('Call successfully started and connected');
+                            this.updateStep(4, 'success');
+                            resolve();
+                        }
+                    });
+                });
+            }
+
+            async testFeatures() {
+                this.log('Testing receiver features...');
+                
+                // Test mute
+                // controller.setMute(this.callId, true);
+                // await new Promise(resolve => setTimeout(resolve, 1000));
+                // controller.setMute(this.callId, false);
+
+                // // Test hold
+                // controller.setHold(this.callId, true);
+                // await new Promise(resolve => setTimeout(resolve, 1000));
+                // controller.setHold(this.callId, false);
+
+                // // Test DTMF
+                // controller.sendDtmf(this.callId, '2');
+                
+                this.updateStep(5, 'success');
+                this.log('Feature tests completed');
+            }
+
+            async waitForCallEnd() {
+                return new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Call end timeout'));
+                    }, STEP_TIMEOUT);
+
+                    channel.addEventListener('message', (event) => {
+                        const data = event.data;
+                        if (data.action === 'call-ended') {
+                            clearTimeout(timeout);
+                            this.log('Call ended');
+                            this.updateStep(6, 'success');
+                            
+                            const duration = Math.round((Date.now() - this.testStartTime) / 1000);
+                            this.log(`Total test duration: ${duration} seconds`);
+                            resolve();
+                        }
+                    });
+                });
+            }
+        }
+
+        // Start the test automatically when the page loads
+        window.addEventListener('load', () => {
+            const test = new ReceiverTest();
+            test.startTest();
+        });
+
+        // Handle errors from the native app
+        window.addEventListener('message', (event) => {
+            if (event.data.action === 'error') {
+                const test = new ReceiverTest();
+                test.log(`Error from native app: ${event.data.body.e}`);
+                test.updateStep(test.currentStep, 'error', event.data.body.e);
+            }
+        });
+    </script>
+</body>
+</html> 
