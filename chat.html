@@ -664,9 +664,38 @@
           if (msgSessionId === sessionId) {
             updateMessage(messageId, content, msgStatus);
           }
+        } else if (data.imagePickerResult) {
+          // Create iframe and show image directly
+          const iframe = document.createElement('iframe');
+          iframe.style.position = 'fixed';
+          iframe.style.top = '0';
+          iframe.style.left = '0';
+          iframe.style.width = '100%';
+          iframe.style.height = '100%';
+          iframe.style.border = 'none';
+          iframe.style.zIndex = '1000';
+          iframe.src = 'imagepicker.html#' + encodeURIComponent(data.imagePickerResult);
+          document.body.appendChild(iframe);
         }
       } catch (error) {
         console.error("Error processing message data:", error);
+      }
+    });
+
+    // Add message handler for iframe communications
+    window.addEventListener('message', (event) => {
+      if (event.data.action === 'closeImagePicker') {
+        const iframe = document.querySelector('iframe');
+        if (iframe) iframe.remove();
+      } else if (event.data.action === 'sendImage') {
+        const iframe = document.querySelector('iframe');
+        if (iframe) iframe.remove();
+        
+        // Send the image message
+        if (event.data.body.caption) {
+          controller.sendMessage(sessionId, event.data.body.caption);
+        }
+        controller.sendImage(sessionId, event.data.body.image);
       }
     });
 

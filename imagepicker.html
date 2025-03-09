@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Preview</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --secondary-purple: #6a5acd;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #000;
+        }
+
+        #top-bar {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        #back-button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        #image-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #preview-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        #bottom-bar {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            gap: 10px;
+        }
+
+        #caption-input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 24px;
+            border: none;
+            background: #333;
+            color: white;
+            font-size: 16px;
+        }
+
+        #send-button {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            background: var(--secondary-purple);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        #send-button:active {
+            transform: scale(0.95);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            #send-button {
+                background: rgba(20, 20, 30, 1);
+                border: 2px solid rgba(255, 255, 255, 0.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="top-bar">
+        <button id="back-button">
+            <span class="material-icons">arrow_back</span>
+        </button>
+    </div>
+    
+    <div id="image-container">
+        <img id="preview-image" alt="Preview">
+    </div>
+    
+    <div id="bottom-bar">
+        <input type="text" id="caption-input" placeholder="Add a caption...">
+        <button id="send-button">
+            <span class="material-icons">send</span>
+        </button>
+    </div>
+
+    <script>
+        const backButton = document.getElementById('back-button');
+        const sendButton = document.getElementById('send-button');
+        const captionInput = document.getElementById('caption-input');
+        const previewImage = document.getElementById('preview-image');
+
+        // Get image data from URL hash
+        const imageData = decodeURIComponent(window.location.hash.slice(1));
+        previewImage.src = imageData;
+
+        // Handle back button
+        backButton.addEventListener('click', () => {
+            window.parent.postMessage({ action: 'closeImagePicker' }, '*');
+        });
+
+        // Handle send button
+        sendButton.addEventListener('click', () => {
+            const caption = captionInput.value.trim();
+            window.parent.postMessage({
+                action: 'sendImage',
+                body: {
+                    image: previewImage.src,
+                    caption: caption
+                }
+            }, '*');
+        });
+    </script>
+</body>
+</html> 
