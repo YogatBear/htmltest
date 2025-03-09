@@ -228,6 +228,14 @@
                 };
                 this.sendMessageToNativeApp(deleteSessionRequest);
             }
+
+            imagePicker() {
+                const request = {
+                    action: "image-picker",
+                    body: { localId: this.localId, pid: this.pid }
+                };
+                this.sendMessageToNativeApp(request);
+            }
         }
 
     </script>

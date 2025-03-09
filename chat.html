@@ -300,6 +300,33 @@
     .system-message-time + .system-message {
       margin-top: 4px;  /* Reduced margin after timestamp */
     }
+
+    /* Add this to the style section */
+    #image-button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: var(--secondary-purple);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-right: 4px;
+    }
+
+    #image-button i {
+      font-size: 20px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      #image-button {
+        background-color: var(--purple-gradient);
+        background: rgba(20, 20, 30, 1);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+      }
+    }
   </style>
 </head>
 
@@ -317,9 +344,12 @@
   </div>
   <div id="chat-container"></div>
   <div class="message-input">
+    <button id="image-button">
+      <i class="material-icons">image</i>
+    </button>
     <input type="text" id="message-text" placeholder="Type a message..." />
     <button id="send-button">
-        <i class="material-icons">send</i>
+      <i class="material-icons">send</i>
     </button>
   </div>
 
@@ -332,7 +362,7 @@
     const chatContainer = document.getElementById('chat-container');
     const messageText = document.getElementById('message-text');
     const sendButton = document.getElementById('send-button');
-
+    const imageButton = document.getElementById('image-button');
     controller.getMessages(sessionId, 20, "");
 
     window.addEventListener('popstate', function(event) {
@@ -541,6 +571,11 @@
       if (e.key === 'Enter') {
         sendButton.click();
       }
+    });
+
+    imageButton.addEventListener('click', () => {
+      console.log("Choosing image");
+      controller.imagePicker();
     });
 
     // Add scroll event listener for infinite scrolling
