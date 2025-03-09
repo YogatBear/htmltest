@@ -618,6 +618,7 @@
 
     channel.addEventListener('message', (event) => {
       try {
+        console.log("Received channel message:", event.data);
         const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
         if (data.message) {
           console.log("Received single message data:", data.message);
