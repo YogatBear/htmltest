@@ -665,6 +665,7 @@
             updateMessage(messageId, content, msgStatus);
           }
         } else if (data.imagePickerResult) {
+          console.log("Received imagePickerResult data:", data.imagePickerResult);
           // Create iframe and show image directly
           const iframe = document.createElement('iframe');
           iframe.style.position = 'fixed';
