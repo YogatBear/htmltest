@@ -236,6 +236,14 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+
+            sendImageMessage(sessionId, imageUri, caption) {
+                const request = {
+                    action: "send-image-message",
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId, imageUri: imageUri, content: caption }
+                };
+                this.sendMessageToNativeApp(request);
+            }
         }
 
     </script>

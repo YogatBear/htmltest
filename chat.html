@@ -676,7 +676,13 @@
           iframe.style.height = '100%';
           iframe.style.border = 'none';
           iframe.style.zIndex = '1000';
-          iframe.src = 'imagepicker.html#' + encodeURIComponent(data.imagePickerResult);
+          
+          // Pass both the image data and URI to the imagepicker
+          const params = new URLSearchParams();
+          params.set('imageData', data.imagePickerResult);
+          params.set('imageUri', data.imageUri || '');
+          iframe.src = 'imagepicker.html#' + encodeURIComponent(params.toString());
+          
           document.body.appendChild(iframe);
         }
       } catch (error) {
@@ -684,7 +690,7 @@
       }
     });
 
-    // Add message handler for iframe communications
+    // Update message handler for iframe communications
     window.addEventListener('message', (event) => {
       if (event.data.action === 'closeImagePicker') {
         const iframe = document.querySelector('iframe');
@@ -693,11 +699,12 @@
         const iframe = document.querySelector('iframe');
         if (iframe) iframe.remove();
         
-        // Send the image message
-        if (event.data.body.caption) {
-          controller.sendMessage(sessionId, event.data.body.caption);
-        }
-        controller.sendImage(sessionId, event.data.body.image);
+        // Call controller method with all required parameters
+        controller.sendImageMessage(
+          sessionId,
+          event.data.body.imageUri,
+          event.data.body.caption || ''
+        );
       }
     });
 
