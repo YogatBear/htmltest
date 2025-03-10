@@ -9,12 +9,12 @@
   <style>
     :root {
       --primary-white: #ffffff;
-      --secondary-purple: #6a5acd;
+      --secondary-purple: rgb(115, 66, 160);
       --light-purple: #9370db;
       --dark-purple: #4b0082;
       --purple-gradient: linear-gradient(135deg, var(--primary-white) 0%, var(--light-purple) 100%);
       --glass-bg: rgba(255, 255, 255, 0.1);
-      --glass-border: rgba(255, 255, 255, 0.2);
+      --glass-border: rgba(200, 200, 200, 0.7);
     }
     * {
       margin: 0;
@@ -24,7 +24,7 @@
     }
     body {
       font-family: 'Poppins', sans-serif;
-      background: var(--purple-gradient);
+      /* background: var(--purple-gradient); */
       background-size: 200% 200%;
       animation: gradientAnimation 15s ease infinite;
       height: 100vh;
@@ -67,6 +67,7 @@
     .message.received {
       float: left;
       background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(200, 200, 200, 0.8);
       color: var(--dark-purple);
       border-bottom-left-radius: 4px;
     }
@@ -261,7 +262,7 @@
       }
       #chat-container {
         background-color: var(--purple-gradient);
-        background: rgba(20, 20, 30, 0.8);
+        background: rgb(46, 46, 46);
       }
       .message-input {
         background-color: var(--purple-gradient);
@@ -288,7 +289,7 @@
     /* Add a wrapper div for system message content */
     .system-message-content {
       display: inline-block;
-      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(200, 200, 200, 0.5);
       padding: 6px 12px;
       border-radius: 12px;
       font-size: 12px;
@@ -325,6 +326,16 @@
         background-color: var(--purple-gradient);
         background: rgba(20, 20, 30, 1);
         border: 2px solid rgba(255, 255, 255, 0.5);
+      }
+      .system-message-content {
+        color: rgba(255, 255, 255, 0.9);
+      }
+      .date-separator span {
+        color: rgba(255, 255, 255, 0.9);
+        background: none;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+
+
       }
     }
   </style>
@@ -553,6 +564,9 @@
     function closeChat() {
         window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
     }
+    // addMessage("Encryption key received", "SYSTEM", Date.now(), "text", null, null, false);
+    // addMessage("Hey girlll", "testing", Date.now(), "text", null, null, false);
+    // addMessage("Wassup", "dukedennis.eth", Date.now(), "text", null, null, false);
 
     document.getElementById("back-button").addEventListener("click", () => {
         window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');

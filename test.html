@@ -103,14 +103,7 @@
         }
 
         const channel = new BroadcastChannel('myChannel');
-        
-        // Get test number from URL params
-        const urlParams = new URLSearchParams(window.location.search);
-        const caller = urlParams.get('caller') || "test-caller.eth";
-        const receiver = urlParams.get('receiver') || "test-receiver.eth";
-        document.getElementById('receiverFrame').src = `test-receiver.html?caller=${encodeURIComponent(caller)}&receiver=${encodeURIComponent(receiver)}`;
-        const TEST_NUMBER = receiver;
-        
+        const TEST_NUMBER = "test.eth"; // Replace with your test number
         const STEP_TIMEOUT = 10000; // 10 seconds timeout for each step
 
         class CallTest {
@@ -270,11 +263,10 @@
             const testFrame = window.frames['test-receiver'];
             testFrame.postMessage({
                 action: 'receiving-call',
-                body: { from: TEST_NUMBER }
+                body: { from: 'test.eth' }
             }, '*');
         });
     </script>
-    <iframe name="test-receiver" id="receiverFrame" style="width:100%;height:90vh;border:none;"></iframe>
-
+    <iframe name="test-receiver" src="test-receiver.html" style="width:100%;height:90vh;border:none;"></iframe>
 </body>
 </html> 

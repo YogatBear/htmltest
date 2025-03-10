@@ -81,11 +81,8 @@
     <script>
         const controller = window.top.controller;
         const channel = new BroadcastChannel('myChannel');
-        
-        // Get identities from URL params
-        const urlParams = new URLSearchParams(window.location.search);
-        const TEST_NUMBER = urlParams.get('receiver') || "test-receiver.eth"; // Receiver's test identity
-        const EXPECTED_CALLER = urlParams.get('caller') || "test-caller.eth"; // Expected caller's identity
+        const TEST_NUMBER = "test-receiver.eth"; // Receiver's test identity
+        const EXPECTED_CALLER = "test-caller.eth"; // Expected caller's identity
         const STEP_TIMEOUT = 10000; // 10 seconds timeout for each step
 
         class ReceiverTest {
