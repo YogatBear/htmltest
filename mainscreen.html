@@ -280,6 +280,7 @@
         const remoteId = urlParams.get('remoteId');
 
         if(remoteId != null) {
+            console.log("opening chat" + remoteId);
             openChat(remoteId);
         }
 
@@ -355,6 +356,16 @@
             document.querySelector('.container').classList.remove('slide-left');
             chatContainer.classList.remove('slide-left');
             controller.getRecentSessions(20);
+            
+            // Update the URL in the parent window to reflect we're back to main screen
+            if (window.parent && window.parent !== window) {
+                console.log("updating url");
+                const currentUrl = new URL(window.parent.location.href);
+                currentUrl.searchParams.set('screen', 'MAIN');
+                currentUrl.searchParams.set('remoteId', 'null');
+                window.parent.history.replaceState({}, '', currentUrl.toString());
+            }
+            
             setTimeout(() => {
                 chatContainer.innerHTML = '';
             }, 300);

@@ -209,6 +209,27 @@
                     console.log('Unknown action:', action);
                     break;
             }
+
+            // Handle URL update requests from iframe children
+            if (action === 'update-url') {
+                try {
+                    console.log("Received request to update URL");
+                    const currentUrl = new URL(window.location.href);
+                    
+                    // Update parameters from the request
+                    if (body) {
+                        Object.keys(body).forEach(key => {
+                            currentUrl.searchParams.set(key, body[key]);
+                        });
+                    }
+                    
+                    // Update the URL
+                    history.replaceState({}, '', currentUrl.toString());
+                    console.log("URL updated to:", currentUrl.toString());
+                } catch (e) {
+                    console.error("Error updating URL in parent:", e);
+                }
+            }
         });
     </script>
     <iframe id="error-frame" src="errorwindow.html" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;"></iframe>
