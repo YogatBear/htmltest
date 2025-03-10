@@ -4,28 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Purple Connect</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide-icons/0.321.0/font/lucide.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Text:wght@400;500;600&display=swap');
+
+        :root {
+            --primary-white: #ffffff;
+            --secondary-purple: rgb(115, 66, 160);
+            --light-purple: #8e8aff;
+            --dark-purple: #3634a3;
+            --purple-10: rgba(115, 66, 160, 0.1);
+            --purple-20: rgba(115, 66, 160, 0.2);
+            --system-gray: #f2f2f7;
+            --system-gray2: #e5e5ea;
+            --text-primary: #000000;
+            --text-secondary: #8e8e93;
+            --separator-color: rgba(60, 60, 67, 0.12);
+            --background-color: #ffffff;
+            --input-bg: #f2f2f7;
+            --shadow-color: rgba(115, 66, 160, 0.3);
+            --shadow-color-active: rgba(115, 66, 160, 0.2);
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-white: #1a1a1a;
+                --secondary-purple: rgb(138, 93, 180);
+                --light-purple: #a28bc7;
+                --dark-purple: #5e3b88;
+                --purple-10: rgba(138, 93, 180, 0.15);
+                --purple-20: rgba(138, 93, 180, 0.25);
+                --system-gray: #2c2c2e;
+                --system-gray2: #3a3a3c;
+                --text-primary: #ffffff;
+                --text-secondary: #aeaeb2;
+                --separator-color: rgba(200, 200, 205, 0.12);
+                --background-color: rgb(23, 23, 23);
+                --input-bg: #2c2c2e;
+                --shadow-color: rgba(0, 0, 0, 0.5);
+                --shadow-color-active: rgba(0, 0, 0, 0.7);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            font-family: -apple-system, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            background-color: var(--background-color);
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            -webkit-user-select: none;
+        }
 
         .container {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: white;
-            padding: 20px 20px 0;
-            box-sizing: border-box;
             width: 100%;
             height: 100vh;
-            overflow-y: auto;
-            /* Add hardware acceleration */
+            background-color: var(--background-color);
+            position: relative;
             transform: translateZ(0);
             -webkit-transform: translateZ(0);
             will-change: transform;
-        }
-        .container, #chat-container {
-            transition: transform 0.25s cubic-bezier(0.1, 0.7, 0.1, 1);
+            transition: transform 0.35s cubic-bezier(0.28, 0.11, 0.32, 1);
+            overflow: hidden;
         }
 
         #chat-container {
@@ -34,304 +90,143 @@
             left: 100%;
             width: 100%;
             height: 100%;
-            background: white;
-            /* Add hardware acceleration */
+            background-color: var(--background-color);
             transform: translateZ(0);
             -webkit-transform: translateZ(0);
             will-change: transform;
+            transition: transform 0.35s cubic-bezier(0.28, 0.11, 0.32, 1);
+            z-index: 10;
         }
 
         .slide-left {
-            /* Make animation simpler by only using transform */
-            transform: translateX(-100%) translateZ(0);
-            -webkit-transform: translateX(-100%) translateZ(0);
+            transform: translateX(-100%) translateZ(0) !important;
+            -webkit-transform: translateX(-100%) translateZ(0) !important;
         }
 
-
-        :root {
-            --primary-white: #ffffff;
-            --secondary-purple: #6a5acd;
-            --light-purple: #9370db;
-            --dark-purple: #4b0082;
-            --purple-gradient: linear-gradient(135deg, var(--secondary-purple) 0%, var(--dark-purple) 100%);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
+        /* Clean header with just search bar */
+        .header {
+            padding: 12px 16px;
+            background-color: var(--background-color);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            border-bottom: 0.5px solid var(--separator-color);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        html, body {
-            height: 100%;
-            font-family: 'Poppins', sans-serif;
-            background: var(--purple-gradient);
-            background-size: 200% 200%;
-            animation: gradientAnimation 15s ease infinite;
-            color: var(--dark-purple);
-            overflow-x: hidden;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            user-select: none;
-            -webkit-user-select: none; /* Prevent text selection */
-        }
-        .slide-left {
-            transform: translateX(-100%);
-        }
-        .container {
-            width:100%;
-            /* max-width: 600px; */
-            margin: 0 auto;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            position: relative;
-            overflow: hidden;
-        }
-
+        /* Larger, cleaner search bar */
         .input-container {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
-            position: relative;
-            gap: 10px;
-            background: white;
-            padding: 8px 12px;
-            border-radius: 25px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: var(--input-bg);
+            padding: 0 12px;
+            border-radius: 12px;
+            height: 44px;
             width: 100%;
             box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        .input-container:focus-within {
+            background-color: var(--purple-10);
+            border: 1px solid var(--secondary-purple);
         }
 
         .input-icon {
-            position: static;
             color: var(--secondary-purple);
-            display: flex;
-            align-items: center;
+            font-size: 22px !important;
+            margin-right: 8px;
         }
 
         input[type="text"] {
             flex: 1;
-            padding: 8px;
+            height: 44px;
+            padding: 0;
             border: none;
-            border-radius: 0;
-            font-size: 16px;
+            font-size: 17px;
             background: transparent;
-            /* color: var(--dark-purple); */
+            color: var(--text-primary);
             outline: none;
-            min-width: 0; /* Prevents input from overflowing */
+            min-width: 0;
+            font-weight: 400;
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-left: 8px;
         }
 
         .action-button {
-            background: transparent;
-            color: var(--secondary-purple);
             width: 40px;
             height: 40px;
-            padding: 8px;
-            border: none;
             border-radius: 50%;
-            cursor: pointer;
+            background-color: var(--secondary-purple);
+            color: white;
+            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent; /* Removes tap highlight on iOS */
-            -webkit-touch-callout: none; /* Prevents callout to copy image, etc on iOS */
-            outline: none; /* Removes focus outline */
-        }
-
-        .action-button i {
-            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            transition: all 0.2s ease;
+            padding: 0;
         }
 
         .action-button:active {
-            background-color: rgba(106, 90, 205, 0.1);
+            transform: scale(0.92);
+            background-color: var(--dark-purple);
+            box-shadow: 0 1px 3px var(--shadow-color-active);
         }
 
-        .action-button::before {
-            display: none;
-        }
-
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            gap:10px
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--light-purple);
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: var(--secondary-purple);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
+        .action-button i {
+            font-size: 20px;
         }
 
         .iframe-container {
             flex: 1;
-            min-height: 0;
+            overflow: hidden;
             position: relative;
-            margin: 0 -20px;  /* Negative margin to counter container padding */
-            margin-bottom: -20px; /* Extend to bottom of screen */
         }
 
         iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        
-        .chat-iframe {
-            border-radius: 0;
         }
 
-        .slide-left {
-            animation: slideLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-
-        @keyframes slideLeft {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(-100%);
-                opacity: 0.8;
-            }
-        }
-
-        @media (prefers-color-scheme: dark) {
-            body {
-                background: linear-gradient(135deg, #2d1f3d 0%, #1a1a2e 100%);
-            }
-            
-            .container {
-                background: #1e1e26;
-            }
-            
-            input[type="text"] {
-                background: rgba(255, 255, 255, 0.05);
-                color: var(--dark-purple);
-            }
-            
-            input[type="text"]::placeholder {
-                color: rgba(0, 0, 0, 0.5);
-            }
-            
-            .action-button {
-            }
-        }
-
-        @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Add custom scrollbar */
+        /* Hide scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--secondary-purple);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--light-purple);
-        }
-
-        .action-button:focus {
-            outline: none; /* Removes focus outline */
+            width: 0;
+            background: transparent;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="input-container">
-            <i class="material-icons input-icon">search</i>
-            <input type="text" placeholder="Search or start new chat" id="numberInput">
-            <button class="action-button message">
-                <i class="material-icons">chat</i>
-            </button>
-            <button class="action-button call">
-                <i class="material-icons">call</i>
-            </button>
+        <div class="header">
+            <div class="input-container">
+                <i class="material-icons input-icon">search</i>
+                <input type="text" placeholder="Search contacts or messages" id="numberInput">
+                <div class="action-buttons">
+                    <button class="action-button message">
+                        <i class="material-icons">chat</i>
+                    </button>
+                    <button class="action-button call">
+                        <i class="material-icons">call</i>
+                    </button>
+                </div>
+            </div>
         </div>
-        <!-- <div class="toggle-container">
-            <span class="toggle-title">Text Mode</span>
-            <label class="toggle-switch">
-                <input type="checkbox" id="keyboardToggle">
-                <span class="slider"></span>
-            </label>
-        </div> -->
-        <!-- <div class="action-buttons">
-            <button class="action-button call">
-                <i class="lucide lucide-phone"></i>
-                Call
-            </button>
-            <button class="action-button message">
-                <i class="lucide lucide-message-circle"></i>
-                Message
-            </button>
-        </div> -->
         <div class="iframe-container">
-            <!-- <iframe src="recentCalls.html" class="shimmer"></iframe> -->
             <iframe src="recentsessions.html" class="shimmer"></iframe>
         </div>
     </div>
@@ -342,8 +237,6 @@
         const callButton = document.querySelector(".call");
         const messageButton = document.querySelector(".message");
         const domainButtons = document.querySelectorAll(".domain-button");
-        const keyboardToggle = document.querySelector("#keyboardToggle");
-        const buttonContainer = document.querySelector(".button-container");
         const chatContainer = document.getElementById('chat-container');
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -353,10 +246,6 @@
             openChat(remoteId);
         }
 
-        // Set initial input type
-        // input.inputMode = "tel";
-
-        // Convert input to lowercase
         input.addEventListener('input', function(e) {
             this.value = this.value.toLowerCase();
         });
@@ -381,16 +270,6 @@
             });
         });
 
-        // keyboardToggle.addEventListener("change", function() {
-        //     if (this.checked) {
-        //         input.inputMode = "text";
-        //         buttonContainer.style.display = "flex";
-        //     } else {
-        //         input.inputMode = "tel";
-        //         buttonContainer.style.display = "none";
-        //     }
-        // });
-
         window.addEventListener('message', (event) => {
             switch (event.data.action) {
                 case 'call':
@@ -413,25 +292,21 @@
         });
 
         function openChat(sessionId) {
-            // Create and load the iframe first
             const iframe = document.createElement('iframe');
             iframe.className = 'chat-iframe';
-            iframe.style.cssText = 'width:100%;height:100%;border:none;visibility:hidden;'; // Hide initially
+            iframe.style.cssText = 'width:100%;height:100%;border:none;visibility:hidden;';
             iframe.src = `chat.html?sessionId=${encodeURIComponent(sessionId)}`;
             
-            // Clear any existing content and add the new iframe
             chatContainer.innerHTML = '';
             chatContainer.appendChild(iframe);
             
-            // Wait for iframe to load before starting animation
             iframe.onload = () => {
-                // Show iframe and start animation in next frame
                 setTimeout(() => {
                     iframe.style.visibility = 'visible';
                     document.querySelector('.container').classList.add('slide-left');
                     chatContainer.classList.add('slide-left');
                     history.pushState({page: 'chat'}, '', 'chat');
-                }, 50); // Small delay to ensure smooth transition
+                }, 50);
             };
         }
 
@@ -441,8 +316,7 @@
             controller.getRecentSessions(20);
             setTimeout(() => {
                 chatContainer.innerHTML = '';
-            }, 300); // Clear chat container after animation
-            //controller.displayBackButton(false);
+            }, 300);
         }
 
         function makeCall(jsonData) {
@@ -451,11 +325,9 @@
                     action: "call-attempt",
                     body: jsonData
                 };
-                console.log(window.parent)
                 window.parent.postMessage(connectRequest, '*');
             }
         }
-
     </script>
 </body>
 </html>

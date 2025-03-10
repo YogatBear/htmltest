@@ -6,16 +6,60 @@
     <title>Ringing</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Text:wght@400;500;600&display=swap');
+
         :root {
-            --primary-white: #ffffff;
-            --secondary-purple: #6a5acd;
-            --light-purple: #9370db;
-            --dark-purple: #4b0082;
+            --secondary-purple: rgb(115, 66, 160);
+            --light-purple: #8e8aff;
+            --dark-purple: #3634a3;
+            --purple-05: rgba(115, 66, 160, 0.05);
+            --purple-10: rgba(115, 66, 160, 0.1);
+            --text-primary: #000000;
+            --text-secondary: #8e8e93;
+            --separator-color: rgba(60, 60, 67, 0.08);
+            --danger-color: #ff3b30;
+            --system-gray: #f2f2f7;
+            --unread-blue: rgb(115, 66, 160);
+            --background-color: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --shadow-color-active: rgba(0, 0, 0, 0.2);
+            --danger-shadow: rgba(255, 59, 48, 0.3);
+            --danger-shadow-active: rgba(255, 59, 48, 0.2);
             --purple-gradient: linear-gradient(135deg, var(--secondary-purple) 0%, var(--dark-purple) 100%);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --secondary-purple: rgb(138, 93, 180);
+                --light-purple: #a28bc7;
+                --dark-purple: #5e3b88;
+                --purple-05: rgba(138, 93, 180, 0.1);
+                --purple-10: rgba(138, 93, 180, 0.15);
+                --text-primary: #ffffff;
+                --text-secondary: #aeaeb2;
+                --separator-color: rgba(200, 200, 205, 0.28);
+                --danger-color: #ff453a;
+                --system-gray: #2c2c2e;
+                --unread-blue: rgb(138, 93, 180);
+                --background-color: rgb(23, 23, 23);
+                --shadow-color: rgba(0, 0, 0, 0.5);
+                --shadow-color-active: rgba(0, 0, 0, 0.7);
+                --danger-shadow: rgba(255, 69, 58, 0.3);
+                --danger-shadow-active: rgba(255, 69, 58, 0.5);
+                --purple-gradient: linear-gradient(135deg, var(--secondary-purple) 0%, var(--dark-purple) 100%);
+            }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
-            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
@@ -25,7 +69,7 @@
             background: var(--purple-gradient);
             background-size: 200% 200%;
             animation: gradientAnimation 15s ease infinite;
-            color: white;
+            color: var(--text-primary);
             -webkit-tap-highlight-color: transparent;
             user-select: none;
             -webkit-user-select: none;
@@ -41,8 +85,10 @@
         h2 {
             font-size: 24px;
             margin-bottom: 40px;
-            font-weight: normal;
+            font-weight: 600;
             animation: slideDown 0.4s ease-out;
+            color: white;
+            letter-spacing: -0.5px;
         }
 
         #name {
@@ -55,19 +101,36 @@
             overflow: hidden;
             text-overflow: ellipsis;
             padding: 0 20px;
+            color: white;
         }
 
-        .ringing-animation {
+        .profile-circle {
             width: 100px;
             height: 100px;
             border-radius: 50%;
-            border: 3px solid white;
-            margin: 0 auto 40px;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            color: white;
+            font-size: 36px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .ringing-animation {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            margin: 0 auto;
             animation: ring 2s ease-out infinite;
         }
 
         .hang-up-button {
-            background: #ff3b30;
+            background: var(--danger-color);
             border: none;
             border-radius: 50%;
             width: 70px;
@@ -79,12 +142,13 @@
             justify-content: center;
             margin: 0 auto;
             animation: scaleIn 0.3s ease-out;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s ease;
+            box-shadow: 0 4px 12px var(--danger-shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .hang-up-button:hover {
-            transform: scale(1.05);
+        .hang-up-button:active {
+            transform: scale(0.92);
+            box-shadow: 0 2px 8px var(--danger-shadow-active);
         }
 
         .material-icons {
@@ -120,8 +184,11 @@
 </head>
 <body>
     <div class="container">
+        <div class="profile-circle">
+            <span id="initial"></span>
+        </div>
         <div class="ringing-animation"></div>
-        <h2>Ringing<span id="name"></span></h2>
+        <h2>Calling<span id="name"></span></h2>
         <button class="hang-up-button">
             <i class="material-icons">call_end</i>
         </button>
@@ -133,6 +200,7 @@
         
         if(to) {
             document.querySelector("#name").textContent = to;
+            document.querySelector("#initial").textContent = to.charAt(0).toUpperCase();
         }
         
         document.querySelector(".hang-up-button").addEventListener("click", () => {

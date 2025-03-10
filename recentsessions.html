@@ -3,12 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reusable Recent Message Session Component</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <title>Recent Conversations</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Text:wght@400;500;600&display=swap');
+
         :root {
-            --secondary-purple: #6a5acd;
+            --secondary-purple: rgb(115, 66, 160);
+            --light-purple: #8e8aff;
+            --dark-purple: #3634a3;
+            --purple-05: rgba(115, 66, 160, 0.05);
+            --purple-10: rgba(115, 66, 160, 0.1);
+            --text-primary: #000000;
+            --text-secondary: #8e8e93;
+            --separator-color: rgba(60, 60, 67, 0.08);
+            --danger-color: #ff3b30;
+            --system-gray: #f2f2f7;
+            --unread-blue: rgb(115, 66, 160);
+            --background-color: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --shadow-color-active: rgba(0, 0, 0, 0.2);
+            --danger-shadow: rgba(255, 59, 48, 0.3);
+            --danger-shadow-active: rgba(255, 59, 48, 0.2);
+            --delete-mode-bg: rgba(115, 66, 160, 0.05);
+            --modal-bg: #ffffff;
+            --cancel-button-bg: #f2f2f7;
+            --cancel-button-active: rgba(115, 66, 160, 0.05);
+            --confirm-button-bg: rgba(255, 59, 48, 0.1);
+            --confirm-button-active: rgba(255, 59, 48, 0.2);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --secondary-purple: rgb(138, 93, 180);
+                --light-purple: #a28bc7;
+                --dark-purple: #5e3b88;
+                --purple-05: rgba(138, 93, 180, 0.1);
+                --purple-10: rgba(138, 93, 180, 0.15);
+                --text-primary: #ffffff;
+                --text-secondary: #aeaeb2;
+                --separator-color: rgba(200, 200, 205, 0.28);
+                --danger-color: #ff453a;
+                --system-gray: #2c2c2e;
+                --unread-blue: rgb(138, 93, 180);
+                --background-color: rgb(23, 23, 23);
+                --shadow-color: rgba(0, 0, 0, 0.5);
+                --shadow-color-active: rgba(0, 0, 0, 0.7);
+                --danger-shadow: rgba(255, 69, 58, 0.3);
+                --danger-shadow-active: rgba(255, 69, 58, 0.5);
+                --delete-mode-bg: rgba(138, 93, 180, 0.15);
+                --modal-bg: #1c1c1e;
+                --cancel-button-bg: #2c2c2e;
+                --cancel-button-active: rgba(138, 93, 180, 0.2);
+                --confirm-button-bg: rgba(255, 69, 58, 0.2);
+                --confirm-button-active: rgba(255, 69, 58, 0.3);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: none;
+            height: 100%;
+            width: 100%;
+            position: fixed;
+            margin: 0;
+            padding: 0;
         }
 
         .recent-sessions {
@@ -21,58 +91,57 @@
             height: 100%;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            /* border: 3px solid rgba(0,0,0,1); */
         }
         
         .message-entry {
             display: flex;
-            padding: 15px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            background: white;
+            padding: 14px 16px;
             position: relative;
             width: 100%;
             box-sizing: border-box;
             align-items: center;
-            gap: 15px;
+            gap: 16px;
             user-select: none;
             -webkit-user-select: none;
-            -webkit-touch-callout: none; /* Prevents callout on long press */
+            -webkit-touch-callout: none;
+            transition: background-color 0.2s ease;
+            border-bottom: 0.5px solid var(--separator-color);
+            background-color: var(--background-color);
         }
 
         .message-entry:active {
-            background-color: rgba(0,0,0,0.05);
+            background-color: var(--purple-05);
         }
         
         .profile-circle {
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
             color: white;
-            font-size: 18px;
+            font-size: 19px;
             font-weight: 500;
             flex-shrink: 0;
+            box-shadow: 0 2px 4px var(--shadow-color);
         }
         
         .message-details {
             flex: 1;
             min-width: 0;
-            padding-right: 0;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            min-height: 48px; /* Match profile circle height */
-            padding: 4px 0; /* Add vertical padding */
+            justify-content: center;
+            min-height: 52px;
+            padding: 2px 0;
         }
         
         .message-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0; /* Remove margin bottom */
+            margin-bottom: 4px;
             width: 100%;
         }
         
@@ -84,7 +153,7 @@
         .header-right {
             display: flex;
             align-items: center;
-            margin-left: auto; /* Push to right */
+            margin-left: auto;
         }
         
         .message-content {
@@ -95,205 +164,160 @@
         }
         
         .contact-name {
-            font-size: 16px;
-            font-weight: 500;
-            color: #202020;
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.24px;
         }
         
         .message-text {
-            font-size: 14px;
-            color: #667781;
+            font-size: 15px;
+            color: var(--text-secondary);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             flex: 1;
             padding-right: 8px;
+            letter-spacing: -0.24px;
         }
         
         .message-time {
-            font-size: 12px;
-            color: #667781;
+            font-size: 14px;
+            color: var(--text-secondary);
             white-space: nowrap;
+            margin-top: 1px;
         }
         
         .unread-bubble {
-            background-color: #6a5acd;
-            background-color: var(--secondary-purple);
+            background-color: var(--unread-blue);
             color: white;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 500;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            border-radius: 12px;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            margin-left: 8px;
         }
         
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            overflow: hidden;
-        }
-        @media (prefers-color-scheme: dark) {
-            body {
-                background: linear-gradient(135deg, #2d1f3d 0%, #1a1a2e 100%);
-            }
-            .message-entry {
-                border-bottom: 1px solid black;
-                background: var(--dark-purple);
-            }
-            .contact-name {
-                color: white;
-            }
-            .message-text {
-                color: white;
-            }
-            .message-time {
-                color: white;
-            }
-            .call-button {
-                color: white;
-                border-color: white;
-            }
-            
-            .call-button:hover {
-                background-color: rgba(255, 255, 255, 0.1);
-            }
+        /* Buttons */
+        .button-container {
+            display: flex;
+            gap: 8px;
         }
 
-        /* Update call button styles */
         .call-button {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            border: 2px solid var(--secondary-purple);
-            background: transparent;
+            background-color: var(--secondary-purple);
+            border: none;
             cursor: pointer;
-            color: var(--secondary-purple);
-            margin-left: 5px;
-            padding: 8px;
+            color: white;
             flex-shrink: 0;
             user-select: none;
             -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            outline: none;
             transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
                         background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .call-button:hover {
-            background-color: rgba(106, 90, 205, 0.1);
+            box-shadow: 0 2px 5px var(--shadow-color);
         }
 
         .call-button:active {
-            transform: scale(0.9);
-            background-color: rgba(106, 90, 205, 0.2);
+            transform: scale(0.92);
+            background-color: var(--dark-purple);
+            box-shadow: 0 1px 3px var(--shadow-color-active);
         }
 
-        @media (prefers-color-scheme: dark) {
-            .call-button:active {
-                background-color: rgba(255, 255, 255, 0.2);
-            }
-        }
-
-        /* Add these new styles */
         .delete-button {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            border: 2px solid #dc3545;
-            background: transparent;
+            background-color: var(--danger-color);
+            border: none;
             cursor: pointer;
-            color: #dc3545;
-            margin-left: 5px;
-            padding: 8px;
+            color: white;
             flex-shrink: 0;
             user-select: none;
             -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            outline: none;
-            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                        background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .delete-button:hover {
-            background-color: rgba(220, 53, 69, 0.1);
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 5px var(--danger-shadow);
         }
 
         .delete-button:active {
-            transform: scale(0.9);
-            background-color: rgba(220, 53, 69, 0.2);
+            transform: scale(0.92);
+            box-shadow: 0 1px 3px var(--danger-shadow-active);
         }
 
         .delete-mode {
-            background-color: rgba(220, 53, 69, 0.05);
+            background-color: var(--delete-mode-bg);
         }
 
+        /* Modal */
         .confirm-delete-modal {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: white;
+            background: var(--modal-bg);
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 5px 20px var(--shadow-color);
             z-index: 1000;
             text-align: center;
             user-select: none;
             -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            width: 280px;
         }
 
         .modal-buttons {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 20px;
         }
 
         .modal-button {
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 12px;
+            border-radius: 12px;
             border: none;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 17px;
             user-select: none;
             -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            outline: none;
+            transition: background-color 0.2s ease;
         }
 
         .confirm-button {
-            background-color: #dc3545;
-            color: white;
+            background-color: var(--confirm-button-bg);
+            color: var(--danger-color);
+        }
+
+        .confirm-button:active {
+            background-color: var(--confirm-button-active);
         }
 
         .cancel-button {
-            background-color: #6c757d;
-            color: white;
+            background-color: var(--cancel-button-bg);
+            color: var(--text-primary);
         }
 
-        @media (prefers-color-scheme: dark) {
-            .confirm-delete-modal {
-                background: #2d1f3d;
-                color: white;
-            }
+        .cancel-button:active {
+            background-color: var(--cancel-button-active);
+        }
 
-            .delete-mode {
-                background-color: rgba(220, 53, 69, 0.15);
-            }
+        /* Hide scrollbar */
+        ::-webkit-scrollbar {
+            display: none;
         }
     </style>
 </head>
@@ -301,7 +325,6 @@
     <ul id="recent-sessions" class="recent-sessions"></ul>
 
     <script>
-
         const channel = new BroadcastChannel('myChannel');
         function hashStringToColor(str) {
             // Generate a hash of the string
@@ -310,20 +333,13 @@
                 hash = str.charCodeAt(i) + ((hash << 5) - hash);
             }
             
-            // Convert hash to RGB values
-            const r = (hash & 0xFF0000) >> 16;
-            const g = (hash & 0x00FF00) >> 8;
-            const b = hash & 0x0000FF;
+            // Create purple variants by centering around true purple (270-290)
+            // and adding smaller variations
+            const hue = ((hash % 30) + 270) % 360; // Center around purple with less variation
+            const saturation = 70 + (hash % 20); // 70-90% saturation
+            const lightness = 55 + (hash % 15); // 55-70% lightness
             
-            // Ensure colors aren't too dark or too light
-            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-            if (brightness < 128) {
-                return `hsl(${hash % 360}, 70%, 60%)`; // Lighter version
-            } else if (brightness > 200) {
-                return `hsl(${hash % 360}, 70%, 45%)`; // Darker version
-            }
-            
-            return `rgb(${r}, ${g}, ${b})`;
+            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
         }
 
         class RecentSessionsComponent {
@@ -372,7 +388,8 @@
                 const modal = document.createElement('div');
                 modal.className = 'confirm-delete-modal';
                 modal.innerHTML = `
-                    <div>Are you sure you want to delete this conversation? This will delete all of its messages.</div>
+                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">Delete Conversation</div>
+                    <div style="font-size: 15px; color: var(--text-secondary);">This will permanently remove all messages in this conversation.</div>
                     <div class="modal-buttons">
                         <button class="modal-button confirm-button">Delete</button>
                         <button class="modal-button cancel-button">Cancel</button>
@@ -408,13 +425,26 @@
 
                     const messageDate = new Date(time);
                     const today = new Date();
-                    const isToday = messageDate.toDateString() === today.toDateString();
-                    const timeOrDate = isToday ? messageDate.toLocaleTimeString([], { timeStyle: 'short' }) : messageDate.toLocaleDateString();
-                    const iconSymbol = 'chat';
+                    const yesterday = new Date();
+                    yesterday.setDate(today.getDate() - 1);
+                    
+                    let timeOrDate;
+                    if (messageDate.toDateString() === today.toDateString()) {
+                        timeOrDate = messageDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+                    } else if (messageDate.toDateString() === yesterday.toDateString()) {
+                        timeOrDate = 'Yesterday';
+                    } else {
+                        if (messageDate.getFullYear() === today.getFullYear()) {
+                            timeOrDate = messageDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                        } else {
+                            timeOrDate = messageDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+                        }
+                    }
+                    
                     const name = (author === msgSessionId || author === "SYSTEM") ? "" : "You: ";
-                    const messageinfo = name + content + ' ';
+                    const messageinfo = name + content;
 
-                    // Replace random color with consistent hash-based color
+                    // Use consistent hash-based color with purple focus
                     const profileColor = hashStringToColor(msgSessionId);
 
                     const li = document.createElement('li');
@@ -430,24 +460,23 @@
                                     <span class="contact-name">${formatName(msgSessionId)}</span>
                                 </div>
                                 <div class="header-right">
-                                    ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}
+                                    <span class="message-time">${timeOrDate}</span>
                                 </div>
                             </div>
                             <div class="message-content">
                                 <div class="message-text">${messageinfo}</div>
-                                <span class="message-time">${timeOrDate}</span>
+                                ${unreadCount > 0 ? `<div class="unread-bubble">${unreadCount}</div>` : ''}
                             </div>
                         </div>
                         <div class="button-container">
                             <button class="call-button">
-                                <i class="material-icons">call</i>
+                                <i class="material-icons" style="font-size: 20px;">call</i>
                             </button>
                             <button class="delete-button" style="display: none;">
-                                <i class="material-icons">delete</i>
+                                <i class="material-icons" style="font-size: 20px;">delete</i>
                             </button>
                         </div>`;
 
-                    // Create button container and add its listeners FIRST
                     const buttonContainer = li.querySelector('.button-container');
                     const deleteButton = li.querySelector('.delete-button');
                     const callButton = li.querySelector('.call-button');
@@ -471,7 +500,7 @@
                         }
                     });
 
-                    // Add click listener to the message content area ONLY, not the entire li
+                    // Add click listener to the message content area
                     const messageContent = li.querySelector('.message-details');
                     messageContent.addEventListener('click', () => {
                         if (this.deleteMode === msgSessionId) {
@@ -486,6 +515,8 @@
                     let isLongPress = false;
 
                     const startLongPress = (e) => {
+                        if (e.target.closest('.button-container')) return;
+                        
                         isLongPress = false;
                         longPressTimer = setTimeout(() => {
                             isLongPress = true;
@@ -499,7 +530,6 @@
 
                     const endLongPress = (e) => {
                         clearTimeout(longPressTimer);
-                        // Don't handle button clicks in endLongPress
                         if (e.target.closest('.button-container')) {
                             return;
                         }
@@ -527,16 +557,26 @@
             }
         }
 
-
         const com = new RecentSessionsComponent('recent-sessions');
+        com.updateRecentSessions([
+            ["msg1", new Date().toISOString(), "SYSTEM", "Your order has been confirmed and is being processed.", "Support", 2],
+            ["msg2", new Date(Date.now() - 3600000).toISOString(), "alice@example.com", "Can we reschedule our meeting to Thursday?", "Alice Smith", 0],
+            ["msg3", new Date(Date.now() - 86400000).toISOString(), "SYSTEM", "Welcome to the platform! Let us know if you need help.", "Onboarding", 1],
+            ["msg4", new Date(Date.now() - 172800000).toISOString(), "bob.jones", "The project files are ready for review", "Bob Jones", 0],
+            ["msg5", new Date(Date.now() - 259200000).toISOString(), "SYSTEM", "Your account security was verified successfully", "Security", 0],
+            ["msg6", new Date(Date.now() - 345600000).toISOString(), "marketing", "Check out our latest summer promotion!", "Marketing", 3],
+            ["msg7", new Date(Date.now() - 432000000).toISOString(), "carol.davis", "Here's the report you requested last week", "Carol Davis", 0],
+            ["msg8", new Date(Date.now() - 518400000).toISOString(), "tech.team", "Your support ticket #45928 has been resolved", "Tech Support", 0],
+            ["msg9", new Date(Date.now() - 604800000).toISOString(), "david.wilson", "Let's catch up next week when I'm back from vacation", "David Wilson", 0],
+            ["msg10", new Date(Date.now() - 691200000).toISOString(), "events@example.com", "Reminder: Company picnic this Saturday at noon", "Events Team", 1]
+        ]);
         
-function formatName(name) {
-    if (name.length > 25) {
-        return name.substring(0, 22) + "...";
-    }
-    return name;
-}
-
+        function formatName(name) {
+            if (name.length > 25) {
+                return name.substring(0, 22) + "...";
+            }
+            return name;
+        }
     </script>
 </body>
 </html>
