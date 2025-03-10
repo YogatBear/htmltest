@@ -244,6 +244,13 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+            openContacts() {
+                const request = {
+                    action: "choose-contact",
+                    body: { localId: this.localId, pid: this.pid }
+                };
+                this.sendMessageToNativeApp(request);
+            }
         }
 
     </script>

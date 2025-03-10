@@ -130,6 +130,9 @@
                     console.error("Error parsing JSON or processing data:", error);
                 }
             }
+            openContacts() {
+                controller.openContacts();
+            }
         }
 
         const app = new App(
@@ -198,6 +201,9 @@
                     break;
                 case 'new-message':
                     app.dataFetched(body);
+                    break;
+                case 'choose-contact':
+                    app.openContacts();
                     break;
                 default:
                     console.log('Unknown action:', action);
