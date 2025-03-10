@@ -563,6 +563,11 @@
 
     function closeChat() {
         window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
+        const connectRequest = {
+        action: "set-page",
+        body: { page: 'main' }
+      };
+      window.parent.parent.postMessage(connectRequest, '*');
     }
     // addMessage("Encryption key received", "SYSTEM", Date.now(), "text", null, null, false);
     // addMessage("Hey girlll", "testing", Date.now(), "text", null, null, false);
