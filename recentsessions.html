@@ -559,18 +559,18 @@
         }
 
         const com = new RecentSessionsComponent('recent-sessions');
-        // com.updateRecentSessions([
-        //     ["msg1", new Date().toISOString(), "SYSTEM", "Your order has been confirmed and is being processed.", "Support", 2],
-        //     ["msg2", new Date(Date.now() - 3600000).toISOString(), "alice@example.com", "Can we reschedule our meeting to Thursday?", "Alice Smith", 0],
-        //     ["msg3", new Date(Date.now() - 86400000).toISOString(), "SYSTEM", "Welcome to the platform! Let us know if you need help.", "OnboardingOnboardingOnboardingOnboardingOnboarding", 1],
-        //     ["msg4", new Date(Date.now() - 172800000).toISOString(), "bob.jones", "The project files are ready for review", "Bob Jones", 0],
-        //     ["msg5", new Date(Date.now() - 259200000).toISOString(), "SYSTEM", "Your account security was verified successfully", "Security", 0],
-        //     ["msg6", new Date(Date.now() - 345600000).toISOString(), "marketing", "Check out our latest summer promotion!", "Marketing", 3],
-        //     ["msg7", new Date(Date.now() - 432000000).toISOString(), "carol.davis", "Here's the report you requested last week", "Carol Davis", 0],
-        //     ["msg8", new Date(Date.now() - 518400000).toISOString(), "tech.team", "Your support ticket #45928 has been resolved", "Tech Support", 0],
-        //     ["msg9", new Date(Date.now() - 604800000).toISOString(), "david.wilson", "Let's catch up next week when I'm back from vacation", "David Wilson", 0],
-        //     ["msg10", new Date(Date.now() - 691200000).toISOString(), "events@example.com", "Reminder: Company picnic this Saturday at noon", "Events Team", 1]
-        // ]);
+        com.updateRecentSessions([
+            ["msg1", new Date().toISOString(), "SYSTEM", "Your order has been confirmed and is being processed.", "Support", 2],
+            ["msg2", new Date(Date.now() - 3600000).toISOString(), "alice@example.com", "Can we reschedule our meeting to Thursday?", "Alice Smith", 0],
+            ["msg3", new Date(Date.now() - 86400000).toISOString(), "SYSTEM", "Welcome to the platform! Let us know if you need help.", "OnboardingOnboardingOnboardingOnboardingOnboarding", 1],
+            ["msg4", new Date(Date.now() - 172800000).toISOString(), "bob.jones", "The project files are ready for review", "Bob Jones", 0],
+            ["msg5", new Date(Date.now() - 259200000).toISOString(), "SYSTEM", "Your account security was verified successfully", "Security", 0],
+            ["msg6", new Date(Date.now() - 345600000).toISOString(), "marketing", "Check out our latest summer promotion!", "Marketing", 3],
+            ["msg7", new Date(Date.now() - 432000000).toISOString(), "carol.davis", "Here's the report you requested last week", "Carol Davis", 0],
+            ["msg8", new Date(Date.now() - 518400000).toISOString(), "tech.team", "Your support ticket #45928 has been resolved", "Tech Support", 0],
+            ["msg9", new Date(Date.now() - 604800000).toISOString(), "david.wilson", "Let's catch up next week when I'm back from vacation", "David Wilson", 0],
+            ["msg10", new Date(Date.now() - 691200000).toISOString(), "events@example.com", "Reminder: Company picnic this Saturday at noon", "Events Team", 1]
+        ]);
         
         function formatName(name) {
             if (name.length > 25) {

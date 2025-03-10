@@ -113,6 +113,13 @@
             border-bottom: 0.5px solid var(--separator-color);
         }
 
+        /* New header content container for layout */
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
         /* Larger, cleaner search bar */
         .input-container {
             display: flex;
@@ -121,7 +128,7 @@
             padding: 0 12px;
             border-radius: 12px;
             height: 44px;
-            width: 100%;
+            flex: 1;
             box-sizing: border-box;
             transition: all 0.2s ease;
         }
@@ -188,6 +195,30 @@
             font-size: 20px;
         }
 
+        /* Add new contacts button styles */
+        .contacts-button {
+            background: none;
+            border: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+
+        .contacts-button:active {
+            background-color: var(--purple-10);
+        }
+
+        .contacts-button i {
+            font-size: 24px;
+            color: var(--secondary-purple);
+        }
+
         .iframe-container {
             flex: 1;
             overflow: hidden;
@@ -213,17 +244,22 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="input-container">
-                <i class="material-icons input-icon">search</i>
-                <input type="text" placeholder="Search contacts or messages" id="numberInput">
-                <div class="action-buttons">
-                    <button class="action-button message">
-                        <i class="material-icons">chat</i>
-                    </button>
-                    <button class="action-button call">
-                        <i class="material-icons">call</i>
-                    </button>
+            <div class="header-content">
+                <div class="input-container">
+                    <i class="material-icons input-icon">search</i>
+                    <input type="text" placeholder="Search contacts or messages" id="numberInput">
+                    <div class="action-buttons">
+                        <button class="action-button message">
+                            <i class="material-icons">chat</i>
+                        </button>
+                        <button class="action-button call">
+                            <i class="material-icons">call</i>
+                        </button>
+                    </div>
                 </div>
+                <button class="contacts-button">
+                    <i class="material-icons">contacts</i>
+                </button>
             </div>
         </div>
         <div class="iframe-container">
@@ -238,6 +274,7 @@
         const messageButton = document.querySelector(".message");
         const domainButtons = document.querySelectorAll(".domain-button");
         const chatContainer = document.getElementById('chat-container');
+        const contactsButton = document.querySelector(".contacts-button");
 
         const urlParams = new URLSearchParams(window.location.search);
         const remoteId = urlParams.get('remoteId');
@@ -268,6 +305,10 @@
             button.addEventListener("click", function() {
                 input.value += this.textContent.toLowerCase();
             });
+        });
+
+        contactsButton.addEventListener("click", function() {
+            openContacts();
         });
 
         window.addEventListener('message', (event) => {
@@ -327,6 +368,13 @@
                 };
                 window.parent.postMessage(connectRequest, '*');
             }
+        }
+        function openContacts() {
+            const connectRequest = {
+                action: "choose-contact",
+                body: {}
+            }
+            window.parent.postMessage(connectRequest, '*');
         }
     </script>
 </body>
