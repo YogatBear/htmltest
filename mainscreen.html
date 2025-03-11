@@ -327,6 +327,16 @@
                     break;
             }
         });
+
+        channel.addEventListener('message', (event) => {
+            try {
+                const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+                console.log("received data: "+event.data)
+                if (data.injectRemoteId !== undefined) input.value = (data.injectRemoteId);
+            } catch (error) {
+                console.error("Error parsing message data:", error);
+            }
+        });
         
         window.addEventListener('popstate', function(event) {
             console.log("back button pressed");
