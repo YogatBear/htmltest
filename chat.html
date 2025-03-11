@@ -636,7 +636,7 @@
         const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
         if (data.message) {
           console.log("Received single message data:", data.message);
-          const [messageId, time, author, content, msgSessionId, msgStatus] = data.message;
+          const [messageId, time, author, content, fileId, msgSessionId, msgStatus] = data.message;
           if (msgSessionId === sessionId) {
             addMessage(content, author, time, "text", msgStatus, messageId, true);
             controller.updateSessionTimestamp(sessionId);
@@ -656,7 +656,7 @@
           const sortedMessages = [...data.messages].sort((a, b) => b[1] - a[1]);
           
           sortedMessages.forEach(msg => {
-            const [messageId, time, author, content, msgSessionId, msgStatus] = msg;
+            const [messageId, time, author, content, fileId, msgSessionId, msgStatus] = msg;
             if (msgSessionId === sessionId) {
               addMessage(content, author, time, "text", msgStatus, messageId, false);
             }
