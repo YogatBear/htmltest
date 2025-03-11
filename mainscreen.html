@@ -279,6 +279,8 @@
         const urlParams = new URLSearchParams(window.location.search);
         const remoteId = urlParams.get('remoteId');
 
+        const channel = new BroadcastChannel('myChannel');
+
         if(remoteId != null) {
             console.log("opening chat" + remoteId);
             openChat(remoteId);
