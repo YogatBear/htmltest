@@ -120,17 +120,11 @@
         const captionInput = document.getElementById('caption-input');
         const previewImage = document.getElementById('preview-image');
 
-        // Parse hash parameters
-        const hashData = new URLSearchParams(decodeURIComponent(window.location.hash.slice(1)));
-        const imageData = hashData.get('imageData');
-        const imageUri = hashData.get('imageUri');
-
-        // Set image source
-        if (imageData.startsWith('data:')) {
-            previewImage.src = imageData;
-        } else {
-            previewImage.src = `data:image/webp;base64,${imageData}`;
-        }
+        // Get image URI from URL hash
+        const imageUri = decodeURIComponent(window.location.hash.slice(1));
+        
+        // Set image source directly to the content URI
+        previewImage.src = imageUri;
 
         // Handle back button
         backButton.addEventListener('click', () => {
@@ -143,7 +137,6 @@
             window.parent.postMessage({
                 action: 'sendImage',
                 body: {
-                    image: previewImage.src,
                     imageUri: imageUri,
                     caption: caption
                 }

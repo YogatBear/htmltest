@@ -691,11 +691,8 @@
           iframe.style.border = 'none';
           iframe.style.zIndex = '1000';
           
-          // Pass both the image data and URI to the imagepicker
-          const params = new URLSearchParams();
-          params.set('imageData', data.imagePickerResult);
-          params.set('imageUri', data.imageUri || '');
-          iframe.src = 'imagepicker.html#' + encodeURIComponent(params.toString());
+          // Now imagePickerResult is the URI itself
+          iframe.src = 'imagepicker.html#' + encodeURIComponent(data.imagePickerResult);
           
           document.body.appendChild(iframe);
         }
