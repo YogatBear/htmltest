@@ -244,10 +244,10 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
-            contactPicker() {
+            contactPicker(type) {
                 const request = {
                     action: "contact-picker",
-                    body: { localId: this.localId, pid: this.pid }
+                    body: { localId: this.localId, pid: this.pid, contactType: type }
                 };
                 this.sendMessageToNativeApp(request);
             }

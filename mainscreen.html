@@ -253,7 +253,7 @@
             <div class="header-content">
                 <div class="input-container">
                     <i class="material-icons input-icon">search</i>
-                    <input type="text" placeholder="Search contacts or messages" id="numberInput">
+                    <input type="text" placeholder="" id="numberInput">
                     <div class="action-buttons">
                         <button class="action-button message">
                             <i class="material-icons">chat</i>
@@ -317,7 +317,7 @@
         });
 
         contactsButton.addEventListener("click", function() {
-            controller.contactPicker();
+            controller.contactPicker(1);
         });
 
         window.addEventListener('message', (event) => {
