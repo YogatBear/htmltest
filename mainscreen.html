@@ -105,7 +105,7 @@
 
         /* Clean header with just search bar */
         .header {
-            padding: 12px 16px;
+            padding: 8px 12px;
             background-color: var(--background-color);
             position: sticky;
             top: 0;
@@ -117,7 +117,8 @@
         .header-content {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
+            width: 100%;
         }
 
         /* Larger, cleaner search bar */
@@ -125,12 +126,13 @@
             display: flex;
             align-items: center;
             background-color: var(--input-bg);
-            padding: 0 12px;
+            padding: 0 8px;
             border-radius: 12px;
-            height: 44px;
+            height: 40px;
             flex: 1;
             box-sizing: border-box;
             transition: all 0.2s ease;
+            min-width: 0;
         }
 
         .input-container:focus-within {
@@ -146,10 +148,10 @@
 
         input[type="text"] {
             flex: 1;
-            height: 44px;
+            height: 40px;
             padding: 0;
             border: none;
-            font-size: 17px;
+            font-size: 16px;
             background: transparent;
             color: var(--text-primary);
             outline: none;
@@ -165,13 +167,13 @@
         /* Action buttons */
         .action-buttons {
             display: flex;
-            gap: 10px;
-            margin-left: 8px;
+            gap: 6px;
+            margin-left: 4px;
         }
 
         .action-button {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background-color: var(--secondary-purple);
             color: white;
@@ -192,7 +194,7 @@
         }
 
         .action-button i {
-            font-size: 20px;
+            font-size: 18px;
         }
 
         /* Add new contacts button styles */
@@ -204,10 +206,11 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             transition: background-color 0.2s ease;
+            margin-left: 4px;
         }
 
         .contacts-button:active {
@@ -215,7 +218,7 @@
         }
 
         .contacts-button i {
-            font-size: 24px;
+            font-size: 22px;
             color: var(--secondary-purple);
         }
 
