@@ -105,7 +105,7 @@
 
         /* Clean header with just search bar */
         .header {
-            padding: 8px 12px;
+            padding: 6px 8px;
             background-color: var(--background-color);
             position: sticky;
             top: 0;
@@ -119,6 +119,7 @@
             align-items: center;
             gap: 4px;
             width: 100%;
+            max-width: 100%;
         }
 
         /* Larger, cleaner search bar */
@@ -126,12 +127,10 @@
             display: flex;
             align-items: center;
             background-color: var(--input-bg);
-            padding: 0 8px;
+            padding: 0 6px;
             border-radius: 12px;
-            height: 40px;
+            height: 36px;
             flex: 1;
-            box-sizing: border-box;
-            transition: all 0.2s ease;
             min-width: 0;
         }
 
@@ -141,17 +140,16 @@
         }
 
         .input-icon {
-            color: var(--secondary-purple);
-            font-size: 22px !important;
-            margin-right: 8px;
+            font-size: 20px !important;
+            margin-right: 6px;
         }
 
         input[type="text"] {
             flex: 1;
-            height: 40px;
+            height: 36px;
             padding: 0;
             border: none;
-            font-size: 16px;
+            font-size: 15px;
             background: transparent;
             color: var(--text-primary);
             outline: none;
@@ -167,13 +165,13 @@
         /* Action buttons */
         .action-buttons {
             display: flex;
-            gap: 6px;
-            margin-left: 4px;
+            gap: 4px;
+            margin-left: 2px;
         }
 
         .action-button {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background-color: var(--secondary-purple);
             color: white;
@@ -185,6 +183,7 @@
             box-shadow: 0 2px 5px var(--shadow-color);
             transition: all 0.2s ease;
             padding: 0;
+            min-width: 28px;
         }
 
         .action-button:active {
@@ -194,7 +193,7 @@
         }
 
         .action-button i {
-            font-size: 18px;
+            font-size: 16px;
         }
 
         /* Add new contacts button styles */
@@ -206,11 +205,12 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             transition: background-color 0.2s ease;
-            margin-left: 4px;
+            margin-left: 2px;
+            min-width: 28px;
         }
 
         .contacts-button:active {
@@ -218,7 +218,7 @@
         }
 
         .contacts-button i {
-            font-size: 22px;
+            font-size: 20px;
             color: var(--secondary-purple);
         }
 
