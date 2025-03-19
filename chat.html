@@ -303,23 +303,7 @@
     }
 
     /* Add this to the style section */
-    #image-button {
-      width: 40px;
-      height: 40px;
-      border: none;
-      border-radius: 50%;
-      background: var(--secondary-purple);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      margin-right: 4px;
-    }
 
-    #image-button i {
-      font-size: 20px;
-    }
 
     @media (prefers-color-scheme: dark) {
       #image-button {
@@ -355,9 +339,6 @@
   </div>
   <div id="chat-container"></div>
   <div class="message-input">
-    <button id="image-button">
-      <i class="material-icons">image</i>
-    </button>
     <input type="text" id="message-text" placeholder="Type a message..." />
     <button id="send-button">
       <i class="material-icons">send</i>
@@ -373,7 +354,6 @@
     const chatContainer = document.getElementById('chat-container');
     const messageText = document.getElementById('message-text');
     const sendButton = document.getElementById('send-button');
-    const imageButton = document.getElementById('image-button');
     controller.getMessages(sessionId, 20, "");
 
     window.addEventListener('popstate', function(event) {
@@ -587,10 +567,6 @@
       }
     });
 
-    imageButton.addEventListener('click', () => {
-      console.log("Choosing image");
-      controller.imagePicker();
-    });
 
     // Add scroll event listener for infinite scrolling
     chatContainer.addEventListener('scroll', () => {
@@ -636,7 +612,7 @@
         const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
         if (data.message) {
           console.log("Received single message data:", data.message);
-          const [messageId, time, author, content, fileId, msgSessionId, msgStatus] = data.message;
+          const [messageId, time, author, content, msgSessionId, msgStatus] = data.message;
           if (msgSessionId === sessionId) {
             addMessage(content, author, time, "text", msgStatus, messageId, true);
             controller.updateSessionTimestamp(sessionId);
@@ -656,7 +632,7 @@
           const sortedMessages = [...data.messages].sort((a, b) => b[1] - a[1]);
           
           sortedMessages.forEach(msg => {
-            const [messageId, time, author, content, fileId, msgSessionId, msgStatus] = msg;
+            const [messageId, time, author, content, msgSessionId, msgStatus] = msg;
             if (msgSessionId === sessionId) {
               addMessage(content, author, time, "text", msgStatus, messageId, false);
             }
@@ -675,7 +651,7 @@
           controller.updateSessionTimestamp(sessionId);
         } else if (data.updatedMessage) {
           console.log("Received updatedMessage data:", data.updatedMessage);
-          const [messageId, time, author, content, fileId, msgSessionId, msgStatus] = data.updatedMessage;
+          const [messageId, time, author, content, msgSessionId, msgStatus] = data.updatedMessage;
           if (msgSessionId === sessionId) {
             updateMessage(messageId, content, msgStatus);
           }
@@ -691,8 +667,11 @@
           iframe.style.border = 'none';
           iframe.style.zIndex = '1000';
           
-          // Now imagePickerResult is the URI itself
-          iframe.src = 'imagepicker.html#' + encodeURIComponent(data.imagePickerResult);
+          // Pass both the image data and URI to the imagepicker
+          const params = new URLSearchParams();
+          params.set('imageData', data.imagePickerResult);
+          params.set('imageUri', data.imageUri || '');
+          iframe.src = 'imagepicker.html#' + encodeURIComponent(params.toString());
           
           document.body.appendChild(iframe);
         }

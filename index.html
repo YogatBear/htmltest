@@ -244,9 +244,9 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
-            openContacts() {
+            contactPicker() {
                 const request = {
-                    action: "choose-contact",
+                    action: "contact-picker",
                     body: { localId: this.localId, pid: this.pid }
                 };
                 this.sendMessageToNativeApp(request);

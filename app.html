@@ -133,6 +133,9 @@
             openContacts() {
                 controller.openContacts();
             }
+            fillInput(body) {
+                screenFrame.contentWindow.postMessage({ action: 'fillInput', body: body }, '*');
+            }
         }
 
         const app = new App(
@@ -201,9 +204,6 @@
                     break;
                 case 'new-message':
                     app.dataFetched(body);
-                    break;
-                case 'choose-contact':
-                    app.openContacts();
                     break;
                 case 'inject-remote-id':
                     app.dataFetched(body);

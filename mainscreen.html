@@ -311,7 +311,7 @@
         });
 
         contactsButton.addEventListener("click", function() {
-            openContacts();
+            controller.contactPicker();
         });
 
         window.addEventListener('message', (event) => {
@@ -327,7 +327,15 @@
                 case 'closeChat':
                     closeChat();
                     break;
+                case 'fillInput':
+                    fillInput(event.data.body.value);
+                    break;
             }
+        });
+        
+        window.addEventListener('popstate', function(event) {
+            console.log("back button pressed");
+            closeChat();
         });
 
         channel.addEventListener('message', (event) => {
@@ -338,11 +346,6 @@
             } catch (error) {
                 console.error("Error parsing message data:", error);
             }
-        });
-        
-        window.addEventListener('popstate', function(event) {
-            console.log("back button pressed");
-            closeChat();
         });
 
         function openChat(sessionId) {
@@ -382,7 +385,12 @@
                 chatContainer.innerHTML = '';
             }, 300);
         }
-
+        function fillInput(value) {
+            const input = document.getElementById("numberInput");
+            if (input) {
+                input.value = value;
+            }
+        }
         function makeCall(jsonData) {
             if (jsonData != null) {
                 const connectRequest = {
@@ -391,13 +399,6 @@
                 };
                 window.parent.postMessage(connectRequest, '*');
             }
-        }
-        function openContacts() {
-            const connectRequest = {
-                action: "choose-contact",
-                body: {}
-            }
-            window.parent.postMessage(connectRequest, '*');
         }
     </script>
 </body>

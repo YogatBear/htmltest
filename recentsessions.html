@@ -422,7 +422,7 @@
             updateRecentSessions(recentSessions) {
                 this.container.innerHTML = "";
                 recentSessions.forEach(msg => {
-                    const [messageId, time, author, content, fileId, msgSessionId, unreadCount] = msg;
+                    const [messageId, time, author, content, msgSessionId, unreadCount] = msg;
 
                     const messageDate = new Date(time);
                     const today = new Date();
