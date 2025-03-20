@@ -376,7 +376,7 @@
     let lastAuthor = null;
     let hasMoreMessages = true;
 
-    function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false) {
+    function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false, contact = null) {
       const currentDate = formatDate(time);
       
       // If updating an existing message, handle as before
@@ -385,7 +385,7 @@
         if (existingMsg) {
           const nextElement = existingMsg.nextElementSibling;
           existingMsg.remove();
-          const updatedMessage = createMessageElement(content, author, time, type, status, messageId, false);
+          const updatedMessage = createMessageElement(content, author, time, type, status, messageId, false, contact);
           if (nextElement) {
             chatContainer.insertBefore(updatedMessage, nextElement);
           } else {
@@ -412,7 +412,7 @@
         systemMessageTime.textContent = formatTime(time);
         messageElement.appendChild(systemMessageTime);
       } else {
-        messageElement = createMessageElement(content, author, time, type, status, messageId, animate);
+        messageElement = createMessageElement(content, author, time, type, status, messageId, animate, contact);
       }
 
       // For older messages (scrolling up) or chronological insertion
@@ -473,7 +473,7 @@
     }
 
     // Helper function to create message elements
-    function createMessageElement(content, author, time, type, status, messageId, animate) {
+    function createMessageElement(content, author, time, type, status, messageId, animate, contact) {
       const messageElement = document.createElement('div');
       messageElement.classList.add('message', author === sessionId ? 'received' : 'sent');
       if (animate) {
@@ -485,10 +485,12 @@
         messageElement.dataset.time = time; // Store the timestamp for date comparison
       }
 
-      if (author === sessionId && author !== lastAuthor) {
+      // Add author name if it's a different author than the last message and not the local user or SYSTEM
+      if (author !== sessionId && author !== lastAuthor && author !== 'SYSTEM') {
         const authorElement = document.createElement('div');
         authorElement.classList.add('message-author');
-        authorElement.textContent = author;
+        // Use contact name if available, otherwise use author
+        authorElement.textContent = contact || author;
         messageElement.appendChild(authorElement);
       }
 
@@ -622,7 +624,7 @@
           console.log("Received single message data:", data.message);
           const [messageId, time, author, content, msgSessionId, contact, msgStatus] = data.message;
           if (msgSessionId === sessionId) {
-            addMessage(content, contact, time, "text", msgStatus, messageId, true);
+            addMessage(content, author, time, "text", msgStatus, messageId, true, contact);
             controller.updateSessionTimestamp(sessionId);
           }
         } else if (data.messages) {
@@ -642,7 +644,7 @@
           sortedMessages.forEach(msg => {
             const [messageId, time, author, content, msgSessionId, contact, msgStatus] = msg;
             if (msgSessionId === sessionId) {
-              addMessage(content, contact, time, "text", msgStatus, messageId, false);
+              addMessage(content, author, time, "text", msgStatus, messageId, false, contact);
             }
           });
 
