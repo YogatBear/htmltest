@@ -482,14 +482,14 @@
       
       if (messageId !== null) {
         messageElement.dataset.messageId = messageId;
-        messageElement.dataset.time = time; // Store the timestamp for date comparison
+        messageElement.dataset.time = time;
       }
 
-      // Add author name if it's a different author than the last message and not the local user or SYSTEM
-      if (author !== sessionId && author !== lastAuthor && author !== 'SYSTEM') {
+      // Only show author name for messages from others (not our own messages)
+      // and not for system messages, and only when the author changes
+      if (author !== sessionId && author !== 'SYSTEM' && author !== lastAuthor) {
         const authorElement = document.createElement('div');
         authorElement.classList.add('message-author');
-        // Use contact name if available, otherwise use author
         authorElement.textContent = contact || author;
         messageElement.appendChild(authorElement);
       }
