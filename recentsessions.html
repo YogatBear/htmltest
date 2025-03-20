@@ -516,7 +516,7 @@
                         if (this.deleteMode === msgSessionId) {
                             this.exitDeleteMode();
                         } else if (!this.deleteMode) {
-                            window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId, contact: contact } }, '*');
+                            window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
                         }
                     });
 
