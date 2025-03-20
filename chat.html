@@ -642,7 +642,7 @@
           sortedMessages.forEach(msg => {
             const [messageId, time, author, content, msgSessionId, contact, msgStatus] = msg;
             if (msgSessionId === sessionId) {
-              addMessage(content, author, time, "text", msgStatus, messageId, false);
+              addMessage(content, contact, time, "text", msgStatus, messageId, false);
             }
           });
 
