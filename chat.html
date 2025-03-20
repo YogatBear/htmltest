@@ -630,7 +630,6 @@
         } else if (data.messages) {
           console.log("Received multiple messages data:", data.messages);
           
-          // If we receive an empty messages array, disable infinite scrolling
           if (!data.messages || data.messages.length === 0) {
             hasMoreMessages = false;
             return;
@@ -638,8 +637,11 @@
 
           const scrollHeightBefore = chatContainer.scrollHeight;
           
-          // Sort messages by time in reverse order for older messages
-          const sortedMessages = [...data.messages].sort((a, b) => b[1] - a[1]);
+          // Sort messages by time in ASCENDING order (oldest first)
+          const sortedMessages = [...data.messages].sort((a, b) => a[1] - b[1]);
+          
+          // Reset lastAuthor before processing the batch of messages
+          lastAuthor = null;
           
           sortedMessages.forEach(msg => {
             const [messageId, time, author, content, msgSessionId, contact, msgStatus] = msg;
