@@ -96,8 +96,30 @@
         
         .call-info {
             text-align: center;
-            margin-top: 15vh;
+            margin-top: 10vh;
             animation: slideDown 0.3s ease-out;
+        }
+        
+        .profile-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+        }
+        
+        .profile-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            color: white;
+            font-size: 36px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
         .phone-number {
@@ -355,6 +377,11 @@
 <body>
     <div class="container">
         <div class="call-info">
+            <div class="profile-container">
+                <div class="profile-circle">
+                    <span id="initial"></span>
+                </div>
+            </div>
             <div class="phone-number" id="phoneNumber"></div>
             <div class="call-duration" id="callDuration"></div>
         </div>
@@ -428,6 +455,7 @@
 
         if (callId) {
             phoneNumberElement.textContent = callId;
+            document.querySelector("#initial").textContent = callId.charAt(0).toUpperCase();
             startCallTimer();
         }
 
