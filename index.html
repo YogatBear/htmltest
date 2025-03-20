@@ -251,6 +251,14 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+
+            getContactName(sessionId) {
+                const request = {
+                    action: "get-contact-name",
+                    body: { localId: this.localId, pid: this.pid, remoteId: remoteId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
         }
 
     </script>

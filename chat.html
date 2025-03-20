@@ -354,6 +354,7 @@
     const chatContainer = document.getElementById('chat-container');
     const messageText = document.getElementById('message-text');
     const sendButton = document.getElementById('send-button');
+    controller.getContactName(sessionId);
     controller.getMessages(sessionId, 20, "");
 
     window.addEventListener('popstate', function(event) {
@@ -610,6 +611,13 @@
       try {
         console.log("Received channel message:", event.data);
         const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        
+        // Add handling for contactName
+        if (data.contactName) {
+            const titleElement = document.getElementById('title');
+            titleElement.textContent = data.contactName;
+        }
+        
         if (data.message) {
           console.log("Received single message data:", data.message);
           const [messageId, time, author, content, msgSessionId, contact, msgStatus] = data.message;
