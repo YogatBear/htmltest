@@ -429,7 +429,7 @@
             updateRecentSessions(recentSessions) {
                 this.container.innerHTML = "";
                 recentSessions.forEach(msg => {
-                    const [messageId, time, author, content, msgSessionId, unreadCount] = msg;
+                    const [messageId, time, author, content, msgSessionId, contact, unreadCount] = msg;
 
                     const messageDate = new Date(time);
                     const today = new Date();
@@ -452,20 +452,22 @@
                     const name = (author === msgSessionId || author === "SYSTEM") ? "" : "You: ";
                     const messageinfo = name + content;
 
-                    // Use consistent hash-based color with purple focus
+                    // Use msgSessionId for color generation but contact for display
                     const profileColor = hashStringToColor(msgSessionId);
+                    const displayName = contact || msgSessionId; // Fallback to msgSessionId if contact is null
+                    const firstLetter = displayName.charAt(0).toUpperCase();
 
                     const li = document.createElement('li');
                     li.className = "message-entry";
 
                     li.innerHTML = `
                         <div class="profile-circle" style="background-color: ${profileColor};">
-                            <span class="profile-initial">${msgSessionId.charAt(0).toUpperCase()}</span>
+                            <span class="profile-initial">${firstLetter}</span>
                         </div>
                         <div class="message-details">
                             <div class="message-header">
                                 <div class="header-left">
-                                    <span class="contact-name">${formatName(msgSessionId)}</span>
+                                    <span class="contact-name">${formatName(displayName)}</span>
                                 </div>
                                 <div class="header-right">
                                     <span class="message-time">${timeOrDate}</span>
