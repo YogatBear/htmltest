@@ -622,7 +622,7 @@
           console.log("Received single message data:", data.message);
           const [messageId, time, author, content, msgSessionId, contact, msgStatus] = data.message;
           if (msgSessionId === sessionId) {
-            addMessage(content, author, time, "text", msgStatus, messageId, true);
+            addMessage(content, contact, time, "text", msgStatus, messageId, true);
             controller.updateSessionTimestamp(sessionId);
           }
         } else if (data.messages) {
