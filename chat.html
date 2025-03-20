@@ -487,7 +487,7 @@
 
       // Show contact name for messages FROM the other person (where author is NOT sessionId)
       // Don't show for system messages or consecutive messages from same author
-      if (author !== sessionId && author !== 'SYSTEM' && author !== lastAuthor) {
+      if (author == sessionId && author !== lastAuthor) {
         const authorElement = document.createElement('div');
         authorElement.classList.add('message-author');
         authorElement.textContent = contact || author;
