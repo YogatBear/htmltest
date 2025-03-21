@@ -419,7 +419,7 @@
       }
 
       // For older messages (scrolling up) or chronological insertion
-      if (time < Date.now() - 1000 || author === 'SYSTEM') {
+      if (time < Date.now() - 1000) {
         // Find the appropriate position for the message
         let insertPosition = null;
         const messages = Array.from(chatContainer.children);
@@ -456,7 +456,7 @@
         
         lastDisplayedDate = currentDate;
       } else {
-        // For new messages
+        // For new messages (including new system messages)
         if (currentDate !== lastDisplayedDate) {
           const dateElement = document.createElement('div');
           dateElement.classList.add('date-separator');
