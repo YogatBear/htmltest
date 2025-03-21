@@ -370,7 +370,7 @@
                         console.log("Received recent sessions data:", data.recentSessions);
                         this.updateRecentSessions(data.recentSessions);
                     }
-                    else if (data.message) {
+                    else if (data.message || data.updatedMessage) {
                         this.controller.getRecentSessions(20);
                     }
                 } catch (error) {
