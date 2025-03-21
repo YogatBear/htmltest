@@ -587,23 +587,33 @@
     });
 
     function updateMessage(messageId, content, status) {
-        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
-        if (messageElement) {
-            // Update the message content
-            const contentElement = messageElement.querySelector('.message-content');
-            if (contentElement) {
-                contentElement.textContent = content;
-            }
-            
-            // Update the status icon if it exists
-            const statusIcon = messageElement.querySelector('.message-status-icon');
-            if (statusIcon) {
-                switch (status) {
-                    case 0: statusIcon.textContent = 'schedule'; break;
-                    case 1: statusIcon.textContent = 'done'; break;
-                    case 2: statusIcon.textContent = 'error'; break;
-                    case 4: statusIcon.textContent = 'done_all'; break;
-                    default: statusIcon.textContent = ''; break;
+        const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (existingMsg) {
+            if (existingMsg.classList.contains('system-message')) {
+                // Update system message content
+                const contentWrapper = existingMsg.querySelector('.system-message-content');
+                if (contentWrapper) {
+                    contentWrapper.textContent = content;
+                }
+            } else {
+                // Update regular message content
+                const contentElement = existingMsg.querySelector('.message-content');
+                if (contentElement) {
+                    contentElement.textContent = content;
+                }
+                
+                // Update status if it's a sent message
+                if (existingMsg.classList.contains('sent') && status !== null) {
+                    const statusIcon = existingMsg.querySelector('.message-status-icon');
+                    if (statusIcon) {
+                        switch (status) {
+                            case 0: statusIcon.textContent = 'schedule'; break;
+                            case 1: statusIcon.textContent = 'done'; break;
+                            case 2: statusIcon.textContent = 'error'; break;
+                            case 4: statusIcon.textContent = 'done_all'; break;
+                            default: statusIcon.textContent = ''; break;
+                        }
+                    }
                 }
             }
         }
