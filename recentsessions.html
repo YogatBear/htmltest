@@ -371,7 +371,7 @@
                         this.updateRecentSessions(data.recentSessions);
                     }
                     else if (data.message || data.updatedMessage) {
-                        this.controller.getRecentSessions(20);
+                        this.controller.getRecentSessions(100);
                     }
                 } catch (error) {
                     console.error("Error parsing message data:", error);
