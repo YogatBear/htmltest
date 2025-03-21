@@ -401,6 +401,9 @@
         messageElement = document.createElement('div');
         messageElement.classList.add('system-message');
         messageElement.dataset.time = time;
+        if (messageId !== null) {
+          messageElement.dataset.messageId = messageId;
+        }
         
         const contentWrapper = document.createElement('div');
         contentWrapper.classList.add('system-message-content');
