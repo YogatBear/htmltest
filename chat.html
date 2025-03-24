@@ -542,7 +542,7 @@
     document.getElementById("call-button").addEventListener("click", () => {
       window.parent.postMessage({ 
                                 action: 'call', 
-                                body: { remoteId: this.sessionId }
+                                body: { remoteId: sessionId }
                             }, '*');
     });
 
