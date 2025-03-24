@@ -261,20 +261,17 @@
             align-items: center;
             justify-content: space-between;
             color: white;
-            transform: translate3d(0, -150%, 0);
+            transform: translateY(-150%);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            will-change: transform;
-            -webkit-transform: translate3d(0, -150%, 0);
         }
 
         .calling-overlay.show {
-            transform: translate3d(0, 0, 0);
-            -webkit-transform: translate3d(0, 0, 0);
+            transform: translateY(0);
         }
 
         .calling-left {
