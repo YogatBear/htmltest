@@ -508,6 +508,7 @@
             
             // The cancel button will be handled by the controller
             document.getElementById('cancelCall').addEventListener('click', () => {
+                controller.rejectCall(remoteId);
                 overlay.classList.remove('show');
                 // Controller cancel call functionality will be added here
             }, { once: true });  // Remove listener after first click
