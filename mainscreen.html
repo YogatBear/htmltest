@@ -252,7 +252,10 @@
             top: 16px;
             left: 16px;
             right: 16px;
-            background: var(--purple-gradient);
+            background: linear-gradient(135deg, 
+                rgba(115, 66, 160, 0.95) 0%,
+                rgba(54, 52, 163, 0.95) 100%
+            );
             padding: 16px;
             display: flex;
             align-items: center;
@@ -262,7 +265,9 @@
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
             border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.25),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
         }
@@ -297,6 +302,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             min-width: 0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         #callingId {
@@ -307,6 +313,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             vertical-align: bottom;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .cancel-call {
