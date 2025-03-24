@@ -275,6 +275,9 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            min-width: 0;
+            flex: 1;
+            margin-right: 12px;
         }
 
         .calling-spinner {
@@ -290,14 +293,24 @@
             font-size: 16px;
             font-weight: 500;
             letter-spacing: -0.2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
         }
 
         #callingId {
             font-weight: 600;
             margin-left: 4px;
+            display: inline-block;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: bottom;
         }
 
         .cancel-call {
+            flex-shrink: 0;
             background: rgba(255, 255, 255, 0.2);
             border: none;
             padding: 8px 16px;
