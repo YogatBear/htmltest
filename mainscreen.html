@@ -418,7 +418,7 @@
         window.addEventListener('message', (event) => {
             switch (event.data.action) {
                 case 'call':
-                    makeCall(event.data.body.remoteId);
+                    makeCall(event.data.body.remoteId, event.data.body.contact);
                     break;
                     
                 case 'chat':
@@ -492,10 +492,10 @@
                 input.value = value;
             }
         }
-        function makeCall(remoteId) {
+        function makeCall(remoteId, contact) {
             const overlay = document.getElementById('callingOverlay');
             const callingId = document.getElementById('callingId');
-            callingId.textContent = remoteId;
+            callingId.textContent = contact && contact.trim() !== '' ? contact : remoteId;
             overlay.classList.add('show');
             
             // The cancel button will be handled by the controller

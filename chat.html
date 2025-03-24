@@ -350,6 +350,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const channel = new BroadcastChannel('myChannel');
     const sessionId = decodeURIComponent(urlParams.get('sessionId'));
+    const contact = "";
 
     const chatContainer = document.getElementById('chat-container');
     const messageText = document.getElementById('message-text');
@@ -542,7 +543,7 @@
     document.getElementById("call-button").addEventListener("click", () => {
       window.parent.postMessage({ 
                                 action: 'call', 
-                                body: { remoteId: sessionId }
+                                body: { remoteId: sessionId, contact: contact }
                             }, '*');
     });
 
@@ -630,6 +631,7 @@
         if (data.contactName) {
             const titleElement = document.getElementById('title');
             titleElement.textContent = data.contactName;
+            contact = data.contactName;
         }
         
         if (data.message) {
