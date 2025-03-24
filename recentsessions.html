@@ -505,7 +505,7 @@
                         if (!this.deleteMode) {
                             window.parent.postMessage({ 
                                 action: 'call', 
-                                body: { to: msgSessionId }
+                                body: { remoteId: msgSessionId }
                             }, '*');
                         }
                     });
