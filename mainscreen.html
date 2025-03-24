@@ -495,7 +495,8 @@
         function makeCall(remoteId, contact) {
             const overlay = document.getElementById('callingOverlay');
             const callingId = document.getElementById('callingId');
-            callingId.textContent = contact && contact.trim() !== '' ? contact : remoteId;
+            console.log("contact: "+contact);
+            callingId.textContent = contact && contact !== '' ? contact : remoteId;
             overlay.classList.add('show');
             
             // The cancel button will be handled by the controller
