@@ -433,8 +433,15 @@
                 case 'closeChat':
                     closeChat();
                     break;
+
                 case 'fillInput':
                     fillInput(event.data.body.value);
+                    break;
+
+                case 'ringing':
+                    // Close the calling overlay if it's open
+                    const overlay = document.getElementById('callingOverlay');
+                    overlay.classList.remove('show');
                     break;
             }
         });
