@@ -72,12 +72,11 @@
         }
 
         class App {
-            constructor(ens, main, ringing, callattempt, incall, incomingcall) {
+            constructor(ens, main, ringing, incall, incomingcall) {
                 this.ens = ens;
                 this.urls = {
                     "main": main,
                     "ringing": ringing,
-                    "callattempt": callattempt,
                     "incall": incall,
                     "incomingcall": incomingcall
                 };
@@ -92,15 +91,9 @@
             }
 
             ring(to) {
-                if (screen === 'MAIN') {
-                    screenFrame.contentWindow.postMessage({ action: 'ringing' }, '*');
-                }
+                screenFrame.contentWindow.postMessage({ action: 'ringing' }, '*');
             }
 
-            callattempt(to) {
-                this.setPage('callattempt', {key:"to",value:to}); // Show call attempt screen
-                controller.call(to);
-            }
             callStarted(_with) {
                 this.setPage('incall', {key:"to",value:_with}); // Show in-call screen
             }
@@ -142,7 +135,6 @@
             "test.eth",
             "mainscreen.html",
             "ringing.html",
-            "callattempt.html",
             "incall.html",
             "incomingcall.html"
         );
@@ -162,9 +154,6 @@
             switch (action) {
                 case 'ringing':
                     app.ring(body.to);
-                    break;
-                case 'call-attempt':
-                    app.callattempt(body.to);
                     break;
                 case 'call-started':
                     app.callStarted(body.from);
