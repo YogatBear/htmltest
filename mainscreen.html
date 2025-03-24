@@ -245,6 +245,68 @@
             width: 0;
             background: transparent;
         }
+
+        /* Add these styles */
+        .calling-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--purple-gradient);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            transform: translateY(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+        }
+
+        .calling-overlay.show {
+            transform: translateY(0);
+        }
+
+        .calling-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .calling-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .calling-text {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .cancel-call {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 16px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .cancel-call:active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -273,6 +335,13 @@
         </div>
     </div>
     <div id="chat-container"></div>
+    <div class="calling-overlay" id="callingOverlay">
+        <div class="calling-left">
+            <div class="calling-spinner"></div>
+            <span class="calling-text">Calling <span id="callingId"></span></span>
+        </div>
+        <button class="cancel-call" id="cancelCall">Cancel</button>
+    </div>
     <script>
         const controller = window.top.controller;
         const input = document.querySelector("#numberInput");
@@ -300,7 +369,7 @@
             if (input.value === ""){
                 return
             }
-            makeCall({to: input.value});
+            makeCall(input.value);
         });
 
         messageButton.addEventListener("click", function() {
@@ -397,14 +466,19 @@
                 input.value = value;
             }
         }
-        function makeCall(jsonData) {
-            if (jsonData != null) {
-                const connectRequest = {
-                    action: "call-attempt",
-                    body: jsonData
-                };
-                window.parent.postMessage(connectRequest, '*');
-            }
+        function makeCall(remoteId) {
+            const overlay = document.getElementById('callingOverlay');
+            const callingId = document.getElementById('callingId');
+            callingId.textContent = remoteId;
+            overlay.classList.add('show');
+            
+            // The cancel button will be handled by the controller
+            document.getElementById('cancelCall').addEventListener('click', () => {
+                overlay.classList.remove('show');
+                // Controller cancel call functionality will be added here
+            }, { once: true });  // Remove listener after first click
+            
+            controller.call(remoteId);
         }
     </script>
 </body>
