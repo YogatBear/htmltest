@@ -540,11 +540,10 @@
 
     // Call button logic
     document.getElementById("call-button").addEventListener("click", () => {
-      const connectRequest = {
-        action: "call-attempt",
-        body: { to: sessionId }
-      };
-      window.parent.parent.postMessage(connectRequest, '*');
+      window.parent.postMessage({ 
+                                action: 'call', 
+                                body: { remoteId: this.sessionId }
+                            }, '*');
     });
 
     function closeChat() {
