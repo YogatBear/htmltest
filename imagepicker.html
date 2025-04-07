@@ -123,7 +123,7 @@
         // Parse hash parameters
         const hashData = new URLSearchParams(decodeURIComponent(window.location.hash.slice(1)));
         const imageData = hashData.get('imageData');
-        const imageUri = hashData.get('imageUri');
+        const imageId = hashData.get('imageId');
 
         // Set image source
         // if (imageData.startsWith('data:')) {
@@ -145,7 +145,7 @@
                 action: 'sendImage',
                 body: {
                     image: previewImage.src,
-                    imageUri: imageUri,
+                    imageId: imageId,
                     caption: caption
                 }
             }, '*');

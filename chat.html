@@ -717,7 +717,7 @@
           // Pass both the image data and URI to the imagepicker
           const params = new URLSearchParams();
           params.set('imageData', data.imagePickerResult);
-          params.set('imageUri', data.imageUri || '');
+          params.set('imageId', data.imageId || '');
           iframe.src = 'imagepicker.html#' + encodeURIComponent(params.toString());
           
           document.body.appendChild(iframe);
@@ -739,7 +739,7 @@
         // Call controller method with all required parameters
         controller.sendImageMessage(
           sessionId,
-          event.data.body.imageUri,
+          event.data.body.imageId,
           event.data.body.caption || ''
         );
       }
