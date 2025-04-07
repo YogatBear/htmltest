@@ -126,11 +126,12 @@
         const imageUri = hashData.get('imageUri');
 
         // Set image source
-        if (imageData.startsWith('data:')) {
-            previewImage.src = imageData;
-        } else {
-            previewImage.src = `data:image/webp;base64,${imageData}`;
-        }
+        // if (imageData.startsWith('data:')) {
+        //     previewImage.src = imageData;
+        // } else {
+        //     previewImage.src = `data:image/webp;base64,${imageData}`;
+        // }
+        previewImage.src = imageData;
 
         // Handle back button
         backButton.addEventListener('click', () => {
