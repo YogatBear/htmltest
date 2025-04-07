@@ -99,6 +99,21 @@
       border-top: 1px solid rgba(0, 0, 0, 0.1);
       z-index: 1000;
     }
+    #image-button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: var(--secondary-purple);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    #image-button i {
+      font-size: 20px;
+    }
     #message-text {
       flex: 1;
       height: 40px;
@@ -278,6 +293,21 @@
       .system-message-time {
         color: rgba(255, 255, 255, 0.7);
       }
+      #image-button {
+        background-color: var(--purple-gradient);
+        background: rgba(20, 20, 30, 1);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+      }
+      .system-message-content {
+        color: rgba(255, 255, 255, 0.9);
+      }
+      .date-separator span {
+        color: rgba(255, 255, 255, 0.9);
+        background: none;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+
+
+      }
     }
     
     /* Spacing between different message types */
@@ -301,27 +331,6 @@
     .system-message-time + .system-message {
       margin-top: 4px;  /* Reduced margin after timestamp */
     }
-
-    /* Add this to the style section */
-
-
-    @media (prefers-color-scheme: dark) {
-      #image-button {
-        background-color: var(--purple-gradient);
-        background: rgba(20, 20, 30, 1);
-        border: 2px solid rgba(255, 255, 255, 0.5);
-      }
-      .system-message-content {
-        color: rgba(255, 255, 255, 0.9);
-      }
-      .date-separator span {
-        color: rgba(255, 255, 255, 0.9);
-        background: none;
-        border: 2px solid rgba(255, 255, 255, 0.5);
-
-
-      }
-    }
   </style>
 </head>
 
@@ -339,6 +348,9 @@
   </div>
   <div id="chat-container"></div>
   <div class="message-input">
+    <button id="image-button">
+      <i class="material-icons">image</i>
+    </button>
     <input type="text" id="message-text" placeholder="Type a message..." />
     <button id="send-button">
       <i class="material-icons">send</i>
@@ -570,6 +582,11 @@
         controller.sendMessage(sessionId, message);
         messageText.value = '';
       }
+    });
+
+    // Add image button event listener
+    document.getElementById("image-button").addEventListener("click", () => {
+      controller.imagePicker();
     });
 
     messageText.addEventListener('keypress', (e) => {
