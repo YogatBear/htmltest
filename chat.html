@@ -614,7 +614,7 @@
         contentElement.textContent = content;
       } else if (type === 'image') {
         const img = document.createElement('img');
-        img.src = content;
+        img.src = "http://localhost:8080/images/" + content;
         contentElement.appendChild(img);
       } else if (type === 'pendingDownload') {
         // Create file download UI
