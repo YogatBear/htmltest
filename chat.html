@@ -597,11 +597,6 @@
       
       // Store the message type as a data attribute
       messageElement.dataset.messageType = type;
-      
-      // For pendingDownload messages, store the fileInfo for comparison later
-      if (type === 'pendingDownload') {
-        messageElement.fileInfo = JSON.parse(JSON.stringify(content));
-      }
 
       // Show contact name for messages FROM the other person (where author is NOT sessionId)
       // Don't show for system messages or consecutive messages from same author
@@ -619,7 +614,7 @@
         contentElement.textContent = content;
       } else if (type === 'image') {
         const img = document.createElement('img');
-        img.src = content;
+        img.src = "http://localhost:8080/images/" + content;
         contentElement.appendChild(img);
       } else if (type === 'pendingDownload') {
         // Create file download UI
@@ -909,67 +904,52 @@
               // Find the existing message
               const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
               if (existingMsg) {
-                // Get the message type and check for changes needed
-                const currentType = existingMsg.dataset.messageType;
-                
-                // Default to image type if data.files is empty or not present
-                if (!data.files || !Array.isArray(data.files) || data.files.length === 0) {
-                  if (currentType !== 'image') {
-                    // Convert to image
-                    const nextElement = existingMsg.nextElementSibling;
-                    existingMsg.remove();
-                    
+                // If the message exists but has a different type, we need to replace it
+                if (existingMsg.dataset.messageType !== 'pendingDownload' && 
+                    existingMsg.dataset.messageType !== 'image') {
+                  // Get the next sibling to reinsert at the right position
+                  const nextElement = existingMsg.nextElementSibling;
+                  existingMsg.remove();
+                  
+                  // Check if it's a file or an image
+                  if (data.files && Array.isArray(data.files)) {
+                    const file = data.files.find(f => f[0] === fileId);
+                    if (file) {
+                      // It's a file - display pending download
+                      const fileInfo = {
+                        fileId: file[0],
+                        name: file[1],
+                        type: file[2],
+                        size: file[3],
+                        cid: file[4]
+                      };
+                      const updatedMessage = createMessageElement(fileInfo, author, time, "pendingDownload", msgStatus, messageId, false, contact);
+                      if (nextElement) {
+                        chatContainer.insertBefore(updatedMessage, nextElement);
+                      } else {
+                        chatContainer.appendChild(updatedMessage);
+                      }
+                    } else {
+                      // It's an image - use fileId as src
+                      const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact);
+                      if (nextElement) {
+                        chatContainer.insertBefore(updatedMessage, nextElement);
+                      } else {
+                        chatContainer.appendChild(updatedMessage);
+                      }
+                    }
+                  } else {
+                    // No files array but fileId exists, assume it's an image
                     const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact);
                     if (nextElement) {
                       chatContainer.insertBefore(updatedMessage, nextElement);
                     } else {
                       chatContainer.appendChild(updatedMessage);
                     }
-                  } else {
-                    // Just update status if it's already an image
-                    updateMessage(messageId, content, msgStatus);
                   }
                 } else {
-                  // Check if it's a file or an image
-                  let shouldBeType = 'image'; // Default to image if no files match
-                  let fileInfo = null;
-                  
-                  const file = data.files.find(f => f[0] === fileId);
-                  if (file) {
-                    shouldBeType = 'pendingDownload';
-                    fileInfo = {
-                      fileId: file[0],
-                      name: file[1],
-                      type: file[2],
-                      size: file[3],
-                      cid: file[4]
-                    };
-                  }
-                  
-                  // If the type needs to change or if pendingDownload is now ready for download
-                  if (currentType !== shouldBeType || 
-                      (currentType === 'pendingDownload' && shouldBeType === 'pendingDownload' && 
-                       JSON.stringify(fileInfo) !== JSON.stringify(existingMsg.fileInfo))) {
-                    // Get the next sibling to reinsert at the right position
-                    const nextElement = existingMsg.nextElementSibling;
-                    existingMsg.remove();
-                    
-                    let updatedMessage;
-                    if (shouldBeType === 'pendingDownload') {
-                      updatedMessage = createMessageElement(fileInfo, author, time, "pendingDownload", msgStatus, messageId, false, contact);
-                    } else {
-                      updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact);
-                    }
-                    
-                    if (nextElement) {
-                      chatContainer.insertBefore(updatedMessage, nextElement);
-                    } else {
-                      chatContainer.appendChild(updatedMessage);
-                    }
-                  } else {
-                    // Just update status for same type
-                    updateMessage(messageId, content, msgStatus);
-                  }
+                  // Otherwise just update the status
+                  updateMessage(messageId, content, msgStatus);
                 }
               }
             } else {
