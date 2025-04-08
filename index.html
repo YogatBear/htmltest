@@ -260,10 +260,10 @@
                 this.sendMessageToNativeApp(request);
             }
 
-            downloadFile(fileId) {
+            downloadFile(fileId, cid, messageId) {
                 const request = {
                     action: "download-file",
-                    body: { localId: this.localId, pid: this.pid, fileId: fileId }
+                    body: { localId: this.localId, pid: this.pid, fileId: fileId, cid: cid, messageId: messageId }
                 };
                 this.sendMessageToNativeApp(request);
             }

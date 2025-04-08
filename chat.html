@@ -647,7 +647,7 @@
         downloadButton.addEventListener('click', () => {
           window.parent.postMessage({ 
             action: 'download-file', 
-            body: { fileId: content.fileId } 
+            body: { fileId: content.fileId, cid: content.cid, messageId: messageId } 
           }, '*');
         });
         

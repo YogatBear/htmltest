@@ -444,7 +444,7 @@
                     overlay.classList.remove('show');
                     break;
                 case 'download-file':
-                    downloadFile(event.data.body.fileId);
+                    downloadFile(event.data.body.fileId, event.data.body.cid, event.data.body.messageId);
                     break;
             }
         });
@@ -523,9 +523,9 @@
             
             controller.call(remoteId);
         }
-        function downloadFile(fileId) {
+        function downloadFile(fileId, cid, messageId) {
             console.log("downloading file: "+fileId);
-            controller.downloadFile(fileId);
+            controller.downloadFile(fileId, cid, messageId);
             // Implement file download functionality here
         }
     </script>
