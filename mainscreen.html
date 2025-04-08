@@ -443,6 +443,9 @@
                     const overlay = document.getElementById('callingOverlay');
                     overlay.classList.remove('show');
                     break;
+                case 'download-file':
+                    downloadFile(event.data.body.fileId);
+                    break;
             }
         });
         
@@ -519,6 +522,11 @@
             }, { once: true });  // Remove listener after first click
             
             controller.call(remoteId);
+        }
+        function downloadFile(fileId) {
+            console.log("downloading file: "+fileId);
+            controller.downloadFile(fileId);
+            // Implement file download functionality here
         }
     </script>
 </body>

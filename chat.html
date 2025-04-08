@@ -84,6 +84,70 @@
         transform: translateY(0);
       }
     }
+    /* File container styling */
+    .file-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 220px;
+      max-width: 100%;
+    }
+    
+    .file-container .material-icons {
+      font-size: 28px;
+    }
+    
+    .file-info {
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    .file-name {
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+    
+    .file-size {
+      font-size: 11px;
+      opacity: 0.7;
+    }
+    
+    /* Image styling in messages */
+    .message-content img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    
+    .download-button {
+      background: transparent;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+    }
+    
+    .download-button:hover {
+      background: rgba(0, 0, 0, 0.1);
+    }
+    
+    .sent .download-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .download-button .material-icons {
+      font-size: 20px;
+    }
     /* Input area */
     .message-input {
       position: fixed;
@@ -305,8 +369,36 @@
         color: rgba(255, 255, 255, 0.9);
         background: none;
         border: 2px solid rgba(255, 255, 255, 0.5);
-
-
+      }
+      
+      /* Dark mode styles for message content */
+      .message.received {
+        background: rgba(40, 40, 50, 0.9);
+        border-color: rgba(60, 60, 70, 0.8);
+        color: rgba(255, 255, 255, 0.9);
+      }
+      
+      /* Dark mode styles for file container */
+      .message.received .file-container {
+        color: rgba(255, 255, 255, 0.9);
+      }
+      
+      .message.received .file-size {
+        color: rgba(255, 255, 255, 0.7);
+      }
+      
+      .message.received .download-button:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      
+      #message-text {
+        background: rgba(40, 40, 50, 0.8);
+        color: white;
+        border-color: rgba(60, 60, 70, 0.8);
+      }
+      
+      #message-text::placeholder {
+        color: rgba(255, 255, 255, 0.5);
       }
     }
     
@@ -502,6 +594,9 @@
         messageElement.dataset.messageId = messageId;
         messageElement.dataset.time = time;
       }
+      
+      // Store the message type as a data attribute
+      messageElement.dataset.messageType = type;
 
       // Show contact name for messages FROM the other person (where author is NOT sessionId)
       // Don't show for system messages or consecutive messages from same author
@@ -521,6 +616,43 @@
         const img = document.createElement('img');
         img.src = content;
         contentElement.appendChild(img);
+      } else if (type === 'pendingDownload') {
+        // Create file download UI
+        const fileContainer = document.createElement('div');
+        fileContainer.classList.add('file-container');
+        
+        const fileIcon = document.createElement('span');
+        fileIcon.classList.add('material-icons');
+        fileIcon.textContent = 'insert_drive_file';
+        fileContainer.appendChild(fileIcon);
+        
+        const fileInfo = document.createElement('div');
+        fileInfo.classList.add('file-info');
+        
+        const fileName = document.createElement('div');
+        fileName.classList.add('file-name');
+        fileName.textContent = content.name;
+        fileInfo.appendChild(fileName);
+        
+        const fileSize = document.createElement('div');
+        fileSize.classList.add('file-size');
+        fileSize.textContent = formatFileSize(content.size);
+        fileInfo.appendChild(fileSize);
+        
+        fileContainer.appendChild(fileInfo);
+        
+        const downloadButton = document.createElement('button');
+        downloadButton.classList.add('download-button');
+        downloadButton.innerHTML = '<span class="material-icons">download</span>';
+        downloadButton.addEventListener('click', () => {
+          window.parent.postMessage({ 
+            action: 'download-file', 
+            body: { fileId: content.fileId } 
+          }, '*');
+        });
+        
+        fileContainer.appendChild(downloadButton);
+        contentElement.appendChild(fileContainer);
       }
       
       messageElement.appendChild(contentElement);
@@ -548,6 +680,15 @@
 
       messageElement.appendChild(footerElement);
       return messageElement;
+    }
+
+    // Helper function to format file size
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
     // Set the chat title
@@ -624,7 +765,14 @@
                 // Update regular message content
                 const contentElement = existingMsg.querySelector('.message-content');
                 if (contentElement) {
-                    contentElement.textContent = content;
+                    // Check if this is a file or image message
+                    if (existingMsg.dataset.messageType === 'pendingDownload' || 
+                        existingMsg.dataset.messageType === 'image') {
+                        // Don't update the content for these types
+                    } else {
+                        // For text messages, update the content
+                        contentElement.textContent = content;
+                    }
                 }
                 
                 // Update status if it's a sent message
@@ -657,15 +805,41 @@
         
         if (data.message) {
           console.log("Received single message data:", data.message);
-          const [messageId, time, author, content, msgSessionId, contact, msgStatus] = data.message;
+          const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = data.message;
           if (msgSessionId === sessionId) {
-            addMessage(content, author, time, "text", msgStatus, messageId, true, contact);
+            if (fileId && fileId.trim() !== '') {
+              // Check if it's an image or a file
+              if (data.files && Array.isArray(data.files)) {
+                // Look for the file in data.files
+                const file = data.files.find(f => f[0] === fileId);
+                if (file) {
+                  // It's a file - display pending download message
+                  const fileInfo = {
+                    fileId: file[0],
+                    name: file[1],
+                    type: file[2],
+                    size: file[3],
+                    cid: file[4]
+                  };
+                  addMessage(fileInfo, author, time, "pendingDownload", msgStatus, messageId, true, contact);
+                } else {
+                  // It's an image - use fileId as the src
+                  addMessage(fileId, author, time, "image", msgStatus, messageId, true, contact);
+                }
+              } else {
+                // No files array, assume it's an image
+                addMessage(fileId, author, time, "image", msgStatus, messageId, true, contact);
+              }
+            } else {
+              // Normal text message
+              addMessage(content, author, time, "text", msgStatus, messageId, true, contact);
+            }
             controller.updateSessionTimestamp(sessionId);
           }
         } else if (data.messages) {
           console.log("Received multiple messages data:", data.messages);
           
-          if (!data.messages || data.messages.length === 0) {
+          if (!data.messages || data.messages.length === 0 || !data.files) {
             hasMoreMessages = false;
             return;
           }
@@ -679,9 +853,34 @@
           lastAuthor = null;
           
           sortedMessages.forEach(msg => {
-            const [messageId, time, author, content, msgSessionId, contact, msgStatus] = msg;
+            const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = msg;
             if (msgSessionId === sessionId) {
-              addMessage(content, author, time, "text", msgStatus, messageId, false, contact);
+              if (fileId && fileId.trim() !== '') {
+                // Check if it's a file or an image
+                if (data.files && Array.isArray(data.files)) {
+                  const file = data.files.find(f => f[0] === fileId);
+                  if (file) {
+                    // It's a file - display pending download
+                    const fileInfo = {
+                      fileId: file[0],
+                      name: file[1],
+                      type: file[2],
+                      size: file[3],
+                      cid: file[4]
+                    };
+                    addMessage(fileInfo, author, time, "pendingDownload", msgStatus, messageId, false, contact);
+                  } else {
+                    // It's an image - use fileId as src
+                    addMessage(fileId, author, time, "image", msgStatus, messageId, false, contact);
+                  }
+                } else {
+                  // No files array but fileId exists, assume it's an image
+                  addMessage(fileId, author, time, "image", msgStatus, messageId, false, contact);
+                }
+              } else {
+                // Normal text message
+                addMessage(content, author, time, "text", msgStatus, messageId, false, contact);
+              }
             }
           });
 
@@ -698,9 +897,65 @@
           controller.updateSessionTimestamp(sessionId);
         } else if (data.updatedMessage) {
           console.log("Received updatedMessage data:", data.updatedMessage);
-          const [messageId, time, author, content, msgSessionId, contact, msgStatus] = data.updatedMessage;
+          const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = data.updatedMessage;
           if (msgSessionId === sessionId) {
-            updateMessage(messageId, content, msgStatus);
+            // If there's a fileId, we need special handling
+            if (fileId && fileId.trim() !== '') {
+              // Find the existing message
+              const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
+              if (existingMsg) {
+                // If the message exists but has a different type, we need to replace it
+                if (existingMsg.dataset.messageType !== 'pendingDownload' && 
+                    existingMsg.dataset.messageType !== 'image') {
+                  // Get the next sibling to reinsert at the right position
+                  const nextElement = existingMsg.nextElementSibling;
+                  existingMsg.remove();
+                  
+                  // Check if it's a file or an image
+                  if (data.files && Array.isArray(data.files)) {
+                    const file = data.files.find(f => f[0] === fileId);
+                    if (file) {
+                      // It's a file - display pending download
+                      const fileInfo = {
+                        fileId: file[0],
+                        name: file[1],
+                        type: file[2],
+                        size: file[3],
+                        cid: file[4]
+                      };
+                      const updatedMessage = createMessageElement(fileInfo, author, time, "pendingDownload", msgStatus, messageId, false, contact);
+                      if (nextElement) {
+                        chatContainer.insertBefore(updatedMessage, nextElement);
+                      } else {
+                        chatContainer.appendChild(updatedMessage);
+                      }
+                    } else {
+                      // It's an image - use fileId as src
+                      const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact);
+                      if (nextElement) {
+                        chatContainer.insertBefore(updatedMessage, nextElement);
+                      } else {
+                        chatContainer.appendChild(updatedMessage);
+                      }
+                    }
+                  } else {
+                    // No files array but fileId exists, assume it's an image
+                    const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact);
+                    if (nextElement) {
+                      chatContainer.insertBefore(updatedMessage, nextElement);
+                    } else {
+                      chatContainer.appendChild(updatedMessage);
+                    }
+                  }
+                } else {
+                  // Otherwise just update the status
+                  updateMessage(messageId, content, msgStatus);
+                }
+              }
+            } else {
+              // Regular text message update
+              updateMessage(messageId, content, msgStatus);
+            }
           }
         } else if (data.imagePickerResult) {
           console.log("Received imagePickerResult data:", data.imagePickerResult);
