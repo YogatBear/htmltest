@@ -903,48 +903,35 @@
             if (fileId && fileId.trim() !== '') {
               // Find the existing message
               const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
-              console.log("here 0")
-              if (existingMsg) {
-                // If the message exists but has a different type, we need to replace it
-                if (existingMsg.dataset.messageType !== 'pendingDownload' && 
-                    existingMsg.dataset.messageType !== 'image') {
-                  // Get the next sibling to reinsert at the right position
-                  const nextElement = existingMsg.nextElementSibling;
-                  existingMsg.remove();
-                  console.log("here 1")
-                  // Check if it's a file or an image
-                  if (data.files && Array.isArray(data.files)) {
-                    console.log("here 2")
-                    const file = data.files.find(f => f[0] === fileId);
-                    if (file) {
-                      console.log("here 3")
-                      // It's a file - display pending download
-                      const fileInfo = {
-                        fileId: file[0],
-                        name: file[1],
-                        type: file[2],
-                        size: file[3],
-                        cid: file[4]
-                      };
-                      const updatedMessage = createMessageElement(fileInfo, author, time, "pendingDownload", msgStatus, messageId, false, contact);
-                      if (nextElement) {
-                        chatContainer.insertBefore(updatedMessage, nextElement);
-                      } else {
-                        chatContainer.appendChild(updatedMessage);
-                      }
+              console.log("Found existing message:", existingMsg);
+              
+              // Whether existing message exists or not, we need to handle the fileId
+              if (!existingMsg || existingMsg.dataset.messageType === 'pendingDownload') {
+                // Need to replace with image message - either the message doesn't exist yet
+                // or it was a pending download that is now ready
+                const nextElement = existingMsg ? existingMsg.nextElementSibling : null;
+                if (existingMsg) existingMsg.remove();
+                
+                // Check if it's a file or an image
+                if (data.files && Array.isArray(data.files)) {
+                  const file = data.files.find(f => f[0] === fileId);
+                  if (file) {
+                    // It's a file - display pending download
+                    const fileInfo = {
+                      fileId: file[0],
+                      name: file[1],
+                      type: file[2],
+                      size: file[3],
+                      cid: file[4]
+                    };
+                    const updatedMessage = createMessageElement(fileInfo, author, time, "pendingDownload", msgStatus, messageId, false, contact);
+                    if (nextElement) {
+                      chatContainer.insertBefore(updatedMessage, nextElement);
                     } else {
-                      console.log("here 4")
-                      // It's an image - use fileId as src
-                      const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact);
-                      if (nextElement) {
-                        chatContainer.insertBefore(updatedMessage, nextElement);
-                      } else {
-                        chatContainer.appendChild(updatedMessage);
-                      }
+                      chatContainer.appendChild(updatedMessage);
                     }
                   } else {
-                    console.log("here 5")
-                    // No files array but fileId exists, assume it's an image
+                    // It's an image - use fileId as src
                     const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact);
                     if (nextElement) {
                       chatContainer.insertBefore(updatedMessage, nextElement);
@@ -953,9 +940,29 @@
                     }
                   }
                 } else {
-                  // Otherwise just update the status
-                  updateMessage(messageId, content, msgStatus);
+                  // No files array but fileId exists, assume it's an image
+                  const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact);
+                  if (nextElement) {
+                    chatContainer.insertBefore(updatedMessage, nextElement);
+                  } else {
+                    chatContainer.appendChild(updatedMessage);
+                  }
                 }
+              } else if (existingMsg.dataset.messageType !== 'image') {
+                // If it exists but is not an image or pending download, replace it
+                const nextElement = existingMsg.nextElementSibling;
+                existingMsg.remove();
+                
+                // Create an image message
+                const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact);
+                if (nextElement) {
+                  chatContainer.insertBefore(updatedMessage, nextElement);
+                } else {
+                  chatContainer.appendChild(updatedMessage);
+                }
+              } else {
+                // It's already an image, just update the status
+                updateMessage(messageId, content, msgStatus);
               }
             } else {
               // Regular text message update
