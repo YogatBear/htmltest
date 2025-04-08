@@ -903,6 +903,7 @@
             if (fileId && fileId.trim() !== '') {
               // Find the existing message
               const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
+              console.log("here 0")
               if (existingMsg) {
                 // If the message exists but has a different type, we need to replace it
                 if (existingMsg.dataset.messageType !== 'pendingDownload' && 
@@ -910,11 +911,13 @@
                   // Get the next sibling to reinsert at the right position
                   const nextElement = existingMsg.nextElementSibling;
                   existingMsg.remove();
-                  
+                  console.log("here 1")
                   // Check if it's a file or an image
                   if (data.files && Array.isArray(data.files)) {
+                    console.log("here 2")
                     const file = data.files.find(f => f[0] === fileId);
                     if (file) {
+                      console.log("here 3")
                       // It's a file - display pending download
                       const fileInfo = {
                         fileId: file[0],
@@ -930,6 +933,7 @@
                         chatContainer.appendChild(updatedMessage);
                       }
                     } else {
+                      console.log("here 4")
                       // It's an image - use fileId as src
                       const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact);
                       if (nextElement) {
@@ -939,6 +943,7 @@
                       }
                     }
                   } else {
+                    console.log("here 5")
                     // No files array but fileId exists, assume it's an image
                     const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact);
                     if (nextElement) {
