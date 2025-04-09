@@ -789,7 +789,7 @@
           contentElement.appendChild(captionElement);
         }
       } else if (type === 'pendingDownload') {
-        // Create file download UI
+        // Create file download UI using content as fileIdObj
         const fileContainer = document.createElement('div');
         fileContainer.classList.add('file-container');
         
@@ -803,12 +803,12 @@
         
         const fileName = document.createElement('div');
         fileName.classList.add('file-name');
-        fileName.textContent = content.name;
+        fileName.textContent = content.name || 'Unknown file';
         fileInfo.appendChild(fileName);
         
         const fileSize = document.createElement('div');
         fileSize.classList.add('file-size');
-        fileSize.textContent = formatFileSize(content.size);
+        fileSize.textContent = formatFileSize(content.size || 0);
         fileInfo.appendChild(fileSize);
         
         fileContainer.appendChild(fileInfo);
@@ -819,7 +819,7 @@
         downloadButton.addEventListener('click', () => {
           window.parent.postMessage({ 
             action: 'download-file', 
-            body: { fileId: content.fileId, cid: content.cid, messageId: messageId } 
+            body: { fileInfo: content, messageId: messageId } 
           }, '*');
         });
         
@@ -948,17 +948,62 @@
                 const contentElement = existingMsg.querySelector('.message-content');
                 if (contentElement) {
                     // Check if this is a file or image message
-                    if (existingMsg.dataset.messageType === 'pendingDownload' || 
-                        existingMsg.dataset.messageType === 'image') {
-                        // For images and files, update captions if they exist
+                    if (existingMsg.dataset.messageType === 'pendingDownload') {
+                        // For pending downloads, update the file info if content is an object
+                        if (typeof content === 'object' && content !== null) {
+                            const fileName = existingMsg.querySelector('.file-name');
+                            if (fileName) {
+                                fileName.textContent = content.name || 'Unknown file';
+                            }
+                            
+                            const fileSize = existingMsg.querySelector('.file-size');
+                            if (fileSize) {
+                                fileSize.textContent = formatFileSize(content.size || 0);
+                            }
+                            
+                            // Update download button click handler
+                            const downloadButton = existingMsg.querySelector('.download-button');
+                            if (downloadButton) {
+                                // Remove old event listeners
+                                const newButton = downloadButton.cloneNode(true);
+                                downloadButton.parentNode.replaceChild(newButton, downloadButton);
+                                
+                                // Add new event listener
+                                newButton.addEventListener('click', () => {
+                                    window.parent.postMessage({ 
+                                        action: 'download-file', 
+                                        body: { fileInfo: content, messageId: messageId } 
+                                    }, '*');
+                                });
+                            }
+                        }
+                        
+                        // Update caption if provided
                         if (caption) {
-                            let captionElement = existingMsg.querySelector('.image-caption, .file-caption');
+                            let captionElement = existingMsg.querySelector('.file-caption');
+                            
+                            // If caption element doesn't exist but we have a caption, create it
+                            if (!captionElement) {
+                                captionElement = document.createElement('div');
+                                captionElement.classList.add('file-caption');
+                                contentElement.appendChild(captionElement);
+                            }
+                            
+                            // Update the caption text
+                            captionElement.textContent = caption;
+                        }
+                    } else if (existingMsg.dataset.messageType === 'image' || existingMsg.dataset.messageType === 'video') {
+                        // For images and videos, update captions if they exist
+                        if (caption) {
+                            let captionElement = existingMsg.querySelector(
+                                existingMsg.dataset.messageType === 'image' ? '.image-caption' : '.video-caption'
+                            );
                             
                             // If caption element doesn't exist but we have a caption, create it
                             if (!captionElement) {
                                 captionElement = document.createElement('div');
                                 captionElement.classList.add(
-                                    existingMsg.dataset.messageType === 'image' ? 'image-caption' : 'file-caption'
+                                    existingMsg.dataset.messageType === 'image' ? 'image-caption' : 'video-caption'
                                 );
                                 contentElement.appendChild(captionElement);
                             }
@@ -1004,35 +1049,26 @@
           console.log("Received single message data:", data.message);
           const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = data.message;
           if (msgSessionId === sessionId) {
-            if (fileId && fileId.trim() !== '') {
-              // Check if it's a file or an image/video
-              if (data.files && Array.isArray(data.files)) {
-                // Look for the file in data.files
-                const file = data.files.find(f => f[0] === fileId);
-                if (file) {
-                  // It's a file - display pending download message
-                  const fileInfo = {
-                    fileId: file[0],
-                    name: file[1],
-                    type: file[2],
-                    size: file[3],
-                    cid: file[4]
-                  };
-                  addMessage(fileInfo, author, time, "pendingDownload", msgStatus, messageId, true, contact, content);
-                } else {
-                  // Check if it's an image or video based on file extension
-                  const fileExtension = fileId.split('.').pop().toLowerCase();
-                  const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
-                  const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
-                  if (messageType === "video") {
-                    console.log("Message type: is video");
-                  }
-                  // Use appropriate message type (image or video)
-                  addMessage(fileId, author, time, messageType, msgStatus, messageId, true, contact, content);
-                }
+            let fileIdObj;
+            try {
+              fileIdObj = fileId ? JSON.parse(fileId) : {};
+            } catch (e) {
+              console.error("Error parsing fileId JSON:", e);
+              fileIdObj = {};
+            }
+
+            if (Object.keys(fileIdObj).length > 0) {
+              // This is a file message
+              if (fileIdObj.fileUrl) {
+                // Downloaded image/video ready to display
+                const fileUrl = fileIdObj.fileUrl;
+                const fileExtension = fileUrl.split('.').pop().toLowerCase();
+                const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+                const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
+                addMessage(fileUrl, author, time, messageType, msgStatus, messageId, true, contact, content);
               } else {
-                // No files array but fileId exists, assume it's an image
-                addMessage(fileId, author, time, "image", msgStatus, messageId, false, contact, content);
+                // Pending download - display with file info
+                addMessage(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, true, contact, content);
               }
             } else {
               // Normal text message
@@ -1059,32 +1095,26 @@
           sortedMessages.forEach(msg => {
             const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = msg;
             if (msgSessionId === sessionId) {
-              if (fileId && fileId.trim() !== '') {
-                // Check if it's a file or an image
-                if (data.files && Array.isArray(data.files)) {
-                  const file = data.files.find(f => f[0] === fileId);
-                  if (file) {
-                    // It's a file - display pending download
-                    const fileInfo = {
-                      fileId: file[0],
-                      name: file[1],
-                      type: file[2],
-                      size: file[3],
-                      cid: file[4]
-                    };
-                    addMessage(fileInfo, author, time, "pendingDownload", msgStatus, messageId, false, contact, content);
-                  } else {
-                    // Check if it's an image or video based on file extension
-                    const fileExtension = fileId.split('.').pop().toLowerCase();
-                    const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
-                    const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
-                    
-                    // Use appropriate message type (image or video)
-                    addMessage(fileId, author, time, messageType, msgStatus, messageId, false, contact, content);
-                  }
+              let fileIdObj;
+              try {
+                fileIdObj = fileId ? JSON.parse(fileId) : {};
+              } catch (e) {
+                console.error("Error parsing fileId JSON:", e);
+                fileIdObj = {};
+              }
+
+              if (Object.keys(fileIdObj).length > 0) {
+                // This is a file message
+                if (fileIdObj.fileUrl) {
+                  // Downloaded image/video ready to display
+                  const fileUrl = fileIdObj.fileUrl;
+                  const fileExtension = fileUrl.split('.').pop().toLowerCase();
+                  const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+                  const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
+                  addMessage(fileUrl, author, time, messageType, msgStatus, messageId, false, contact, content);
                 } else {
-                  // No files array but fileId exists, assume it's an image
-                  addMessage(fileId, author, time, "image", msgStatus, messageId, false, contact, content);
+                  // Pending download - display with file info
+                  addMessage(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content);
                 }
               } else {
                 // Normal text message
@@ -1108,8 +1138,16 @@
           console.log("Received updatedMessage data:", data.updatedMessage);
           const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = data.updatedMessage;
           if (msgSessionId === sessionId) {
-            // If there's a fileId, we need special handling
-            if (fileId && fileId.trim() !== '') {
+            let fileIdObj;
+            try {
+              fileIdObj = fileId ? JSON.parse(fileId) : {};
+            } catch (e) {
+              console.error("Error parsing fileId JSON:", e);
+              fileIdObj = {};
+            }
+
+            // If there's a fileId object with data, we need special handling
+            if (Object.keys(fileIdObj).length > 0) {
               // Find the existing message
               const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
               console.log("Found existing message:", existingMsg);
@@ -1121,46 +1159,22 @@
                 const nextElement = existingMsg ? existingMsg.nextElementSibling : null;
                 if (existingMsg) existingMsg.remove();
                 
-                // Check if it's a file or an image/video
-                if (data.files && Array.isArray(data.files)) {
-                  const file = data.files.find(f => f[0] === fileId);
-                  if (file) {
-                    // It's a file - display pending download
-                    const fileInfo = {
-                      fileId: file[0],
-                      name: file[1],
-                      type: file[2],
-                      size: file[3],
-                      cid: file[4]
-                    };
-                    const updatedMessage = createMessageElement(fileInfo, author, time, "pendingDownload", msgStatus, messageId, false, contact, content);
-                    if (nextElement) {
-                      chatContainer.insertBefore(updatedMessage, nextElement);
-                    } else {
-                      chatContainer.appendChild(updatedMessage);
-                    }
-                  } else {
-                    // Check if it's an image or video based on file extension
-                    const fileExtension = fileId.split('.').pop().toLowerCase();
-                    const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
-                    const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
-                    
-                    // Use appropriate message type (image or video)
-                    const updatedMessage = createMessageElement(fileId, author, time, messageType, msgStatus, messageId, false, contact, content);
-                    if (nextElement) {
-                      chatContainer.insertBefore(updatedMessage, nextElement);
-                    } else {
-                      chatContainer.appendChild(updatedMessage);
-                    }
-                  }
-                } else {
-                  // No files array but fileId exists, check if it's a video or image
-                  const fileExtension = fileId.split('.').pop().toLowerCase();
+                if (fileIdObj.fileUrl) {
+                  // Downloaded file ready to display
+                  const fileUrl = fileIdObj.fileUrl;
+                  const fileExtension = fileUrl.split('.').pop().toLowerCase();
                   const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
                   const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
                   
-                  // Use appropriate message type (image or video)
-                  const updatedMessage = createMessageElement(fileId, author, time, messageType, msgStatus, messageId, false, contact, content);
+                  const updatedMessage = createMessageElement(fileUrl, author, time, messageType, msgStatus, messageId, false, contact, content);
+                  if (nextElement) {
+                    chatContainer.insertBefore(updatedMessage, nextElement);
+                  } else {
+                    chatContainer.appendChild(updatedMessage);
+                  }
+                } else {
+                  // Still a pending download
+                  const updatedMessage = createMessageElement(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content);
                   if (nextElement) {
                     chatContainer.insertBefore(updatedMessage, nextElement);
                   } else {
@@ -1169,36 +1183,48 @@
                 }
               } else {
                 // Handle existing message
-                // Check if the file is a video based on its extension
-                const fileExtension = fileId.split('.').pop().toLowerCase();
-                const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
-                const isVideo = videoExtensions.includes(fileExtension);
-                
-                if (isVideo) {
-                  // Handle video update
-                  if (existingMsg.dataset.messageType === 'video') {
-                    // Just update the video source if it's already a video element
-                    const videoElement = existingMsg.querySelector('.message-content video');
-                    if (videoElement) {
-                      videoElement.src = fileId + '?t=' + new Date().getTime();
-                      videoElement.load(); // Force the video to reload
-                      
-                      // Update status
-                      const statusIcon = existingMsg.querySelector('.message-status-icon');
-                      if (statusIcon && msgStatus !== null) {
-                        switch (msgStatus) {
-                          case 0: statusIcon.textContent = 'schedule'; break;
-                          case 1: statusIcon.textContent = 'done'; break;
-                          case 2: statusIcon.textContent = 'error'; break;
-                          case 4: statusIcon.textContent = 'done_all'; break;
-                          default: statusIcon.textContent = ''; break;
+                if (fileIdObj.fileUrl) {
+                  const fileUrl = fileIdObj.fileUrl;
+                  const fileExtension = fileUrl.split('.').pop().toLowerCase();
+                  const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+                  const isVideo = videoExtensions.includes(fileExtension);
+                  
+                  if (isVideo) {
+                    // Handle video update
+                    if (existingMsg.dataset.messageType === 'video') {
+                      // Just update the video source if it's already a video element
+                      const videoElement = existingMsg.querySelector('.message-content video');
+                      if (videoElement) {
+                        videoElement.src = fileUrl + '?t=' + new Date().getTime();
+                        videoElement.load(); // Force the video to reload
+                        
+                        // Update status
+                        const statusIcon = existingMsg.querySelector('.message-status-icon');
+                        if (statusIcon && msgStatus !== null) {
+                          switch (msgStatus) {
+                            case 0: statusIcon.textContent = 'schedule'; break;
+                            case 1: statusIcon.textContent = 'done'; break;
+                            case 2: statusIcon.textContent = 'error'; break;
+                            case 4: statusIcon.textContent = 'done_all'; break;
+                            default: statusIcon.textContent = ''; break;
+                          }
+                        }
+                      } else {
+                        // Replace the entire message if video element not found
+                        const nextElement = existingMsg.nextElementSibling;
+                        existingMsg.remove();
+                        const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content);
+                        if (nextElement) {
+                          chatContainer.insertBefore(updatedMessage, nextElement);
+                        } else {
+                          chatContainer.appendChild(updatedMessage);
                         }
                       }
                     } else {
-                      // Replace the entire message if video element not found
+                      // If it's not already a video message, replace the entire message
                       const nextElement = existingMsg.nextElementSibling;
                       existingMsg.remove();
-                      const updatedMessage = createMessageElement(fileId, author, time, "video", msgStatus, messageId, false, contact, content);
+                      const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content);
                       if (nextElement) {
                         chatContainer.insertBefore(updatedMessage, nextElement);
                       } else {
@@ -1206,48 +1232,39 @@
                       }
                     }
                   } else {
-                    // If it's not already a video message, replace the entire message
-                    const nextElement = existingMsg.nextElementSibling;
-                    existingMsg.remove();
-                    const updatedMessage = createMessageElement(fileId, author, time, "video", msgStatus, messageId, false, contact, content);
-                    if (nextElement) {
-                      chatContainer.insertBefore(updatedMessage, nextElement);
+                    // Handle image update
+                    if (existingMsg.dataset.messageType === 'image') {
+                      const imageElement = existingMsg.querySelector('.message-content img');
+                      if (imageElement) {
+                        // Force a complete refresh of the image
+                        imageElement.src = fileUrl + '?t=' + new Date().getTime();
+                      } else {
+                        // Replace the entire message if image element not found
+                        const nextElement = existingMsg.nextElementSibling;
+                        existingMsg.remove();
+                        const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content);
+                        if (nextElement) {
+                          chatContainer.insertBefore(updatedMessage, nextElement);
+                        } else {
+                          chatContainer.appendChild(updatedMessage);
+                        }
+                      }
                     } else {
-                      chatContainer.appendChild(updatedMessage);
+                      // If it's not already an image message, replace the entire message
+                      const nextElement = existingMsg.nextElementSibling;
+                      existingMsg.remove();
+                      const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content);
+                      if (nextElement) {
+                        chatContainer.insertBefore(updatedMessage, nextElement);
+                      } else {
+                        chatContainer.appendChild(updatedMessage);
+                      }
                     }
                   }
                 } else {
-                  // Handle image update
-                  if (existingMsg.dataset.messageType === 'image') {
-                    const imageElement = existingMsg.querySelector('.message-content img');
-                    if (imageElement) {
-                      // Force a complete refresh of the image
-                      imageElement.src = fileId + '?t=' + new Date().getTime();
-                    } else {
-                      // Replace the entire message if image element not found
-                      const nextElement = existingMsg.nextElementSibling;
-                      existingMsg.remove();
-                      const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact, content);
-                      if (nextElement) {
-                        chatContainer.insertBefore(updatedMessage, nextElement);
-                      } else {
-                        chatContainer.appendChild(updatedMessage);
-                      }
-                    }
-                  } else {
-                    // If it's not already an image message, replace the entire message
-                    const nextElement = existingMsg.nextElementSibling;
-                    existingMsg.remove();
-                    const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact, content);
-                    if (nextElement) {
-                      chatContainer.insertBefore(updatedMessage, nextElement);
-                    } else {
-                      chatContainer.appendChild(updatedMessage);
-                    }
-                  }
+                  // Update the pending download info display
+                  updateMessage(messageId, fileIdObj, msgStatus, content);
                 }
-                
-                // Don't call updateMessage here as we've already updated the status inline above
               }
             } else {
               // Regular text message update
