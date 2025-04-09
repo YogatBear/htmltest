@@ -503,6 +503,41 @@
     .file-container {
       margin-bottom: 4px;
     }
+
+    /* Video styling in messages */
+    .message-content video {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    
+    .video-container {
+      margin-bottom: 4px;
+    }
+    
+    .video-caption {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(200, 200, 200, 0.3);
+      font-size: 14px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    
+    .sent .video-caption {
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .received .video-caption {
+      color: var(--dark-purple);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .received .video-caption {
+        color: rgba(255, 255, 255, 0.9);
+      }
+    }
   </style>
 </head>
 
@@ -714,6 +749,41 @@
         if (caption) {
           const captionElement = document.createElement('div');
           captionElement.classList.add('image-caption');
+          captionElement.textContent = caption;
+          contentElement.appendChild(captionElement);
+        }
+      } else if (type === 'video') {
+        // Create a container for the video and caption
+        const videoContainer = document.createElement('div');
+        videoContainer.classList.add('video-container');
+        
+        // Add the video element
+        const videoElement = document.createElement('video');
+        videoElement.src = "http://localhost:8080/images/" + content;
+        videoElement.controls = true;
+        videoElement.preload = "metadata";
+        videoElement.classList.add('message-video');
+        
+        // Add ability to go fullscreen on click
+        videoElement.addEventListener('click', (e) => {
+          if (e.target === videoElement) {
+            if (videoElement.requestFullscreen) {
+              videoElement.requestFullscreen();
+            } else if (videoElement.webkitRequestFullscreen) {
+              videoElement.webkitRequestFullscreen();
+            } else if (videoElement.msRequestFullscreen) {
+              videoElement.msRequestFullscreen();
+            }
+          }
+        });
+        
+        videoContainer.appendChild(videoElement);
+        contentElement.appendChild(videoContainer);
+        
+        // If there's caption text, display it below the video
+        if (caption) {
+          const captionElement = document.createElement('div');
+          captionElement.classList.add('video-caption');
           captionElement.textContent = caption;
           contentElement.appendChild(captionElement);
         }
@@ -932,7 +1002,7 @@
           const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = data.message;
           if (msgSessionId === sessionId) {
             if (fileId && fileId.trim() !== '') {
-              // Check if it's an image or a file
+              // Check if it's a file or an image/video
               if (data.files && Array.isArray(data.files)) {
                 // Look for the file in data.files
                 const file = data.files.find(f => f[0] === fileId);
@@ -947,12 +1017,19 @@
                   };
                   addMessage(fileInfo, author, time, "pendingDownload", msgStatus, messageId, true, contact, content);
                 } else {
-                  // It's an image - use fileId as the src
-                  addMessage(fileId, author, time, "image", msgStatus, messageId, true, contact, content);
+                  // Check if it's an image or video based on file extension
+                  const fileExtension = fileId.split('.').pop().toLowerCase();
+                  const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+                  const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
+                  if (messageType === "video") {
+                    console.log("Message type: is video");
+                  }
+                  // Use appropriate message type (image or video)
+                  addMessage(fileId, author, time, messageType, msgStatus, messageId, true, contact, content);
                 }
               } else {
-                // No files array, assume it's an image
-                addMessage(fileId, author, time, "image", msgStatus, messageId, true, contact, content);
+                // No files array but fileId exists, assume it's an image
+                addMessage(fileId, author, time, "image", msgStatus, messageId, false, contact, content);
               }
             } else {
               // Normal text message
@@ -994,8 +1071,13 @@
                     };
                     addMessage(fileInfo, author, time, "pendingDownload", msgStatus, messageId, false, contact, content);
                   } else {
-                    // It's an image - use fileId as src
-                    addMessage(fileId, author, time, "image", msgStatus, messageId, false, contact, content);
+                    // Check if it's an image or video based on file extension
+                    const fileExtension = fileId.split('.').pop().toLowerCase();
+                    const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+                    const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
+                    
+                    // Use appropriate message type (image or video)
+                    addMessage(fileId, author, time, messageType, msgStatus, messageId, false, contact, content);
                   }
                 } else {
                   // No files array but fileId exists, assume it's an image
@@ -1072,32 +1154,45 @@
                     chatContainer.appendChild(updatedMessage);
                   }
                 }
-              } else if (existingMsg.dataset.messageType !== 'image') {
-                // If it exists but is not an image or pending download, replace it
+              } else if (existingMsg.dataset.messageType !== 'image' && existingMsg.dataset.messageType !== 'video') {
+                // If it exists but is not an image, video, or pending download, replace it
                 const nextElement = existingMsg.nextElementSibling;
                 existingMsg.remove();
                 
-                // Create an image message
-                const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact, content);
+                // Check if it's an image or video based on file extension
+                const fileExtension = fileId.split('.').pop().toLowerCase();
+                const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+                const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
+                
+                // Create an appropriate message
+                const updatedMessage = createMessageElement(fileId, author, time, messageType, msgStatus, messageId, false, contact, content);
                 if (nextElement) {
                   chatContainer.insertBefore(updatedMessage, nextElement);
                 } else {
                   chatContainer.appendChild(updatedMessage);
                 }
               } else {
-                // It's already an image, update the status and reload the image
+                // It's already an image or video, update the status and reload if needed
                 updateMessage(messageId, content, msgStatus, caption);
                 
-                // Find and update the image source to force a reload
-                const imageElement = existingMsg.querySelector('.message-content img');
-                if (imageElement) {
-                  // Add a cache-busting parameter or force reload by resetting the src
-                  const currentSrc = imageElement.src;
-                  imageElement.src = '';
-                  // Force browser reflow
-                  void imageElement.offsetWidth;
-                  // Set back the src with a cache-busting query parameter
-                  imageElement.src = currentSrc.split('?')[0] + '?t=' + new Date().getTime();
+                // Find and update the media source to force a reload if it's an image
+                if (existingMsg.dataset.messageType === 'image') {
+                  const imageElement = existingMsg.querySelector('.message-content img');
+                  if (imageElement) {
+                    // Add a cache-busting parameter or force reload by resetting the src
+                    const currentSrc = imageElement.src;
+                    imageElement.src = '';
+                    // Force browser reflow
+                    void imageElement.offsetWidth;
+                    // Set back the src with a cache-busting query parameter
+                    imageElement.src = currentSrc.split('?')[0] + '?t=' + new Date().getTime();
+                  }
+                } else if (existingMsg.dataset.messageType === 'video') {
+                  const videoElement = existingMsg.querySelector('.message-content video');
+                  if (videoElement) {
+                    // For videos, we can just reload the video element
+                    videoElement.load();
+                  }
                 }
               }
             } else {
