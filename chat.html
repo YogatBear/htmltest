@@ -322,6 +322,25 @@
 
       }
     }
+
+    /* Add styles for the image button */
+    #image-button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: var(--secondary-purple);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+
+    #image-button i {
+      font-size: 20px;
+    }
   </style>
 </head>
 
@@ -339,6 +358,9 @@
   </div>
   <div id="chat-container"></div>
   <div class="message-input">
+    <button id="image-button">
+      <i class="material-icons">image</i>
+    </button>
     <input type="text" id="message-text" placeholder="Type a message..." />
     <button id="send-button">
       <i class="material-icons">send</i>
@@ -736,6 +758,11 @@
         // Signal to parent that chat is ready
         window.parent.postMessage({ action: 'chatReady' }, '*');
     };
+
+    // Add click handler for image button
+    document.getElementById("image-button").addEventListener("click", () => {
+      controller.openImagePicker();
+    });
   </script>
 </body>
 </html>
