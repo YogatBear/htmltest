@@ -146,7 +146,7 @@
         const captionInput = document.getElementById('caption-input');
         const previewImage = document.getElementById('preview-image');
         const previewVideo = document.getElementById('preview-video');
-        const videoPlayButton = document.getElementById('video-play-button');
+        // const videoPlayButton = document.getElementById('video-play-button');
 
         // Parse hash parameters
         const hashData = new URLSearchParams(decodeURIComponent(window.location.hash.slice(1)));
@@ -167,30 +167,30 @@
             previewVideo.src = imageData;
             
             // Add play button overlay
-            videoPlayButton.style.display = 'flex';
-            videoPlayButton.addEventListener('click', () => {
-                if (previewVideo.paused) {
-                    previewVideo.play();
-                    videoPlayButton.style.display = 'none';
-                } else {
-                    previewVideo.pause();
-                }
-            });
+            // videoPlayButton.style.display = 'flex';
+            // videoPlayButton.addEventListener('click', () => {
+            //     if (previewVideo.paused) {
+            //         previewVideo.play();
+            //         videoPlayButton.style.display = 'none';
+            //     } else {
+            //         previewVideo.pause();
+            //     }
+            // });
             
-            // Hide play button when video starts playing
-            previewVideo.addEventListener('play', () => {
-                videoPlayButton.style.display = 'none';
-            });
+            // // Hide play button when video starts playing
+            // previewVideo.addEventListener('play', () => {
+            //     videoPlayButton.style.display = 'none';
+            // });
             
-            // Show play button when video is paused
-            previewVideo.addEventListener('pause', () => {
-                videoPlayButton.style.display = 'flex';
-            });
+            // // Show play button when video is paused
+            // previewVideo.addEventListener('pause', () => {
+            //     videoPlayButton.style.display = 'flex';
+            // });
             
-            // Hide play button when video is playing
-            previewVideo.addEventListener('playing', () => {
-                videoPlayButton.style.display = 'none';
-            });
+            // // Hide play button when video is playing
+            // previewVideo.addEventListener('playing', () => {
+            //     videoPlayButton.style.display = 'none';
+            // });
         } else {
             // Show image preview
             previewImage.style.display = 'block';

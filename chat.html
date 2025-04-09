@@ -735,7 +735,7 @@
         
         // Add the image
         const img = document.createElement('img');
-        img.src = "http://localhost:8080/images/" + content;
+        img.src = content;
         img.addEventListener('click', (e) => {
           e.stopPropagation();
           openFullscreenViewer(content);
@@ -759,7 +759,7 @@
         
         // Add the video element
         const videoElement = document.createElement('video');
-        videoElement.src = "http://localhost:8080/images/" + content;
+        videoElement.src = content;
         videoElement.controls = true;
         videoElement.preload = "metadata";
         videoElement.classList.add('message-video');
@@ -1280,7 +1280,7 @@
       }
       
       const img = viewer.querySelector('img');
-      img.src = "http://localhost:8080/images/" + imageId;
+      img.src = imageId;
       
       // Force reflow
       void viewer.offsetWidth;
