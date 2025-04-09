@@ -469,6 +469,40 @@
     .close-viewer:hover {
       background-color: rgba(255, 255, 255, 0.4);
     }
+
+    /* Caption styling for images and files */
+    .image-caption, .file-caption {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(200, 200, 200, 0.3);
+      font-size: 14px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    
+    .sent .image-caption, .sent .file-caption {
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .received .image-caption, .received .file-caption {
+      color: var(--dark-purple);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .received .image-caption, .received .file-caption {
+        color: rgba(255, 255, 255, 0.9);
+      }
+    }
+    
+    /* Adjust image container */
+    .image-container {
+      margin-bottom: 4px;
+    }
+    
+    /* Ensure file container has proper spacing */
+    .file-container {
+      margin-bottom: 4px;
+    }
   </style>
 </head>
 
@@ -529,7 +563,7 @@
     let lastAuthor = null;
     let hasMoreMessages = true;
 
-    function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false, contact = null) {
+    function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false, contact = null, caption = null) {
       const currentDate = formatDate(time);
       
       // If updating an existing message, handle as before
@@ -539,6 +573,12 @@
           const nextElement = existingMsg.nextElementSibling;
           existingMsg.remove();
           const updatedMessage = createMessageElement(content, author, time, type, status, messageId, false, contact);
+          
+          // Store caption in dataset if it exists
+          if (caption) {
+            updatedMessage.dataset.caption = caption;
+          }
+          
           if (nextElement) {
             chatContainer.insertBefore(updatedMessage, nextElement);
           } else {
@@ -569,6 +609,11 @@
         messageElement.appendChild(systemMessageTime);
       } else {
         messageElement = createMessageElement(content, author, time, type, status, messageId, animate, contact);
+        
+        // Store caption in dataset if it exists
+        if (caption) {
+          messageElement.dataset.caption = caption;
+        }
       }
 
       // For older messages (scrolling up) or chronological insertion
@@ -659,13 +704,29 @@
       if (type === 'text') {
         contentElement.textContent = content;
       } else if (type === 'image') {
+        // Create a container for the image and caption
+        const imageContainer = document.createElement('div');
+        imageContainer.classList.add('image-container');
+        
+        // Add the image
         const img = document.createElement('img');
         img.src = "http://localhost:8080/images/" + content;
         img.addEventListener('click', (e) => {
           e.stopPropagation();
           openFullscreenViewer(content);
         });
-        contentElement.appendChild(img);
+        imageContainer.appendChild(img);
+        
+        // Add the image to the content element
+        contentElement.appendChild(imageContainer);
+        
+        // If there's caption text stored in the message, display it below the image
+        if (messageElement.dataset.caption) {
+          const captionElement = document.createElement('div');
+          captionElement.classList.add('image-caption');
+          captionElement.textContent = messageElement.dataset.caption;
+          contentElement.appendChild(captionElement);
+        }
       } else if (type === 'pendingDownload') {
         // Create file download UI
         const fileContainer = document.createElement('div');
@@ -703,6 +764,14 @@
         
         fileContainer.appendChild(downloadButton);
         contentElement.appendChild(fileContainer);
+        
+        // If there's a caption associated with the file, display it
+        if (messageElement.dataset.caption) {
+          const captionElement = document.createElement('div');
+          captionElement.classList.add('file-caption');
+          captionElement.textContent = messageElement.dataset.caption;
+          contentElement.appendChild(captionElement);
+        }
       }
       
       messageElement.appendChild(contentElement);
@@ -871,14 +940,14 @@
                     size: file[3],
                     cid: file[4]
                   };
-                  addMessage(fileInfo, author, time, "pendingDownload", msgStatus, messageId, true, contact);
+                  addMessage(fileInfo, author, time, "pendingDownload", msgStatus, messageId, true, contact, content);
                 } else {
                   // It's an image - use fileId as the src
-                  addMessage(fileId, author, time, "image", msgStatus, messageId, true, contact);
+                  addMessage(fileId, author, time, "image", msgStatus, messageId, true, contact, content);
                 }
               } else {
                 // No files array, assume it's an image
-                addMessage(fileId, author, time, "image", msgStatus, messageId, true, contact);
+                addMessage(fileId, author, time, "image", msgStatus, messageId, true, contact, content);
               }
             } else {
               // Normal text message
@@ -918,14 +987,14 @@
                       size: file[3],
                       cid: file[4]
                     };
-                    addMessage(fileInfo, author, time, "pendingDownload", msgStatus, messageId, false, contact);
+                    addMessage(fileInfo, author, time, "pendingDownload", msgStatus, messageId, false, contact, content);
                   } else {
                     // It's an image - use fileId as src
-                    addMessage(fileId, author, time, "image", msgStatus, messageId, false, contact);
+                    addMessage(fileId, author, time, "image", msgStatus, messageId, false, contact, content);
                   }
                 } else {
                   // No files array but fileId exists, assume it's an image
-                  addMessage(fileId, author, time, "image", msgStatus, messageId, false, contact);
+                  addMessage(fileId, author, time, "image", msgStatus, messageId, false, contact, content);
                 }
               } else {
                 // Normal text message
@@ -1064,7 +1133,9 @@
       } else if (event.data.action === 'sendImage') {
         const iframe = document.querySelector('iframe');
         if (iframe) iframe.remove();
-        
+        if (event.data.body.caption === '') {
+                console.log("Caption is empty 1");
+        }
         // Call controller method with all required parameters
         controller.sendImageMessage(
           sessionId,

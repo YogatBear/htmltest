@@ -141,6 +141,9 @@
         // Handle send button
         sendButton.addEventListener('click', () => {
             const caption = captionInput.value.trim();
+            if (caption === '') {
+                console.log("Caption is empty 1");
+        }
             window.parent.postMessage({
                 action: 'sendImage',
                 body: {

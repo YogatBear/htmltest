@@ -238,6 +238,9 @@
             }
 
             sendImageMessage(to, imageId, caption) {
+                if (caption === '') {
+                    console.log("Caption is empty 2");
+                }
                 const request = {
                     action: "send-image-message",
                     body: { localId: this.localId, pid: this.pid, to: to, imageId: imageId, content: caption }
