@@ -358,7 +358,7 @@
   </div>
   <div id="chat-container"></div>
   <div class="message-input">
-    <input type="file" id="media-input" accept="image/*" capture="environment" style="display: none;">
+    <input type="file" id="media-input" accept="image/*" style="display: none;">
     <button id="image-button">
       <i class="material-icons">image</i>
     </button>
@@ -650,37 +650,13 @@
         }
     }
 
-    // Add click handler for image button
+    // Add click handler for image button - just open the picker
     const mediaInput = document.getElementById("media-input");
     document.getElementById("image-button").addEventListener("click", () => {
       mediaInput.click();
     });
 
-    mediaInput.addEventListener("change", (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        // Create iframe and show image directly
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'fixed';
-        iframe.style.top = '0';
-        iframe.style.left = '0';
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        iframe.style.border = 'none';
-        iframe.style.zIndex = '1000';
-        
-        // Pass the file URL to the imagepicker
-        const params = new URLSearchParams();
-        params.set('imageUrl', URL.createObjectURL(file));
-        params.set('fileName', file.name);
-        iframe.src = 'imagepicker.html#' + encodeURIComponent(params.toString());
-        
-        document.body.appendChild(iframe);
-        
-        // Clear the input for future selections
-        event.target.value = '';
-      }
-    });
+    // Let native handle the result - no change handler needed
 
     channel.addEventListener('message', (event) => {
       try {
