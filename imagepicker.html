@@ -39,6 +39,16 @@
             cursor: pointer;
         }
 
+        #file-name {
+            color: white;
+            margin-left: 10px;
+            font-size: 16px;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         #image-container {
             flex: 1;
             display: flex;
@@ -101,6 +111,7 @@
         <button id="back-button">
             <span class="material-icons">arrow_back</span>
         </button>
+        <div id="file-name"></div>
     </div>
     
     <div id="image-container">
@@ -119,18 +130,21 @@
         const sendButton = document.getElementById('send-button');
         const captionInput = document.getElementById('caption-input');
         const previewImage = document.getElementById('preview-image');
+        const fileName = document.getElementById('file-name');
 
         // Parse hash parameters
         const hashData = new URLSearchParams(decodeURIComponent(window.location.hash.slice(1)));
         const imageData = hashData.get('imageData');
         const imageUri = hashData.get('imageUri');
+        const fileNameText = hashData.get('fileName');
+
+        // Set file name if available
+        if (fileNameText) {
+            fileName.textContent = fileNameText;
+        }
 
         // Set image source
-        if (imageData.startsWith('data:')) {
-            previewImage.src = imageData;
-        } else {
-            previewImage.src = `data:image/webp;base64,${imageData}`;
-        }
+        previewImage.src = imageData;
 
         // Handle back button
         backButton.addEventListener('click', () => {
