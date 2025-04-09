@@ -1154,50 +1154,32 @@
                     chatContainer.appendChild(updatedMessage);
                   }
                 }
-              } else if (existingMsg.dataset.messageType !== 'image' && existingMsg.dataset.messageType !== 'video') {
-                // If it exists but is not an image, video, or pending download, replace it
-                const nextElement = existingMsg.nextElementSibling;
-                existingMsg.remove();
-                
-                // Check if it's an image or video based on file extension
-                const fileExtension = fileId.split('.').pop().toLowerCase();
-                const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
-                const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
-                
-                // Create an appropriate message
-                const updatedMessage = createMessageElement(fileId, author, time, messageType, msgStatus, messageId, false, contact, content);
-                if (nextElement) {
-                  chatContainer.insertBefore(updatedMessage, nextElement);
-                } else {
-                  chatContainer.appendChild(updatedMessage);
-                }
               } else {
-                // It's already an image or video, update the status and reload if needed
-                updateMessage(messageId, content, msgStatus, caption);
-                
-                // Find and update the media source to force a reload if it's an image
-                if (existingMsg.dataset.messageType === 'image') {
-                  const imageElement = existingMsg.querySelector('.message-content img');
-                  if (imageElement) {
-                    // Add a cache-busting parameter or force reload by resetting the src
-                    const currentSrc = imageElement.src;
-                    imageElement.src = '';
-                    // Force browser reflow
-                    void imageElement.offsetWidth;
-                    // Set back the src with a cache-busting query parameter
-                    imageElement.src = currentSrc.split('?')[0] + '?t=' + new Date().getTime();
-                  }
-                } else if (existingMsg.dataset.messageType === 'video') {
-                  const videoElement = existingMsg.querySelector('.message-content video');
-                  if (videoElement) {
-                    // For videos, we can just reload the video element
-                    videoElement.load();
+                // This is the key fix - Always update the image source when we get an updated message with a fileId
+                // Even if the message already exists as an image
+                const imageElement = existingMsg.querySelector('.message-content img');
+                if (imageElement) {
+                  // Force a complete refresh of the image by setting a new src with cache-busting parameter
+                  imageElement.src = fileId + '?t=' + new Date().getTime();
+                } else if (existingMsg.dataset.messageType === 'image') {
+                  // If for some reason we don't find the image element but the message type is 'image',
+                  // replace the entire message
+                  const nextElement = existingMsg.nextElementSibling;
+                  existingMsg.remove();
+                  const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact, content);
+                  if (nextElement) {
+                    chatContainer.insertBefore(updatedMessage, nextElement);
+                  } else {
+                    chatContainer.appendChild(updatedMessage);
                   }
                 }
+                
+                // Update status
+                updateMessage(messageId, content, msgStatus);
               }
             } else {
               // Regular text message update
-              updateMessage(messageId, content, msgStatus, caption);
+              updateMessage(messageId, content, msgStatus);
             }
           }
         } else if (data.imagePickerResult) {
