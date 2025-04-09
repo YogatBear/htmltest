@@ -135,16 +135,32 @@
         // Parse hash parameters
         const hashData = new URLSearchParams(decodeURIComponent(window.location.hash.slice(1)));
         const imageData = hashData.get('imageData');
-        const imageUri = hashData.get('imageUri');
         const fileNameText = hashData.get('fileName');
+        const fileType = hashData.get('fileType');
+        const fileSize = hashData.get('fileSize');
 
         // Set file name if available
         if (fileNameText) {
-            fileName.textContent = fileNameText;
+            fileName.textContent = `${fileNameText} (${formatFileSize(fileSize)})`;
         }
 
         // Set image source
         previewImage.src = imageData;
+
+        // Format file size helper
+        function formatFileSize(bytes) {
+            if (!bytes) return '';
+            const units = ['B', 'KB', 'MB', 'GB'];
+            let size = parseInt(bytes);
+            let unitIndex = 0;
+            
+            while (size >= 1024 && unitIndex < units.length - 1) {
+                size /= 1024;
+                unitIndex++;
+            }
+            
+            return `${size.toFixed(1)} ${units[unitIndex]}`;
+        }
 
         // Handle back button
         backButton.addEventListener('click', () => {
@@ -157,8 +173,10 @@
             window.parent.postMessage({
                 action: 'sendImage',
                 body: {
-                    image: previewImage.src,
-                    imageUri: imageUri,
+                    imageData: imageData,  // Send the full data URL
+                    fileName: fileNameText,
+                    fileType: fileType,
+                    fileSize: fileSize,
                     caption: caption
                 }
             }, '*');

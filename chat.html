@@ -745,7 +745,7 @@
         // Call controller method with all required parameters
         controller.sendImageMessage(
           sessionId,
-          event.data.body.imageUri,
+          event.data.body.imageData,  // Send the full data URL
           event.data.body.caption || ''
         );
       }
@@ -782,11 +782,12 @@
           iframe.style.border = 'none';
           iframe.style.zIndex = '1000';
           
-          // Pass both the image data and file object info
+          // Pass the image data and file metadata
           const params = new URLSearchParams();
           params.set('imageData', e.target.result);
-          params.set('imageUri', URL.createObjectURL(file));
           params.set('fileName', file.name);
+          params.set('fileType', file.type);
+          params.set('fileSize', file.size);
           iframe.src = 'imagepicker.html#' + encodeURIComponent(params.toString());
           
           document.body.appendChild(iframe);
