@@ -147,21 +147,31 @@
         const previewImage = document.getElementById('preview-image');
         const previewVideo = document.getElementById('preview-video');
         const videoPlayButton = document.getElementById('video-play-button');
+        function checkFileType(url) {
+        const match = url.match(/([0-9A-Fa-f\-]{36})\.(\w+)$/);
+        
+        if (!match) return { type: 'unknown', extension: null };
+
+        const extension = match[2].toLowerCase();
+        const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
+        const videoExtensions = ['mp4', 'mov', 'avi', 'webm', 'mkv', 'flv'];
+
+        if (imageExtensions.includes(extension)) {
+            return { type: 'image', extension };
+        } else if (videoExtensions.includes(extension)) {
+            return { type: 'video', extension };
+        } else {
+            return { type: 'unknown', extension };
+        }
+        }
 
         // Parse hash parameters
         const hashData = new URLSearchParams(decodeURIComponent(window.location.hash.slice(1)));
         const imageData = hashData.get('imageData');
-        const imageId = hashData.get('imageId');
+        const fileType = checkFileType(imageData);
         
-        // Determine if this is a video or image based on file extension
-        let isVideo = false;
-        if (imageId) {
-            const fileExtension = imageId.split('.').pop().toLowerCase();
-            const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
-            isVideo = videoExtensions.includes(fileExtension);
-        }
         
-        if (isVideo) {
+        if (fileType.type === 'video') {
             // Show video preview
             previewVideo.style.display = 'block';
             previewVideo.src = imageData;
@@ -208,8 +218,8 @@
             window.parent.postMessage({
                 action: 'sendImage',
                 body: {
-                    image: isVideo ? previewVideo.src : previewImage.src,
-                    imageId: imageId,
+                    image: fileType.type === 'video' ? previewVideo.src : previewImage.src,
+                    imageId: imageData,
                     caption: caption
                 }
             }, '*');
