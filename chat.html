@@ -1118,7 +1118,7 @@
                 const nextElement = existingMsg ? existingMsg.nextElementSibling : null;
                 if (existingMsg) existingMsg.remove();
                 
-                // Check if it's a file or an image
+                // Check if it's a file or an image/video
                 if (data.files && Array.isArray(data.files)) {
                   const file = data.files.find(f => f[0] === fileId);
                   if (file) {
@@ -1137,8 +1137,13 @@
                       chatContainer.appendChild(updatedMessage);
                     }
                   } else {
-                    // It's an image - use fileId as src
-                    const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact, content);
+                    // Check if it's an image or video based on file extension
+                    const fileExtension = fileId.split('.').pop().toLowerCase();
+                    const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+                    const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
+                    
+                    // Use appropriate message type (image or video)
+                    const updatedMessage = createMessageElement(fileId, author, time, messageType, msgStatus, messageId, false, contact, content);
                     if (nextElement) {
                       chatContainer.insertBefore(updatedMessage, nextElement);
                     } else {
@@ -1146,8 +1151,13 @@
                     }
                   }
                 } else {
-                  // No files array but fileId exists, assume it's an image
-                  const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact, content);
+                  // No files array but fileId exists, check if it's a video or image
+                  const fileExtension = fileId.split('.').pop().toLowerCase();
+                  const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+                  const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
+                  
+                  // Use appropriate message type (image or video)
+                  const updatedMessage = createMessageElement(fileId, author, time, messageType, msgStatus, messageId, false, contact, content);
                   if (nextElement) {
                     chatContainer.insertBefore(updatedMessage, nextElement);
                   } else {
@@ -1155,22 +1165,70 @@
                   }
                 }
               } else {
-                // This is the key fix - Always update the image source when we get an updated message with a fileId
-                // Even if the message already exists as an image
-                const imageElement = existingMsg.querySelector('.message-content img');
-                if (imageElement) {
-                  // Force a complete refresh of the image by setting a new src with cache-busting parameter
-                  imageElement.src = fileId + '?t=' + new Date().getTime();
-                } else if (existingMsg.dataset.messageType === 'image') {
-                  // If for some reason we don't find the image element but the message type is 'image',
-                  // replace the entire message
-                  const nextElement = existingMsg.nextElementSibling;
-                  existingMsg.remove();
-                  const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact, content);
-                  if (nextElement) {
-                    chatContainer.insertBefore(updatedMessage, nextElement);
+                // Handle existing message
+                // Check if the file is a video based on its extension
+                const fileExtension = fileId.split('.').pop().toLowerCase();
+                const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+                const isVideo = videoExtensions.includes(fileExtension);
+                
+                if (isVideo) {
+                  // Handle video update
+                  if (existingMsg.dataset.messageType === 'video') {
+                    // Just update the video source if it's already a video element
+                    const videoElement = existingMsg.querySelector('.message-content video');
+                    if (videoElement) {
+                      videoElement.src = fileId + '?t=' + new Date().getTime();
+                      videoElement.load(); // Force the video to reload
+                    } else {
+                      // Replace the entire message if video element not found
+                      const nextElement = existingMsg.nextElementSibling;
+                      existingMsg.remove();
+                      const updatedMessage = createMessageElement(fileId, author, time, "video", msgStatus, messageId, false, contact, content);
+                      if (nextElement) {
+                        chatContainer.insertBefore(updatedMessage, nextElement);
+                      } else {
+                        chatContainer.appendChild(updatedMessage);
+                      }
+                    }
                   } else {
-                    chatContainer.appendChild(updatedMessage);
+                    // If it's not already a video message, replace the entire message
+                    const nextElement = existingMsg.nextElementSibling;
+                    existingMsg.remove();
+                    const updatedMessage = createMessageElement(fileId, author, time, "video", msgStatus, messageId, false, contact, content);
+                    if (nextElement) {
+                      chatContainer.insertBefore(updatedMessage, nextElement);
+                    } else {
+                      chatContainer.appendChild(updatedMessage);
+                    }
+                  }
+                } else {
+                  // Handle image update
+                  if (existingMsg.dataset.messageType === 'image') {
+                    const imageElement = existingMsg.querySelector('.message-content img');
+                    if (imageElement) {
+                      // Force a complete refresh of the image
+                      imageElement.src = fileId + '?t=' + new Date().getTime();
+                    } else {
+                      // Replace the entire message if image element not found
+                      const nextElement = existingMsg.nextElementSibling;
+                      existingMsg.remove();
+                      const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact, content);
+                      if (nextElement) {
+                        chatContainer.insertBefore(updatedMessage, nextElement);
+                      } else {
+                        chatContainer.appendChild(updatedMessage);
+                      }
+                    }
+                  } else {
+                    // If it's not already an image message, replace the entire message
+                    const nextElement = existingMsg.nextElementSibling;
+                    existingMsg.remove();
+                    const updatedMessage = createMessageElement(fileId, author, time, "image", msgStatus, messageId, false, contact, content);
+                    if (nextElement) {
+                      chatContainer.insertBefore(updatedMessage, nextElement);
+                    } else {
+                      chatContainer.appendChild(updatedMessage);
+                    }
                   }
                 }
                 
