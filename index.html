@@ -27,7 +27,11 @@
         localId = getUrlParameter('localId');
         remoteId = getUrlParameter('remoteId');
 
-        guiFrame.src = "app.html?screen=" + screen + "&localId=" + encodeURIComponent(localId) + "&remoteId=" + encodeURIComponent(remoteId);
+        if (screen === 'TEST') {
+            guiFrame.src = "test.html";
+        } else {
+            guiFrame.src = "app.html?screen=" + screen + "&localId=" + encodeURIComponent(localId) + "&remoteId=" + encodeURIComponent(remoteId);
+        }
 
         function getUrlParameter(name) {
             const urlParams = new URLSearchParams(window.location.search);
@@ -170,17 +174,17 @@
                 this.sendMessageToNativeApp(request);
             }
 
-            getMessages(sessionId, range) {
+            getMessages(sessionId, range, start) {
                 const request = {
                     action: "get-messages",
-                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId, range: range }
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId, range: range, startMessage: start }
                 };
                 this.sendMessageToNativeApp(request);
             }
 
-            getRecentMessages(range) {
+            getRecentSessions(range) {
                 const request = {
-                    action: "get-recent-messages",
+                    action: "get-recent-sessions",
                     body: { localId: this.localId, pid: this.pid, range: range }
                 };
                 this.sendMessageToNativeApp(request);
@@ -209,12 +213,51 @@
                 this.sendMessage(action, body);
             }
 
-            chatOpened(remoteId){
+            updateSessionTimestamp(sessionId){
                 const openChatRequest = {
-                    action: "open-chat",
-                    body: { sessionId: remoteId, localId:localId }
+                    action: "update-session-timestamp",
+                    body: { localId:this.localId, pid: this.pid, sessionId: sessionId }
                 };
                 this.sendMessageToNativeApp(openChatRequest);
+            }
+
+            deleteSession(sessionId) {
+                const deleteSessionRequest = {
+                    action: "delete-session",
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId }
+                };
+                this.sendMessageToNativeApp(deleteSessionRequest);
+            }
+
+            imagePicker() {
+                const request = {
+                    action: "image-picker",
+                    body: { localId: this.localId, pid: this.pid }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            sendImageMessage(to, imageUri, caption) {
+                const request = {
+                    action: "send-image-message",
+                    body: { localId: this.localId, pid: this.pid, to: to, imageUri: imageUri, content: caption }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            contactPicker(type) {
+                const request = {
+                    action: "contact-picker",
+                    body: { localId: this.localId, pid: this.pid, contactType: type }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getContactName(sessionId) {
+                const request = {
+                    action: "get-contact-name",
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId }
+                };
+                this.sendMessageToNativeApp(request);
             }
         }
 

@@ -3,54 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adjusted Dialer Grid</title>
+    <title>Dialer</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
-            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-        }
         :root {
             --primary-white: #ffffff;
             --secondary-purple: #6a5acd;
             --light-purple: #9370db;
             --dark-purple: #4b0082;
-            --transparent-purple: #9470db69;
+            --transparent-purple: rgba(106, 90, 205, 0.1);
+            --glass-effect: rgba(255, 255, 255, 0.15);
         }
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            background: transparent;
+            overflow: hidden;
+        }
+
         .dialer-container {
             height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: white;
+            padding: 20px;
+            background: transparent;
         }
+
         #dialerGrid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            padding: 10px;
-            max-width: 240px; /* Adjust based on desired overall width */
+            gap: 12px;
+            padding: 15px;
+            max-width: 260px;
             width: 100%;
+            animation: fadeIn 0.3s ease-out;
         }
+
         .dialerButton {
-            width: 60px; /* Fixed width to match bottom buttons */
-            height: 60px; /* Fixed height to match bottom buttons */
+            width: 60px;
+            height: 60px;
             font-size: 24px;
             border: none;
             border-radius: 50%;
-            background-color: var(--light-purple);
+            background: var(--glass-effect);
+            backdrop-filter: blur(5px);
+            color: white;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.2s ease;
             display: flex;
             justify-content: center;
             align-items: center;
-            color:white
+            animation: scaleIn 0.3s ease-out;
         }
+
         .dialerButton:hover {
-            background-color: #e0e0e0;
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .dialerButton:active {
+            transform: scale(0.95);
+            background: var(--secondary-purple);
+            color: white;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
@@ -75,7 +104,6 @@
     <script>
         const dialerButtons = document.querySelectorAll(".dialerButton");
         const controller = window.top.controller;
-
         const urlParams = new URLSearchParams(window.location.search);
         const callId = urlParams.get('callId');
 
@@ -83,6 +111,14 @@
             button.addEventListener("click", () => {
                 const digit = button.textContent;
                 controller.sendDtmf(callId, digit);
+                
+                // Add visual feedback
+                button.style.backgroundColor = 'var(--secondary-purple)';
+                button.style.color = 'white';
+                setTimeout(() => {
+                    button.style.backgroundColor = 'var(--glass-effect)';
+                    button.style.color = 'white';
+                }, 100);
             });
         });
     </script>

@@ -91,7 +91,7 @@
                         console.log('contact:', contact);
                         console.log('id:', id);
                         // window.parent.postMessage({action: 'call', body: {contact: contact ?? id, id: id}}, '*');
-                        window.parent.postMessage({action: 'call', body: {to:id}}, '*');
+                        window.parent.postMessage({action: 'call', body: {remoteId:id}}, '*');
 
                     });
                     this.container.appendChild(li);
