@@ -135,9 +135,9 @@
         // Parse hash parameters
         const hashData = new URLSearchParams(decodeURIComponent(window.location.hash.slice(1)));
         const imageUrl = hashData.get('imageUrl');
+        const fileNameText = hashData.get('fileName');
 
-        // Extract filename from URL
-        const fileNameText = imageUrl.split('/').pop();
+        // Set file name if available
         if (fileNameText) {
             fileName.textContent = fileNameText;
         }
@@ -148,6 +148,8 @@
         // Handle back button
         backButton.addEventListener('click', () => {
             window.parent.postMessage({ action: 'closeImagePicker' }, '*');
+            // Clean up the blob URL
+            URL.revokeObjectURL(imageUrl);
         });
 
         // Handle send button
@@ -156,10 +158,13 @@
             window.parent.postMessage({
                 action: 'sendImage',
                 body: {
-                    imageUrl: imageUrl,  // Send back the file:// URL
+                    imageUrl: imageUrl,
+                    fileName: fileNameText,
                     caption: caption
                 }
             }, '*');
+            // Clean up the blob URL
+            URL.revokeObjectURL(imageUrl);
         });
     </script>
 </body>
