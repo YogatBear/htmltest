@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Preview</title>
+    <title>Media Preview</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
@@ -39,7 +39,7 @@
             cursor: pointer;
         }
 
-        #image-container {
+        #media-container {
             flex: 1;
             display: flex;
             align-items: center;
@@ -51,6 +51,28 @@
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
+            display: none; /* Hidden by default, shown when needed */
+        }
+        
+        #preview-video {
+            max-width: 100%;
+            max-height: 100%;
+            display: none; /* Hidden by default, shown when needed */
+        }
+        
+        #video-play-button {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 36px;
+            display: none; /* Hidden by default, shown when needed */
         }
 
         #bottom-bar {
@@ -103,8 +125,12 @@
         </button>
     </div>
     
-    <div id="image-container">
-        <img id="preview-image" alt="Preview" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+    <div id="media-container">
+        <img id="preview-image" alt="Preview">
+        <video id="preview-video" controls></video>
+        <div id="video-play-button">
+            <span class="material-icons">play_arrow</span>
+        </div>
     </div>
     
     <div id="bottom-bar">
@@ -119,19 +145,57 @@
         const sendButton = document.getElementById('send-button');
         const captionInput = document.getElementById('caption-input');
         const previewImage = document.getElementById('preview-image');
+        const previewVideo = document.getElementById('preview-video');
+        const videoPlayButton = document.getElementById('video-play-button');
 
         // Parse hash parameters
         const hashData = new URLSearchParams(decodeURIComponent(window.location.hash.slice(1)));
         const imageData = hashData.get('imageData');
         const imageId = hashData.get('imageId');
-
-        // Set image source
-        // if (imageData.startsWith('data:')) {
-        //     previewImage.src = imageData;
-        // } else {
-        //     previewImage.src = `data:image/webp;base64,${imageData}`;
-        // }
-        previewImage.src = imageData;
+        
+        // Determine if this is a video or image based on file extension
+        let isVideo = false;
+        if (imageId) {
+            const fileExtension = imageId.split('.').pop().toLowerCase();
+            const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+            isVideo = videoExtensions.includes(fileExtension);
+        }
+        
+        if (isVideo) {
+            // Show video preview
+            previewVideo.style.display = 'block';
+            previewVideo.src = imageData;
+            
+            // Add play button overlay
+            videoPlayButton.style.display = 'flex';
+            videoPlayButton.addEventListener('click', () => {
+                if (previewVideo.paused) {
+                    previewVideo.play();
+                    videoPlayButton.style.display = 'none';
+                } else {
+                    previewVideo.pause();
+                }
+            });
+            
+            // Hide play button when video starts playing
+            previewVideo.addEventListener('play', () => {
+                videoPlayButton.style.display = 'none';
+            });
+            
+            // Show play button when video is paused
+            previewVideo.addEventListener('pause', () => {
+                videoPlayButton.style.display = 'flex';
+            });
+            
+            // Hide play button when video is playing
+            previewVideo.addEventListener('playing', () => {
+                videoPlayButton.style.display = 'none';
+            });
+        } else {
+            // Show image preview
+            previewImage.style.display = 'block';
+            previewImage.src = imageData;
+        }
 
         // Handle back button
         backButton.addEventListener('click', () => {
@@ -141,13 +205,10 @@
         // Handle send button
         sendButton.addEventListener('click', () => {
             const caption = captionInput.value.trim();
-            if (caption === '') {
-                console.log("Caption is empty 1");
-        }
             window.parent.postMessage({
                 action: 'sendImage',
                 body: {
-                    image: previewImage.src,
+                    image: isVideo ? previewVideo.src : previewImage.src,
                     imageId: imageId,
                     caption: caption
                 }
