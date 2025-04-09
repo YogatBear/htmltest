@@ -1050,11 +1050,17 @@
           const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = data.message;
           if (msgSessionId === sessionId) {
             let fileIdObj;
-            try {
-              fileIdObj = fileId ? JSON.parse(fileId) : {};
-            } catch (e) {
-              console.error("Error parsing fileId JSON:", e);
-              fileIdObj = {};
+            
+            // Check if fileId is already an object (not a string)
+            if (typeof fileId === 'object' && fileId !== null) {
+              fileIdObj = fileId;
+            } else {
+              try {
+                fileIdObj = fileId ? JSON.parse(fileId) : {};
+              } catch (e) {
+                console.error("Error parsing fileId JSON:", e);
+                fileIdObj = {};
+              }
             }
 
             if (Object.keys(fileIdObj).length > 0) {
@@ -1079,7 +1085,7 @@
         } else if (data.messages) {
           console.log("Received multiple messages data:", data.messages);
           
-          if (!data.messages || data.messages.length === 0 || !data.files) {
+          if (!data.messages || data.messages.length === 0) {
             hasMoreMessages = false;
             return;
           }
@@ -1096,11 +1102,17 @@
             const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = msg;
             if (msgSessionId === sessionId) {
               let fileIdObj;
-              try {
-                fileIdObj = fileId ? JSON.parse(fileId) : {};
-              } catch (e) {
-                console.error("Error parsing fileId JSON:", e);
-                fileIdObj = {};
+              
+              // Check if fileId is already an object (not a string)
+              if (typeof fileId === 'object' && fileId !== null) {
+                fileIdObj = fileId;
+              } else {
+                try {
+                  fileIdObj = fileId ? JSON.parse(fileId) : {};
+                } catch (e) {
+                  console.error("Error parsing fileId JSON:", e);
+                  fileIdObj = {};
+                }
               }
 
               if (Object.keys(fileIdObj).length > 0) {
@@ -1139,11 +1151,17 @@
           const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = data.updatedMessage;
           if (msgSessionId === sessionId) {
             let fileIdObj;
-            try {
-              fileIdObj = fileId ? JSON.parse(fileId) : {};
-            } catch (e) {
-              console.error("Error parsing fileId JSON:", e);
-              fileIdObj = {};
+            
+            // Check if fileId is already an object (not a string)
+            if (typeof fileId === 'object' && fileId !== null) {
+              fileIdObj = fileId;
+            } else {
+              try {
+                fileIdObj = fileId ? JSON.parse(fileId) : {};
+              } catch (e) {
+                console.error("Error parsing fileId JSON:", e);
+                fileIdObj = {};
+              }
             }
 
             // If there's a fileId object with data, we need special handling
