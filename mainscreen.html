@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Purple Connect</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Text:wght@400;500;600&display=swap');
+
+        :root {
+            --primary-white: #ffffff;
+            --secondary-purple: rgb(115, 66, 160);
+            --light-purple: #8e8aff;
+            --dark-purple: #3634a3;
+            --purple-10: rgba(115, 66, 160, 0.1);
+            --purple-20: rgba(115, 66, 160, 0.2);
+            --system-gray: #f2f2f7;
+            --system-gray2: #e5e5ea;
+            --text-primary: #000000;
+            --text-secondary: #8e8e93;
+            --separator-color: rgba(60, 60, 67, 0.12);
+            --background-color: #ffffff;
+            --input-bg: #f2f2f7;
+            --shadow-color: rgba(115, 66, 160, 0.3);
+            --shadow-color-active: rgba(115, 66, 160, 0.2);
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-white: #1a1a1a;
+                --secondary-purple: rgb(138, 93, 180);
+                --light-purple: #a28bc7;
+                --dark-purple: #5e3b88;
+                --purple-10: rgba(138, 93, 180, 0.15);
+                --purple-20: rgba(138, 93, 180, 0.25);
+                --system-gray: #2c2c2e;
+                --system-gray2: #3a3a3c;
+                --text-primary: #ffffff;
+                --text-secondary: #aeaeb2;
+                --separator-color: rgba(200, 200, 205, 0.12);
+                --background-color: rgb(23, 23, 23);
+                --input-bg: #2c2c2e;
+                --shadow-color: rgba(0, 0, 0, 0.5);
+                --shadow-color-active: rgba(0, 0, 0, 0.7);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            font-family: -apple-system, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            background-color: var(--background-color);
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100vh;
+            background-color: var(--background-color);
+            position: relative;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            will-change: transform;
+            transition: transform 0.35s cubic-bezier(0.28, 0.11, 0.32, 1);
+            overflow: hidden;
+        }
+
+        #chat-container {
+            position: fixed;
+            top: 0;
+            left: 100%;
+            width: 100%;
+            height: 100%;
+            background-color: var(--background-color);
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            will-change: transform;
+            transition: transform 0.35s cubic-bezier(0.28, 0.11, 0.32, 1);
+            z-index: 10;
+        }
+
+        .slide-left {
+            transform: translateX(-100%) translateZ(0) !important;
+            -webkit-transform: translateX(-100%) translateZ(0) !important;
+        }
+
+        /* Clean header with just search bar */
+        .header {
+            padding: 8px 12px;
+            background-color: var(--background-color);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            border-bottom: 0.5px solid var(--separator-color);
+        }
+
+        /* New header content container for layout */
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        /* Larger, cleaner search bar */
+        .input-container {
+            display: flex;
+            align-items: center;
+            background-color: var(--input-bg);
+            padding-left: 16px;
+            padding-right: 4px;
+            border-radius: 20px;
+            height: 40px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .input-container:focus-within {
+            background-color: var(--purple-10);
+            border: 1px solid var(--secondary-purple);
+        }
+
+        .input-icon {
+            font-size: 22px !important;
+            margin-right: 8px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            height: 40px;
+            padding: 0;
+            border: none;
+            font-size: 16px;
+            background: transparent;
+            color: var(--text-primary);
+            outline: none;
+            min-width: 0;
+            font-weight: 400;
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 4px;
+            margin-left: 4px;
+            height: 100%;
+            align-items: center;
+        }
+
+        .action-button {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: 50%;
+            background-color: var(--secondary-purple);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        .action-button:active {
+            transform: scale(0.92);
+            background-color: var(--dark-purple);
+            box-shadow: 0 1px 3px var(--shadow-color-active);
+        }
+
+        .action-button i {
+            font-size: 20px;
+        }
+
+        /* Add new contacts button styles */
+        .contacts-button {
+            background: none;
+            border: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+            margin-left: 4px;
+            min-width: 36px;
+        }
+
+        .contacts-button:active {
+            background-color: var(--purple-10);
+        }
+
+        .contacts-button i {
+            font-size: 22px;
+            color: var(--secondary-purple);
+        }
+
+        .iframe-container {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* Hide scrollbar */
+        ::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
+
+        /* Add these styles */
+        .calling-overlay {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            background: linear-gradient(135deg, 
+                rgba(115, 66, 160, 0.5) 0%,
+                rgba(54, 52, 163, 0.5) 100%
+            );
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            transform: translateY(-150%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .calling-overlay.show {
+            transform: translateY(0);
+        }
+
+        .calling-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            flex: 1;
+            margin-right: 12px;
+        }
+
+        .calling-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2.5px solid rgba(255, 255, 255, 0.3);
+            border-top: 2.5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .calling-text {
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: -0.2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        #callingId {
+            font-weight: 600;
+            margin-left: 4px;
+            display: inline-block;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: bottom;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .cancel-call {
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .cancel-call:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.96);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="input-container">
+                    <i class="material-icons input-icon">search</i>
+                    <input type="text" placeholder="" id="numberInput">
+                    <div class="action-buttons">
+                        <button class="action-button message">
+                            <i class="material-icons">chat</i>
+                        </button>
+                        <button class="action-button call">
+                            <i class="material-icons">call</i>
+                        </button>
+                    </div>
+                </div>
+                <button class="contacts-button">
+                    <i class="material-icons">contacts</i>
+                </button>
+            </div>
+        </div>
+        <div class="iframe-container">
+            <iframe src="recentsessions.html" class="shimmer"></iframe>
+        </div>
+    </div>
+    <div id="chat-container"></div>
+    <div class="calling-overlay" id="callingOverlay">
+        <div class="calling-left">
+            <div class="calling-spinner"></div>
+            <span class="calling-text">Calling <span id="callingId"></span></span>
+        </div>
+        <button class="cancel-call" id="cancelCall">Cancel</button>
+    </div>
+    <script>
+        const controller = window.top.controller;
+        const input = document.querySelector("#numberInput");
+        const callButton = document.querySelector(".call");
+        const messageButton = document.querySelector(".message");
+        const domainButtons = document.querySelectorAll(".domain-button");
+        const chatContainer = document.getElementById('chat-container');
+        const contactsButton = document.querySelector(".contacts-button");
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const remoteId = urlParams.get('remoteId');
+
+        const channel = new BroadcastChannel('myChannel');
+
+        if(remoteId != null) {
+            console.log("opening chat" + remoteId);
+            openChat(remoteId);
+        }
+
+        input.addEventListener('input', function(e) {
+            this.value = this.value.toLowerCase();
+        });
+
+        callButton.addEventListener("click", function() {
+            if (input.value === ""){
+                return
+            }
+            makeCall(input.value);
+        });
+
+        messageButton.addEventListener("click", function() {
+            if (input.value === ""){
+                return
+            }
+            openChat(input.value);
+        })
+
+        domainButtons.forEach(button => {
+            button.addEventListener("click", function() {
+                input.value += this.textContent.toLowerCase();
+            });
+        });
+
+        contactsButton.addEventListener("click", function() {
+            controller.contactPicker(1);
+        });
+
+        window.addEventListener('message', (event) => {
+            switch (event.data.action) {
+                case 'call':
+                    makeCall(event.data.body.remoteId, event.data.body.contact);
+                    break;
+                    
+                case 'chat':
+                    openChat(event.data.body.sessionId);
+                    break;
+
+                case 'closeChat':
+                    closeChat();
+                    break;
+
+                case 'fillInput':
+                    fillInput(event.data.body.value);
+                    break;
+
+                case 'ringing':
+                    // Close the calling overlay if it's open
+                    const overlay = document.getElementById('callingOverlay');
+                    overlay.classList.remove('show');
+                    break;
+            }
+        });
+        
+        window.addEventListener('popstate', function(event) {
+            console.log("back button pressed");
+            closeChat();
+        });
+
+        channel.addEventListener('message', (event) => {
+            try {
+                const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+                console.log("received data: "+event.data)
+                if (data.injectRemoteId !== undefined) input.value = (data.injectRemoteId);
+            } catch (error) {
+                console.error("Error parsing message data:", error);
+            }
+        });
+
+        function openChat(sessionId) {
+            const iframe = document.createElement('iframe');
+            iframe.className = 'chat-iframe';
+            iframe.style.cssText = 'width:100%;height:100%;border:none;visibility:hidden;';
+            iframe.src = `chat.html?sessionId=${encodeURIComponent(sessionId)}`;
+            
+            chatContainer.innerHTML = '';
+            chatContainer.appendChild(iframe);
+            
+            iframe.onload = () => {
+                setTimeout(() => {
+                    iframe.style.visibility = 'visible';
+                    document.querySelector('.container').classList.add('slide-left');
+                    chatContainer.classList.add('slide-left');
+                    history.pushState({page: 'chat'}, '', 'chat');
+                }, 50);
+            };
+        }
+
+        function closeChat() {
+            document.querySelector('.container').classList.remove('slide-left');
+            chatContainer.classList.remove('slide-left');
+            controller.getRecentSessions(20);
+            
+            // Update the URL in the parent window to reflect we're back to main screen
+            if (window.parent && window.parent !== window) {
+                console.log("updating url");
+                const currentUrl = new URL(window.parent.location.href);
+                currentUrl.searchParams.set('screen', 'MAIN');
+                currentUrl.searchParams.set('remoteId', 'null');
+                window.parent.history.replaceState({}, '', currentUrl.toString());
+            }
+            
+            setTimeout(() => {
+                chatContainer.innerHTML = '';
+            }, 300);
+        }
+        function fillInput(value) {
+            const input = document.getElementById("numberInput");
+            if (input) {
+                input.value = value;
+            }
+        }
+        function makeCall(remoteId, contact) {
+            const overlay = document.getElementById('callingOverlay');
+            const callingId = document.getElementById('callingId');
+            console.log("contact: "+contact);
+            callingId.textContent = contact && contact !== '' ? contact : remoteId;
+            overlay.classList.add('show');
+            
+            // The cancel button will be handled by the controller
+            document.getElementById('cancelCall').addEventListener('click', () => {
+                controller.rejectCall(remoteId);
+                overlay.classList.remove('show');
+                // Controller cancel call functionality will be added here
+            }, { once: true });  // Remove listener after first click
+            
+            controller.call(remoteId);
+        }
+    </script>
+</body>
+</html>

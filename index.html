@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Native Communication</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background-color: #ffffff;
+            margin: 0;
+            width:100%
+        }
+    </style>
+</head>
+<body>
+    <iframe id="guiFrame" frameBorder="0" style="width:100%; height:100vh;"></iframe>
+    <script>
+
+        guiFrame = document.getElementById('guiFrame');
+        pid = getUrlParameter('pid');
+        screen = getUrlParameter('screen');
+        localId = getUrlParameter('localId');
+        remoteId = getUrlParameter('remoteId');
+
+        if (screen === 'TEST') {
+            guiFrame.src = "test.html";
+        } else {
+            guiFrame.src = "app.html?screen=" + screen + "&localId=" + encodeURIComponent(localId) + "&remoteId=" + encodeURIComponent(remoteId);
+        }
+
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            window.top.controller = new Controller();
+        });
+                
+        class Controller {
+
+            constructor() {
+                this.guiFrame = guiFrame;
+                this.pid = pid;
+                this.localId = localId;
+            }
+
+            receiveData(_data) {
+                const data = JSON.parse(_data);
+                this.guiFrame.contentWindow.postMessage(data, '*');
+            }
+
+            sendMessageToNativeApp(jsonData) {
+
+                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+                    window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
+                } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
+                    console.log(JSON.stringify(jsonData));
+                    window.AndroidBridge.processAction(JSON.stringify(jsonData));
+                } else {
+                    console.log("Native interface not available");
+                }
+            }
+
+            // Native actions
+
+            call(to) {
+                const callRequest = {
+                    action: "call",
+                    body: { localId: this.localId, pid: this.pid, to: to }
+                };
+                this.sendMessageToNativeApp(callRequest);
+            }
+
+            acceptCall(callId) {
+                const request = {
+                    action: "accept-call",
+                    body: { localId: this.localId, pid: this.pid, callId: callId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            
+            rejectCall(callId) {
+                const request = {
+                    action: "reject-call",
+                    body: { localId: this.localId, pid: this.pid, callId: callId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            setMute(callId, bool) {
+                const request = {
+                    action: "set-mute",
+                    body: { localId: this.localId, pid: this.pid, callId: callId, mute: bool}
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            
+            setHold(callId, bool) {
+                const request = {
+                    action: "set-hold",
+                    body: { localId: this.localId, pid: this.pid, callId: callId, hold: bool }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            
+            setActiveCall(callId) {
+                const request = {
+                    action: "set-active-call",
+                    body: { localId: this.localId, pid: this.pid, callId: callId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            sendMessage(to, message) {
+                const request = {
+                    action: "send-message",
+                    body: { localId: this.localId, pid: this.pid, to: to, content: message }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            store(key, value) {
+                const request = {
+                    action: "store",
+                    body: { localId: this.localId, pid: this.pid, key: key, value: value }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+        
+            changeAudioDevice(callId, deviceId) {
+                const request = {
+                    action: "set-audio-device",
+                    body: { localId: this.localId, pid: this.pid, callId: callId, deviceId: deviceId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            sendDtmf(callId, digit) {
+                const request = {
+                    action: "send-dtmf",
+                    body: { localId: this.localId, pid: this.pid, callId: callId, digit: digit }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            // Fetch data
+
+            getActiveCalls() {
+                const request = {
+                    action: "get-active-calls",
+                    body: { localId: this.localId, pid: this.pid }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getLogs(remoteId = null) {
+                const request = {
+                    action: "get-logs",
+                    body: { localId: this.localId, pid: this.pid, remoteId: remoteId, range: 10 }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getRecentCalls() {
+                const request = {
+                    action: "get-recent-calls",
+                    body: { localId: this.localId, pid: this.pid, range: 10 }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getMessages(sessionId, range, start) {
+                const request = {
+                    action: "get-messages",
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId, range: range, startMessage: start }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getRecentSessions(range) {
+                const request = {
+                    action: "get-recent-sessions",
+                    body: { localId: this.localId, pid: this.pid, range: range }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getAudioDevices() {
+                const request = {
+                    action: "get-audio-devices",
+                    body: { localId: this.localId, pid: this.pid }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            // Webview capabilities
+
+            displayBackButton(bool) {
+                const request = {
+                    action: "display-back-button",
+                    body: { localId: this.localId, pid: this.pid, display: bool }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            receiveMessage(event) {
+                const { action, body} = event.data;
+                this.sendMessage(action, body);
+            }
+
+            updateSessionTimestamp(sessionId){
+                const openChatRequest = {
+                    action: "update-session-timestamp",
+                    body: { localId:this.localId, pid: this.pid, sessionId: sessionId }
+                };
+                this.sendMessageToNativeApp(openChatRequest);
+            }
+
+            deleteSession(sessionId) {
+                const deleteSessionRequest = {
+                    action: "delete-session",
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId }
+                };
+                this.sendMessageToNativeApp(deleteSessionRequest);
+            }
+
+            imagePicker() {
+                const request = {
+                    action: "image-picker",
+                    body: { localId: this.localId, pid: this.pid }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            sendImageMessage(to, imageUri, caption) {
+                const request = {
+                    action: "send-image-message",
+                    body: { localId: this.localId, pid: this.pid, to: to, imageUri: imageUri, content: caption }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            contactPicker(type) {
+                const request = {
+                    action: "contact-picker",
+                    body: { localId: this.localId, pid: this.pid, contactType: type }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getContactName(sessionId) {
+                const request = {
+                    action: "get-contact-name",
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+        }
+
+    </script>
+</body>
+</html>

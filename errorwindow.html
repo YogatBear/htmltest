@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Window</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+         }
+
+        .error-modal {
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: auto; /* Adjusts width to content */
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="error-modal">
+        <div id="error-message">Error message goes here</div>
+        <button onclick="window.parent.postMessage({action: 'close-error'}, '*');">Close</button>
+    </div>
+    <script>
+        window.addEventListener('message', function(event) {
+            if (event.data.action === 'showError') {
+                document.getElementById('error-message').textContent = event.data.message;
+            }
+        });
+    </script>
+</body>
+</html>
