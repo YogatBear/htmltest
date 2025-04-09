@@ -1182,6 +1182,18 @@
                     if (videoElement) {
                       videoElement.src = fileId + '?t=' + new Date().getTime();
                       videoElement.load(); // Force the video to reload
+                      
+                      // Update status
+                      const statusIcon = existingMsg.querySelector('.message-status-icon');
+                      if (statusIcon && msgStatus !== null) {
+                        switch (msgStatus) {
+                          case 0: statusIcon.textContent = 'schedule'; break;
+                          case 1: statusIcon.textContent = 'done'; break;
+                          case 2: statusIcon.textContent = 'error'; break;
+                          case 4: statusIcon.textContent = 'done_all'; break;
+                          default: statusIcon.textContent = ''; break;
+                        }
+                      }
                     } else {
                       // Replace the entire message if video element not found
                       const nextElement = existingMsg.nextElementSibling;
@@ -1235,8 +1247,7 @@
                   }
                 }
                 
-                // Update status
-                updateMessage(messageId, content, msgStatus);
+                // Don't call updateMessage here as we've already updated the status inline above
               }
             } else {
               // Regular text message update
