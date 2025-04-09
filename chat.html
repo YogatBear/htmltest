@@ -1011,8 +1011,20 @@
                   chatContainer.appendChild(updatedMessage);
                 }
               } else {
-                // It's already an image, just update the status
+                // It's already an image, update the status and reload the image
                 updateMessage(messageId, content, msgStatus);
+                
+                // Find and update the image source to force a reload
+                const imageElement = existingMsg.querySelector('.message-content img');
+                if (imageElement) {
+                  // Add a cache-busting parameter or force reload by resetting the src
+                  const currentSrc = imageElement.src;
+                  imageElement.src = '';
+                  // Force browser reflow
+                  void imageElement.offsetWidth;
+                  // Set back the src with a cache-busting query parameter
+                  imageElement.src = currentSrc.split('?')[0] + '?t=' + new Date().getTime();
+                }
               }
             } else {
               // Regular text message update
