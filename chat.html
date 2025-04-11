@@ -819,7 +819,7 @@
         downloadButton.addEventListener('click', () => {
           window.parent.postMessage({ 
             action: 'download-file', 
-            body: { fileInfo: content, messageId: messageId } 
+            body: { fileId: content.fileId} 
           }, '*');
         });
         
@@ -972,7 +972,7 @@
                                 newButton.addEventListener('click', () => {
                                     window.parent.postMessage({ 
                                         action: 'download-file', 
-                                        body: { fileInfo: content, messageId: messageId } 
+                                        body: { fileId: content.fileId} 
                                     }, '*');
                                 });
                             }
