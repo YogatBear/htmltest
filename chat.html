@@ -747,12 +747,12 @@
         contentElement.appendChild(imageContainer);
         
         // If there's caption text, display it below the image
-        if (caption) {
+        // if (caption) {
           const captionElement = document.createElement('div');
           captionElement.classList.add('image-caption');
           captionElement.textContent = caption;
           contentElement.appendChild(captionElement);
-        }
+        // }
       } else if (type === 'video') {
         // Create a container for the video and caption
         const videoContainer = document.createElement('div');
