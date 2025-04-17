@@ -1,0 +1,35 @@
+name: Sync to GCS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: arnacon-nl
+
+      - name: Sync to GCS
+        run: |
+          # Sync all files to the bucket
+          gsutil -m rsync -r -x '(^\.git/.*|^\.github/.*|.*\.json$|\.DS_Store)' . gs://ens-html
+
+      - name: Set Cache-Control headers
+        run: |
+          # Set the Cache-Control header to cache for 24 hours
+          gsutil -m setmeta -h "Cache-Control: public, max-age=86400" gs://ens-html/**
+          # gsutil -m setmeta -h "Cache-Control: no-cache, no-store, must-revalidate" gs://ens-html/**
