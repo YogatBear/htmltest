@@ -1399,10 +1399,58 @@
     window.onload = function() {
         // Ensure the chat container is properly sized and positioned before animation starts
         chatContainer.style.opacity = '1';
-        // Scroll to bottom on load
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-        // Signal to parent that chat is ready
-        window.parent.postMessage({ action: 'chatReady' }, '*');
+        
+        // Wait for all images to load before scrolling to bottom
+        const allImages = chatContainer.querySelectorAll('img');
+        const allVideos = chatContainer.querySelectorAll('video');
+        
+        // If there are no images or videos, scroll immediately
+        if (allImages.length === 0 && allVideos.length === 0) {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            window.parent.postMessage({ action: 'chatReady' }, '*');
+            return;
+        }
+
+        // Create promises for all images and videos to load
+        const imagePromises = Array.from(allImages).map(img => {
+            return new Promise((resolve) => {
+                if (img.complete) {
+                    resolve();
+                } else {
+                    img.onload = resolve;
+                    img.onerror = resolve; // Resolve even on error to avoid hanging
+                }
+            });
+        });
+        
+        const videoPromises = Array.from(allVideos).map(video => {
+            return new Promise((resolve) => {
+                if (video.readyState >= 1) { // HAVE_METADATA or better
+                    resolve();
+                } else {
+                    video.onloadedmetadata = resolve;
+                    video.onerror = resolve; // Resolve even on error
+                }
+            });
+        });
+        
+        // When all media is loaded, scroll to bottom
+        Promise.all([...imagePromises, ...videoPromises])
+            .then(() => {
+                // Use setTimeout to ensure the layout is complete
+                setTimeout(() => {
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                    // Signal to parent that chat is ready
+                    window.parent.postMessage({ action: 'chatReady' }, '*');
+                }, 100);
+            })
+            .catch(() => {
+                // Fallback in case of any errors
+                setTimeout(() => {
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                    window.parent.postMessage({ action: 'chatReady' }, '*');
+                }, 100);
+            });
     };
   </script>
 </body>
