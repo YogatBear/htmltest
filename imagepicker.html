@@ -155,16 +155,21 @@
         const videoPlayButton = document.getElementById('video-play-button');
         
         function checkFileType(url) {
+            console.log('Checking file type for URL:', url);
+            
             // First try to get the extension from the URL
             const extensionMatch = url.match(/\.([^.]+)$/);
             if (extensionMatch) {
                 const extension = extensionMatch[1].toLowerCase();
+                console.log('Found extension from URL:', extension);
                 const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
                 const videoExtensions = ['mp4', 'mov', 'avi', 'webm', 'mkv', 'flv'];
 
                 if (imageExtensions.includes(extension)) {
+                    console.log('Detected as image type');
                     return { type: 'image', extension };
                 } else if (videoExtensions.includes(extension)) {
+                    console.log('Detected as video type');
                     return { type: 'video', extension };
                 }
             }
@@ -173,28 +178,35 @@
             const uuidMatch = url.match(/([0-9A-Fa-f\-]{36})\.(\w+)$/);
             if (uuidMatch) {
                 const extension = uuidMatch[2].toLowerCase();
+                console.log('Found extension from UUID pattern:', extension);
                 const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
                 const videoExtensions = ['mp4', 'mov', 'avi', 'webm', 'mkv', 'flv'];
 
                 if (imageExtensions.includes(extension)) {
+                    console.log('Detected as image type');
                     return { type: 'image', extension };
                 } else if (videoExtensions.includes(extension)) {
+                    console.log('Detected as video type');
                     return { type: 'video', extension };
                 }
             }
 
+            console.log('Could not determine file type');
             return { type: 'unknown', extension: null };
         }
 
         // Parse hash parameters
-        const hashData = new URLSearchParams(decodeURIComponent(window.location.hash.slice(1)));
+        const hashParams = window.location.hash.slice(1);
+        console.log('Hash params:', hashParams);
+        const hashData = new URLSearchParams(decodeURIComponent(hashParams));
         const imageData = hashData.get('imageData');
-        const fileType = checkFileType(imageData);
+        console.log('Image data URL:', imageData);
         
+        const fileType = checkFileType(imageData);
         console.log('File type detected:', fileType);
         
         if (fileType.type === 'video') {
-            // Show video preview
+            console.log('Setting up video preview');
             previewVideo.style.display = 'block';
             previewVideo.src = imageData;
             
@@ -224,18 +236,23 @@
                 videoPlayButton.style.display = 'none';
             });
         } else {
-            // Show image preview
+            console.log('Setting up image preview');
             previewImage.style.display = 'block';
-            previewImage.src = imageData;
             
             // Log for debugging
             previewImage.addEventListener('error', (e) => {
                 console.error('Error loading image:', e);
+                console.error('Image src at time of error:', previewImage.src);
             });
             
             previewImage.addEventListener('load', () => {
                 console.log('Image loaded successfully');
+                console.log('Final image dimensions:', previewImage.naturalWidth, 'x', previewImage.naturalHeight);
             });
+
+            // Set the image source
+            console.log('Setting image source to:', imageData);
+            previewImage.src = imageData;
         }
 
         // Handle back button
