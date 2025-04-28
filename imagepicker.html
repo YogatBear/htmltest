@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media Preview</title>
     <link rel="stylesheet" href="assets/fonts/fonts.css">
+    <link rel="stylesheet" href="assets/fonts/system-fonts.css">
     <style>
         :root {
             --secondary-purple: #6a5acd;
@@ -45,6 +46,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
         }
 
         #preview-image {
@@ -67,12 +69,16 @@
             border-radius: 50%;
             background: rgba(0, 0, 0, 0.5);
             color: white;
-            display: flex;
+            display: none; /* Hidden by default, shown when needed */
             align-items: center;
             justify-content: center;
             cursor: pointer;
             font-size: 36px;
-            display: none; /* Hidden by default, shown when needed */
+        }
+
+        .material-icons {
+            font-size: 24px;
+            color: white;
         }
 
         #bottom-bar {
@@ -147,22 +153,37 @@
         const previewImage = document.getElementById('preview-image');
         const previewVideo = document.getElementById('preview-video');
         const videoPlayButton = document.getElementById('video-play-button');
-        function checkFileType(url) {
-        const match = url.match(/([0-9A-Fa-f\-]{36})\.(\w+)$/);
         
-        if (!match) return { type: 'unknown', extension: null };
+        function checkFileType(url) {
+            // First try to get the extension from the URL
+            const extensionMatch = url.match(/\.([^.]+)$/);
+            if (extensionMatch) {
+                const extension = extensionMatch[1].toLowerCase();
+                const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
+                const videoExtensions = ['mp4', 'mov', 'avi', 'webm', 'mkv', 'flv'];
 
-        const extension = match[2].toLowerCase();
-        const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
-        const videoExtensions = ['mp4', 'mov', 'avi', 'webm', 'mkv', 'flv'];
+                if (imageExtensions.includes(extension)) {
+                    return { type: 'image', extension };
+                } else if (videoExtensions.includes(extension)) {
+                    return { type: 'video', extension };
+                }
+            }
 
-        if (imageExtensions.includes(extension)) {
-            return { type: 'image', extension };
-        } else if (videoExtensions.includes(extension)) {
-            return { type: 'video', extension };
-        } else {
-            return { type: 'unknown', extension };
-        }
+            // If no extension found or not recognized, try the UUID pattern
+            const uuidMatch = url.match(/([0-9A-Fa-f\-]{36})\.(\w+)$/);
+            if (uuidMatch) {
+                const extension = uuidMatch[2].toLowerCase();
+                const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
+                const videoExtensions = ['mp4', 'mov', 'avi', 'webm', 'mkv', 'flv'];
+
+                if (imageExtensions.includes(extension)) {
+                    return { type: 'image', extension };
+                } else if (videoExtensions.includes(extension)) {
+                    return { type: 'video', extension };
+                }
+            }
+
+            return { type: 'unknown', extension: null };
         }
 
         // Parse hash parameters
@@ -170,6 +191,7 @@
         const imageData = hashData.get('imageData');
         const fileType = checkFileType(imageData);
         
+        console.log('File type detected:', fileType);
         
         if (fileType.type === 'video') {
             // Show video preview
@@ -205,6 +227,15 @@
             // Show image preview
             previewImage.style.display = 'block';
             previewImage.src = imageData;
+            
+            // Log for debugging
+            previewImage.addEventListener('error', (e) => {
+                console.error('Error loading image:', e);
+            });
+            
+            previewImage.addEventListener('load', () => {
+                console.log('Image loaded successfully');
+            });
         }
 
         // Handle back button
