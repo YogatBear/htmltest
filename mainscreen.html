@@ -442,7 +442,7 @@
                     overlay.classList.remove('show');
                     break;
                 case 'download-file':
-                    downloadFile(event.data.body.fileId);
+                    downloadFile(event.data.body.messageId, event.data.body.fileId);
                     break;
             }
         });
