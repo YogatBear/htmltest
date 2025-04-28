@@ -54,6 +54,7 @@
             max-height: 100%;
             object-fit: contain;
             display: none; /* Hidden by default, shown when needed */
+            background: transparent; /* Ensure transparent background */
         }
         
         #preview-video {
@@ -132,7 +133,7 @@
     </div>
     
     <div id="media-container">
-        <img id="preview-image" alt="Preview">
+        <img id="preview-image" alt="Preview" crossorigin="anonymous">
         <video id="preview-video" controls></video>
         <div id="video-play-button">
             <span class="material-icons">play_arrow</span>
@@ -237,22 +238,54 @@
             });
         } else {
             console.log('Setting up image preview');
-            previewImage.style.display = 'block';
+            const img = document.getElementById('preview-image');
             
-            // Log for debugging
-            previewImage.addEventListener('error', (e) => {
-                console.error('Error loading image:', e);
-                console.error('Image src at time of error:', previewImage.src);
-            });
+            // Clear any existing src
+            img.removeAttribute('src');
             
-            previewImage.addEventListener('load', () => {
+            // Add all possible error handlers
+            img.onerror = function(e) {
+                console.error('Image load error:', e);
+                console.error('Error event details:', {
+                    type: e.type,
+                    target: e.target,
+                    src: e.target.src,
+                    timestamp: new Date().toISOString()
+                });
+            };
+            
+            img.addEventListener('error', function(e) {
+                console.error('Image load error (addEventListener):', e);
+            }, true);
+            
+            window.addEventListener('error', function(e) {
+                if (e.target.tagName === 'IMG') {
+                    console.error('Global image error:', e);
+                }
+            }, true);
+            
+            img.addEventListener('load', function() {
                 console.log('Image loaded successfully');
-                console.log('Final image dimensions:', previewImage.naturalWidth, 'x', previewImage.naturalHeight);
+                console.log('Image dimensions:', this.naturalWidth, 'x', this.naturalHeight);
+                console.log('Image complete:', this.complete);
+                console.log('Current src:', this.src);
             });
 
-            // Set the image source
+            // Show the image container first
+            img.style.display = 'block';
+            
+            // Try to load the image
             console.log('Setting image source to:', imageData);
-            previewImage.src = imageData;
+            
+            // Force a browser reflow before setting src
+            void img.offsetWidth;
+            
+            // Set the source
+            img.src = imageData;
+            
+            // Double check the source was set
+            console.log('Image source after setting:', img.src);
+            console.log('Image complete status:', img.complete);
         }
 
         // Handle back button
