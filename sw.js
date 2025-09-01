@@ -31,11 +31,33 @@ self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(function(cache) {
-        console.log('Service Worker: Caching files');
-        return cache.addAll(urlsToCache);
+        console.log('Service Worker: Starting to cache', urlsToCache.length, 'files');
+        
+        // Cache files individually to handle failures gracefully
+        const cachePromises = urlsToCache.map(function(url, index) {
+          return fetch(url)
+            .then(function(response) {
+              if (response.ok) {
+                console.log('Service Worker: Caching', url, '- Status:', response.status);
+                return cache.put(url, response);
+              } else {
+                console.error('Service Worker: Failed to fetch', url, '- Status:', response.status);
+                return Promise.resolve(); // Continue with other files
+              }
+            })
+            .catch(function(error) {
+              console.error('Service Worker: Error fetching', url, '- Error:', error);
+              return Promise.resolve(); // Continue with other files
+            });
+        });
+        
+        return Promise.all(cachePromises);
+      })
+      .then(function() {
+        console.log('Service Worker: Installation complete');
       })
       .catch(function(error) {
-        console.log('Service Worker: Cache failed', error);
+        console.error('Service Worker: Installation failed', error);
       })
   );
   // Skip waiting to activate immediately
@@ -101,5 +123,18 @@ self.addEventListener('fetch', function(event) {
 self.addEventListener('message', function(event) {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
+  } else if (event.data && event.data.type === 'GET_CACHE_CONTENTS') {
+    caches.open(CACHE_NAME).then(function(cache) {
+      return cache.keys();
+    }).then(function(requests) {
+      const urls = requests.map(function(request) {
+        return request.url;
+      });
+      console.log('Service Worker: Cache contents:', urls);
+      event.ports[0].postMessage({
+        type: 'CACHE_CONTENTS',
+        urls: urls
+      });
+    });
   }
 });
