@@ -94,30 +94,52 @@ self.addEventListener('fetch', function(event) {
           return response;
         }
         
+        // Try to match without query parameters for HTML files
+        const url = new URL(event.request.url);
+        if (url.pathname.endsWith('.html')) {
+          const baseUrl = url.origin + url.pathname;
+          return caches.match(baseUrl).then(function(cachedResponse) {
+            if (cachedResponse) {
+              console.log('Service Worker: Serving HTML from cache (ignoring query params)', baseUrl);
+              return cachedResponse;
+            }
+            
+            // If not in cache, try to fetch from network
+            console.log('Service Worker: Fetching from network', event.request.url);
+            return fetchAndCache(event.request);
+          });
+        }
+        
+        // For non-HTML files, try network
         console.log('Service Worker: Fetching from network', event.request.url);
-        return fetch(event.request).then(function(response) {
-          // Don't cache non-successful responses
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
-          }
-
-          // Clone the response as it can only be consumed once
-          const responseToCache = response.clone();
-
-          caches.open(CACHE_NAME)
-            .then(function(cache) {
-              cache.put(event.request, responseToCache);
-            });
-
-          return response;
-        }).catch(function(error) {
-          console.log('Service Worker: Network fetch failed', error);
-          // You could return a fallback page here if needed
-          throw error;
-        });
+        return fetchAndCache(event.request);
       })
   );
 });
+
+// Helper function to fetch and cache
+function fetchAndCache(request) {
+  return fetch(request).then(function(response) {
+    // Don't cache non-successful responses
+    if (!response || response.status !== 200 || response.type !== 'basic') {
+      return response;
+    }
+
+    // Clone the response as it can only be consumed once
+    const responseToCache = response.clone();
+
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        cache.put(request, responseToCache);
+      });
+
+    return response;
+  }).catch(function(error) {
+    console.log('Service Worker: Network fetch failed', error);
+    // You could return a fallback page here if needed
+    throw error;
+  });
+}
 
 // Listen for messages from the main thread
 self.addEventListener('message', function(event) {
