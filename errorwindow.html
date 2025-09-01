@@ -4,7 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Error Window</title>
+    <link rel="stylesheet" href="assets/fonts/fonts.css">
+    <link rel="stylesheet" href="assets/fonts/system-fonts.css">
     <style>
+        :root {
+            --secondary-purple: rgb(115, 66, 160);
+            --light-purple: #8e8aff;
+            --dark-purple: #3634a3;
+            --purple-05: rgba(115, 66, 160, 0.05);
+            --purple-10: rgba(115, 66, 160, 0.1);
+            --text-primary: #000000;
+            --text-secondary: #8e8e93;
+            --separator-color: rgba(60, 60, 67, 0.08);
+            --danger-color: #ff3b30;
+            --system-gray: #f2f2f7;
+            --unread-blue: rgb(115, 66, 160);
+            --background-color: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --shadow-color-active: rgba(0, 0, 0, 0.2);
+            --danger-shadow: rgba(255, 59, 48, 0.3);
+            --danger-shadow-active: rgba(255, 59, 48, 0.2);
+            --glass-effect: rgba(255, 255, 255, 0.15);
+            --purple-gradient: linear-gradient(135deg, var(--secondary-purple) 0%, var(--dark-purple) 100%);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --secondary-purple: rgb(138, 93, 180);
+                --light-purple: #a28bc7;
+                --dark-purple: #5e3b88;
+                --purple-05: rgba(138, 93, 180, 0.1);
+                --purple-10: rgba(138, 93, 180, 0.15);
+                --text-primary: #ffffff;
+                --text-secondary: #aeaeb2;
+                --separator-color: rgba(200, 200, 205, 0.28);
+                --danger-color: #ff453a;
+                --system-gray: #2c2c2e;
+                --unread-blue: rgb(138, 93, 180);
+                --background-color: rgb(23, 23, 23);
+                --shadow-color: rgba(0, 0, 0, 0.5);
+                --shadow-color-active: rgba(0, 0, 0, 0.7);
+                --danger-shadow: rgba(255, 69, 58, 0.3);
+                --danger-shadow-active: rgba(255, 69, 58, 0.5);
+                --glass-effect: rgba(255, 255, 255, 0.1);
+                --purple-gradient: linear-gradient(135deg, 
+                    rgb(138, 93, 180) 0%, 
+                    rgb(94, 59, 136) 50%,
+                    rgb(71, 44, 103) 100%
+                );
+            }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
         body, html {
             height: 100%;
             margin: 0;
@@ -12,22 +70,87 @@
             display: flex;
             justify-content: center;
             align-items: center;
-         }
+        }
+
+        body {
+            background: transparent;
+            color: white;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
 
         .error-modal {
-            background: rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, 
+                rgba(115, 66, 160, 0.5) 0%,
+                rgba(54, 52, 163, 0.5) 100%
+            );
             color: white;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 16px;
+            border-radius: 16px;
             text-align: center;
-            width: auto; /* Adjusts width to content */
+            max-width: 320px;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .error-modal {
+                background: linear-gradient(135deg, 
+                    rgba(138, 93, 180, 0.5) 0%,
+                    rgba(94, 59, 136, 0.5) 100%
+                );
+            }
+        }
+
+        #error-message {
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.4;
+            margin-bottom: 16px;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         button {
-            margin-top: 20px;
-            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
 
+        button:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        button:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.96);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
     </style>
 </head>
 <body>

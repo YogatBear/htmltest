@@ -379,6 +379,7 @@
         const domainButtons = document.querySelectorAll(".domain-button");
         const chatContainer = document.getElementById('chat-container');
         const contactsButton = document.querySelector(".contacts-button");
+        const overlay = document.getElementById('callingOverlay');
 
         const urlParams = new URLSearchParams(window.location.search);
         const remoteId = urlParams.get('remoteId');
@@ -438,11 +439,14 @@
 
                 case 'ringing':
                     // Close the calling overlay if it's open
-                    const overlay = document.getElementById('callingOverlay');
                     overlay.classList.remove('show');
                     break;
                 case 'download-file':
                     downloadFile(event.data.body.messageId, event.data.body.fileId);
+                    break;
+
+                case 'hideAttempt':
+                    overlay.classList.remove('show');
                     break;
             }
         });
@@ -506,7 +510,6 @@
             }
         }
         function makeCall(remoteId, contact) {
-            const overlay = document.getElementById('callingOverlay');
             const callingId = document.getElementById('callingId');
             console.log("contact: "+contact);
             callingId.textContent = contact && contact !== '' ? contact : remoteId;

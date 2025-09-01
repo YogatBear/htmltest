@@ -108,6 +108,7 @@
                 const errorFrame = document.getElementById('error-frame');
                 errorFrame.style.display = 'block';
                 errorFrame.contentWindow.postMessage({action: 'showError', message: message}, '*');
+                screenFrame.contentWindow.postMessage({action: 'hideAttempt'}, '*');
             }
             hideError() {
                 const errorFrame = document.getElementById('error-frame');
