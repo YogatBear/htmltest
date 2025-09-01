@@ -310,22 +310,22 @@
                     .then(function(registration) {
                         console.log('ServiceWorker registration successful with scope: ', registration.scope);
                         
-                        // Debug: Check cache contents after a delay
-                        setTimeout(function() {
-                            if (navigator.serviceWorker.controller) {
-                                const channel = new MessageChannel();
-                                channel.port1.onmessage = function(event) {
-                                    if (event.data.type === 'CACHE_CONTENTS') {
-                                        console.log('Cached files:', event.data.urls);
-                                        console.log('Total cached files:', event.data.urls.length);
-                                    }
-                                };
-                                navigator.serviceWorker.controller.postMessage(
-                                    {type: 'GET_CACHE_CONTENTS'}, 
-                                    [channel.port2]
-                                );
-                            }
-                        }, 3000); // Wait 3 seconds for caching to complete
+                        // Optional: Check cache contents for debugging (uncomment if needed)
+                        // setTimeout(function() {
+                        //     if (navigator.serviceWorker.controller) {
+                        //         const channel = new MessageChannel();
+                        //         channel.port1.onmessage = function(event) {
+                        //             if (event.data.type === 'CACHE_CONTENTS') {
+                        //                 console.log('Cached files:', event.data.urls);
+                        //                 console.log('Total cached files:', event.data.urls.length);
+                        //             }
+                        //         };
+                        //         navigator.serviceWorker.controller.postMessage(
+                        //             {type: 'GET_CACHE_CONTENTS'}, 
+                        //             [channel.port2]
+                        //         );
+                        //     }
+                        // }, 3000);
                         
                         // Listen for updates
                         registration.addEventListener('updatefound', function() {
