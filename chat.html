@@ -884,13 +884,10 @@
     const sendButton = document.getElementById('send-button');
     const imageButton = document.getElementById('image-button');
 
-    if (remoteId) {
+    if (remoteId !== 'null') {
       controller.getContactName(remoteId);
-      controller.getMessages(remoteId, 20, "", false);
     }
-    else {
-      controller.getMessages(sessionId, 20, "", true);
-    }
+    controller.getMessages(20, "");
 
     window.addEventListener('popstate', function(event) {
         console.log("back button pressed");
@@ -1625,7 +1622,7 @@
     else {
       document.getElementById("title").textContent = remoteId;
     }
-    
+
     // Call button logic
     document.getElementById("call-button").addEventListener("click", () => {
       hideContextMenu(); // Hide context menu when calling
@@ -1691,11 +1688,20 @@
           const oldestMessageId = oldestMessage.dataset.messageId;
           if (oldestMessageId) {
             console.log("Fetching older messages with ID:", oldestMessageId);
-            controller.getMessages(sessionId, 20, oldestMessageId);
+            controller.getMessages(20, oldestMessageId);
           }
         }
       }
     });
+
+    function getMessages(range, startMessage) {
+      if (sessionId !== 'null') {
+        controller.getMessages(sessionId, range, startMessage, true);
+      }
+      else if (remoteId !== 'null') {
+        controller.getMessages(remoteId, range, startMessage, false);
+      }
+    }
 
     function updateMessage(messageId, content, status, caption) {
         const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
