@@ -186,14 +186,15 @@
             }
 
             sendMessage(id, message, isSession) {
+                const request = {};
                 if (isSession) {
-                    const request = {
+                    request = {
                         action: "send-message",
                         body: { localId: this.localId, pid: this.pid, sessionId: id, content: message }
                     };
                 }
                 else {
-                    const request = {
+                    request = {
                         action: "send-message",
                         body: { localId: this.localId, pid: this.pid, remoteId: id, content: message }
                     };
