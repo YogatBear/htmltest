@@ -1617,7 +1617,12 @@
     }
 
     // Set the chat title
-    document.getElementById("title").textContent = sessionName;
+    if (sessionName) {
+      document.getElementById("title").textContent = sessionName;
+    }
+    else {
+      document.getElementById("title").textContent = remoteId;
+    }
 
     // Call button logic
     document.getElementById("call-button").addEventListener("click", () => {
