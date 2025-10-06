@@ -186,7 +186,7 @@
             }
 
             sendMessage(id, message, isSession) {
-                const request = {};
+                let request = {};
                 if (isSession) {
                     request = {
                         action: "send-message",
@@ -269,7 +269,7 @@
             }
 
             getMessages(id, range, start, isSession) {
-                const request = {};
+                let request = {};
                 if (isSession) {
                     request = {
                         action: "get-messages",
