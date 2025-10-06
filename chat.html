@@ -887,7 +887,7 @@
     if (remoteId !== 'null') {
       controller.getContactName(remoteId);
     }
-    controller.getMessages(20, "");
+    getMessages(20, "");
 
     window.addEventListener('popstate', function(event) {
         console.log("back button pressed");
@@ -1688,7 +1688,7 @@
           const oldestMessageId = oldestMessage.dataset.messageId;
           if (oldestMessageId) {
             console.log("Fetching older messages with ID:", oldestMessageId);
-            controller.getMessages(20, oldestMessageId);
+            getMessages(20, oldestMessageId);
           }
         }
       }
