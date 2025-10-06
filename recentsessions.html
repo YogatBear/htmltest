@@ -165,7 +165,7 @@
             width: 100%;
         }
         
-        .contact-name {
+        .session-name {
             font-size: 17px;
             font-weight: 600;
             color: var(--text-primary);
@@ -430,7 +430,7 @@
             updateRecentSessions(recentSessions) {
                 this.container.innerHTML = "";
                 recentSessions.forEach(msg => {
-                    const [messageId, time, author, content, msgSessionId, contact, unreadCount] = msg;
+                    const [messageId, time, author, content, msgSessionId, sessionName, unreadCount] = msg;
 
                     const messageDate = new Date(time);
                     const today = new Date();
@@ -453,9 +453,9 @@
                     const name = (author === localId) ? "You: " : "";
                     const messageinfo = name + content;
 
-                    // Use msgSessionId for color generation but contact for display
+                    // Use msgSessionId for color generation but session name for display
                     const profileColor = hashStringToColor(msgSessionId);
-                    const displayName = contact || msgSessionId; // Fallback to msgSessionId if contact is null
+                    const displayName = sessionName; // Fallback to msgSessionId if session name is null
                     const firstLetter = displayName.charAt(0).toUpperCase();
 
                     const li = document.createElement('li');
@@ -468,7 +468,7 @@
                         <div class="message-details">
                             <div class="message-header">
                                 <div class="header-left">
-                                    <span class="contact-name">${formatName(displayName)}</span>
+                                    <span class="session-name">${formatName(displayName)}</span>
                                 </div>
                                 <div class="header-right">
                                     <span class="message-time">${timeOrDate}</span>
@@ -506,7 +506,7 @@
                         if (!this.deleteMode) {
                             window.parent.postMessage({ 
                                 action: 'call', 
-                                body: { remoteId: msgSessionId, contact: contact }
+                                body: { remoteId: msgSessionId, contact: sessionName }
                             }, '*');
                         }
                     });
@@ -517,7 +517,7 @@
                         if (this.deleteMode === msgSessionId) {
                             this.exitDeleteMode();
                         } else if (!this.deleteMode) {
-                            window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
+                            window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId, sessionName: sessionName } }, '*');
                         }
                     });
 

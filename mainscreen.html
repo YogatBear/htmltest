@@ -460,7 +460,7 @@
                     break;
                     
                 case 'chat':
-                    openChat(event.data.body.sessionId);
+                    openChat(event.data.body.sessionId, event.data.body.sessionName);
                     break;
 
                 case 'closeChat':
@@ -504,11 +504,11 @@
             }
         });
 
-        function openChat(sessionId) {
+        function openChat(sessionId, sessionName) {
             const iframe = document.createElement('iframe');
             iframe.className = 'chat-iframe';
             iframe.style.cssText = 'width:100%;height:100%;border:none;visibility:hidden;';
-            iframe.src = `chat.html?sessionId=${encodeURIComponent(sessionId)}`;
+            iframe.src = `chat.html?sessionId=${encodeURIComponent(sessionId)}&sessionName=${encodeURIComponent(sessionName)}&localId=${encodeURIComponent(localId)}`;
             
             chatContainer.innerHTML = '';
             chatContainer.appendChild(iframe);
