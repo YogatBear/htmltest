@@ -863,6 +863,7 @@
   </div>
   <div id="chat-container"></div>
   <div class="message-input">
+    <button id="image-button"></button>
     <input type="text" id="message-text" placeholder="Type a message..." />
     <button id="send-button">
       <i class="material-icons">send</i>
@@ -881,6 +882,7 @@
     const chatContainer = document.getElementById('chat-container');
     const messageText = document.getElementById('message-text');
     const sendButton = document.getElementById('send-button');
+    const imageButton = document.getElementById('image-button');
     controller.getContactName(sessionId);
     controller.getMessages(sessionId, 20, "");
 
@@ -1652,6 +1654,11 @@
       if (e.key === 'Enter') {
         sendButton.click();
       }
+    });
+
+    imageButton.addEventListener('click', () => {
+      console.log("Choosing image");
+      controller.imagePicker();
     });
 
     // Hide context menu when typing

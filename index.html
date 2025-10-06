@@ -41,24 +41,65 @@
     <script>
 
         guiFrame = document.getElementById('guiFrame');
-        pid = getUrlParameter('pid');
-        screen = getUrlParameter('screen');
-        localId = getUrlParameter('localId');
-        remoteId = getUrlParameter('remoteId');
 
-        if (screen === 'TEST') {
-            guiFrame.src = "test.html";
-        } else {
-            guiFrame.src = "app.html?screen=" + screen + "&localId=" + encodeURIComponent(localId) + "&remoteId=" + encodeURIComponent(remoteId);
-        }
+        // Initialize route from current location
+        pid = null;
+        screen = null;
+        localId = null;
+        remoteId = null;
+        applyRouteFromLocation();
 
         function getUrlParameter(name) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(name);
         }
 
+        function getHashParameter(name) {
+            const raw = window.location.hash && window.location.hash.charAt(0) === '#' ? window.location.hash.slice(1) : window.location.hash;
+            if (!raw) return null;
+            const hashParams = new URLSearchParams(raw);
+            return hashParams.get(name);
+        }
+
+        function getParam(name) {
+            const q = getUrlParameter(name);
+            if (q !== null && q !== '') return q;
+            const h = getHashParameter(name);
+            if (h !== null && h !== '') return h;
+            return null;
+        }
+
+        function applyRouteFromLocation() {
+            // Prefer hash params (for offline-friendly deep links), fallback to search params
+            pid = getParam('pid');
+            screen = getParam('screen') || 'MAIN';
+            localId = getParam('localId');
+            remoteId = getParam('remoteId');
+
+            let newSrc;
+            if (screen === 'TEST') {
+                newSrc = 'test.html';
+            } else {
+                newSrc = 'app.html?screen=' + screen + '&localId=' + encodeURIComponent(localId || '') + '&remoteId=' + encodeURIComponent(remoteId || '');
+            }
+
+            // Always update iframe src to ensure navigation happens
+            guiFrame.src = newSrc;
+
+            // Keep controller state in sync if already constructed
+            if (window.top.controller) {
+                window.top.controller.pid = pid;
+                window.top.controller.localId = localId;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             window.top.controller = new Controller();
+        });
+
+        // React to in-app deep links without reloading the page
+        window.addEventListener('hashchange', function() {
+            applyRouteFromLocation();
         });
                 
         class Controller {
@@ -297,6 +338,14 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+
+            createGroup(groupData) {
+                const request = {
+                    action: "create-group",
+                    body: { localId: this.localId, pid: this.pid, groupData: groupData }
+                };
+                this.sendMessageToNativeApp(request);
+            }
         }
 
     </script>
@@ -306,26 +355,26 @@
         // Register service worker for PWA functionality
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('./sw.js')
                     .then(function(registration) {
                         console.log('ServiceWorker registration successful with scope: ', registration.scope);
                         
-                        // Optional: Check cache contents for debugging (uncomment if needed)
-                        // setTimeout(function() {
-                        //     if (navigator.serviceWorker.controller) {
-                        //         const channel = new MessageChannel();
-                        //         channel.port1.onmessage = function(event) {
-                        //             if (event.data.type === 'CACHE_CONTENTS') {
-                        //                 console.log('Cached files:', event.data.urls);
-                        //                 console.log('Total cached files:', event.data.urls.length);
-                        //             }
-                        //         };
-                        //         navigator.serviceWorker.controller.postMessage(
-                        //             {type: 'GET_CACHE_CONTENTS'}, 
-                        //             [channel.port2]
-                        //         );
-                        //     }
-                        // }, 3000);
+                        // Debug: Check cache contents after a delay
+                        setTimeout(function() {
+                            if (navigator.serviceWorker.controller) {
+                                const channel = new MessageChannel();
+                                channel.port1.onmessage = function(event) {
+                                    if (event.data.type === 'CACHE_CONTENTS') {
+                                        console.log('Cached files:', event.data.urls);
+                                        console.log('Total cached files:', event.data.urls.length);
+                                    }
+                                };
+                                navigator.serviceWorker.controller.postMessage(
+                                    {type: 'GET_CACHE_CONTENTS'}, 
+                                    [channel.port2]
+                                );
+                            }
+                        }, 3000); // Wait 3 seconds for caching to complete
                         
                         // Listen for updates
                         registration.addEventListener('updatefound', function() {

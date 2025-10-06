@@ -1,28 +1,29 @@
-const CACHE_NAME = 'arnacon-v2';
+const CACHE_NAME = 'arnacon-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/app.html',
-  '/calllog.html',
-  '/chat.html',
-  '/dialer.html',
-  '/errorwindow.html',
-  '/imagepicker.html',
-  '/incall.html',
-  '/incomingcall.html',
-  '/mainscreen.html',
-  '/recentcalls.html',
-  '/recentsessions.html',
-  '/ringing.html',
-  '/assets/fonts/fonts.css',
-  '/assets/fonts/sf-pro-display.css',
-  '/assets/fonts/sf-pro-text.css',
-  '/assets/fonts/system-fonts.css',
-  '/assets/icons/material-icons.css',
-  '/assets/icons/material-symbols.css',
-  '/assets/icons/MaterialIcons-Regular.woff2',
-  '/assets/icons/MaterialSymbolsOutlined-Regular.woff2',
-  '/manifest.json'
+  './',
+  './index.html',
+  './app.html',
+  './calllog.html',
+  './chat.html',
+  './dialer.html',
+  './errorwindow.html',
+  './imagepicker.html',
+  './incall.html',
+  './incomingcall.html',
+  './mainscreen.html',
+  './recentcalls.html',
+  './recentsessions.html',
+  './groupcreation.html',
+  './ringing.html',
+  './assets/fonts/fonts.css',
+  './assets/fonts/sf-pro-display.css',
+  './assets/fonts/sf-pro-text.css',
+  './assets/fonts/system-fonts.css',
+  './assets/icons/material-icons.css',
+  './assets/icons/material-symbols.css',
+  './assets/icons/MaterialIcons-Regular.woff2',
+  './assets/icons/MaterialSymbolsOutlined-Regular.woff2',
+  './manifest.json'
 ];
 
 // Install event - cache all resources
@@ -31,30 +32,33 @@ self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(function(cache) {
-        console.log('Service Worker: Pre-caching essential files');
-        // Use addAll for faster initial caching - it's atomic and faster
-        return cache.addAll(urlsToCache);
+        console.log('Service Worker: Starting to cache', urlsToCache.length, 'files');
+        
+        // Cache files individually to handle failures gracefully
+        const cachePromises = urlsToCache.map(function(url, index) {
+          return fetch(url)
+            .then(function(response) {
+              if (response.ok) {
+                console.log('Service Worker: Caching', url, '- Status:', response.status);
+                return cache.put(url, response);
+              } else {
+                console.error('Service Worker: Failed to fetch', url, '- Status:', response.status);
+                return Promise.resolve(); // Continue with other files
+              }
+            })
+            .catch(function(error) {
+              console.error('Service Worker: Error fetching', url, '- Error:', error);
+              return Promise.resolve(); // Continue with other files
+            });
+        });
+        
+        return Promise.all(cachePromises);
       })
       .then(function() {
-        console.log('Service Worker: Pre-caching complete');
+        console.log('Service Worker: Installation complete');
       })
       .catch(function(error) {
-        console.error('Service Worker: Pre-caching failed', error);
-        // Fallback to individual caching if addAll fails
-        return caches.open(CACHE_NAME).then(function(cache) {
-          const cachePromises = urlsToCache.map(function(url) {
-            return fetch(url)
-              .then(function(response) {
-                if (response.ok) {
-                  return cache.put(url, response);
-                }
-              })
-              .catch(function(error) {
-                console.warn('Service Worker: Failed to cache', url, error);
-              });
-          });
-          return Promise.all(cachePromises);
-        });
+        console.error('Service Worker: Installation failed', error);
       })
   );
   // Skip waiting to activate immediately
@@ -82,16 +86,12 @@ self.addEventListener('activate', function(event) {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', function(event) {
-  // Skip non-GET requests
-  if (event.request.method !== 'GET') {
-    return;
-  }
-
   event.respondWith(
     caches.match(event.request)
       .then(function(response) {
-        // Return cached version immediately if found
+        // Return cached version or fetch from network
         if (response) {
+          console.log('Service Worker: Serving from cache', event.request.url);
           return response;
         }
         
@@ -101,15 +101,18 @@ self.addEventListener('fetch', function(event) {
           const baseUrl = url.origin + url.pathname;
           return caches.match(baseUrl).then(function(cachedResponse) {
             if (cachedResponse) {
+              console.log('Service Worker: Serving HTML from cache (ignoring query params)', baseUrl);
               return cachedResponse;
             }
             
-            // If not in cache, fetch from network (but don't log excessively)
+            // If not in cache, try to fetch from network
+            console.log('Service Worker: Fetching from network', event.request.url);
             return fetchAndCache(event.request);
           });
         }
         
         // For non-HTML files, try network
+        console.log('Service Worker: Fetching from network', event.request.url);
         return fetchAndCache(event.request);
       })
   );
@@ -118,39 +121,24 @@ self.addEventListener('fetch', function(event) {
 // Helper function to fetch and cache
 function fetchAndCache(request) {
   return fetch(request).then(function(response) {
-    // Don't cache non-successful responses or non-basic responses
+    // Don't cache non-successful responses
     if (!response || response.status !== 200 || response.type !== 'basic') {
       return response;
     }
 
-    // Only cache certain file types to avoid bloating cache
-    const url = new URL(request.url);
-    const shouldCache = url.pathname.endsWith('.html') || 
-                       url.pathname.endsWith('.css') || 
-                       url.pathname.endsWith('.js') || 
-                       url.pathname.endsWith('.woff2') || 
-                       url.pathname.endsWith('.json');
+    // Clone the response as it can only be consumed once
+    const responseToCache = response.clone();
 
-    if (shouldCache) {
-      // Clone the response as it can only be consumed once
-      const responseToCache = response.clone();
-      
-      caches.open(CACHE_NAME)
-        .then(function(cache) {
-          cache.put(request, responseToCache);
-        })
-        .catch(function(error) {
-          // Silently handle cache errors to avoid disrupting the response
-        });
-    }
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        cache.put(request, responseToCache);
+      });
 
     return response;
   }).catch(function(error) {
-    // Return a basic error response instead of throwing
-    return new Response('Network error', { 
-      status: 408, 
-      statusText: 'Network timeout' 
-    });
+    console.log('Service Worker: Network fetch failed', error);
+    // You could return a fallback page here if needed
+    throw error;
   });
 }
 

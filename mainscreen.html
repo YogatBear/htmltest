@@ -223,6 +223,32 @@
             color: var(--secondary-purple);
         }
 
+        /* Group button styles - same as contacts button */
+        .group-button {
+            background: none;
+            border: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+            margin-left: 4px;
+            min-width: 36px;
+        }
+
+        .group-button:active {
+            background-color: var(--purple-10);
+        }
+
+        .group-button i {
+            font-size: 22px;
+            color: var(--secondary-purple);
+        }
+
         .iframe-container {
             flex: 1;
             overflow: hidden;
@@ -357,10 +383,13 @@
                 <button class="contacts-button">
                     <i class="material-icons">contacts</i>
                 </button>
+                <button class="group-button">
+                    <i class="material-icons">group_add</i>
+                </button>
             </div>
         </div>
         <div class="iframe-container">
-            <iframe src="recentsessions.html" class="shimmer"></iframe>
+            <iframe src="recentsessions.html?localId=" + encodeURIComponent(localId) class="shimmer"></iframe>
         </div>
     </div>
     <div id="chat-container"></div>
@@ -379,6 +408,7 @@
         const domainButtons = document.querySelectorAll(".domain-button");
         const chatContainer = document.getElementById('chat-container');
         const contactsButton = document.querySelector(".contacts-button");
+        const groupButton = document.querySelector(".group-button");
         const overlay = document.getElementById('callingOverlay');
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -419,6 +449,10 @@
             controller.contactPicker(1);
         });
 
+        groupButton.addEventListener("click", function() {
+            openGroupCreation();
+        });
+
         window.addEventListener('message', (event) => {
             switch (event.data.action) {
                 case 'call':
@@ -431,6 +465,10 @@
 
                 case 'closeChat':
                     closeChat();
+                    break;
+
+                case 'closeGroupCreation':
+                    closeGroupCreation();
                     break;
 
                 case 'fillInput':
@@ -528,6 +566,44 @@
             console.log("downloading file: "+fileId);
             controller.downloadFile(fileId, cid, messageId);
             // Implement file download functionality here
+        }
+
+        function openGroupCreation() {
+            const iframe = document.createElement('iframe');
+            iframe.className = 'group-iframe';
+            iframe.style.cssText = 'width:100%;height:100%;border:none;visibility:hidden;';
+            iframe.src = 'creategroup.html';
+            
+            chatContainer.innerHTML = '';
+            chatContainer.appendChild(iframe);
+            
+            iframe.onload = () => {
+                setTimeout(() => {
+                    iframe.style.visibility = 'visible';
+                    document.querySelector('.container').classList.add('slide-left');
+                    chatContainer.classList.add('slide-left');
+                    history.pushState({page: 'groupCreation'}, '', 'creategroup');
+                }, 50);
+            };
+        }
+
+        function closeGroupCreation() {
+            document.querySelector('.container').classList.remove('slide-left');
+            chatContainer.classList.remove('slide-left');
+            controller.getRecentSessions(20);
+            
+            // Update the URL in the parent window to reflect we're back to main screen
+            if (window.parent && window.parent !== window) {
+                console.log("updating url");
+                const currentUrl = new URL(window.parent.location.href);
+                currentUrl.searchParams.set('screen', 'MAIN');
+                currentUrl.searchParams.set('remoteId', 'null');
+                window.parent.history.replaceState({}, '', currentUrl.toString());
+            }
+            
+            setTimeout(() => {
+                chatContainer.innerHTML = '';
+            }, 300);
         }
     </script>
 </body>

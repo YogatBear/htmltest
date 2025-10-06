@@ -331,6 +331,9 @@
     <ul id="recent-sessions" class="recent-sessions"></ul>
 
     <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const localId = decodeURIComponent(urlParams.get('localId'));
+
         const channel = new BroadcastChannel('myChannel');
         function hashStringToColor(str) {
             // Generate a hash of the string
@@ -447,7 +450,7 @@
                         }
                     }
                     
-                    const name = (author === msgSessionId || author === "SYSTEM") ? "" : "You: ";
+                    const name = (author === localId) ? "You: " : "";
                     const messageinfo = name + content;
 
                     // Use msgSessionId for color generation but contact for display
