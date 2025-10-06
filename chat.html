@@ -874,6 +874,7 @@
     const controller = window.top.controller;
     const urlParams = new URLSearchParams(window.location.search);
     const channel = new BroadcastChannel('myChannel');
+    const remoteId = decodeURIComponent(urlParams.get('remoteId'));
     const sessionId = decodeURIComponent(urlParams.get('sessionId'));
     const sessionName = decodeURIComponent(urlParams.get('sessionName'));
     const localId = decodeURIComponent(urlParams.get('localId'));
@@ -883,7 +884,9 @@
     const sendButton = document.getElementById('send-button');
     const imageButton = document.getElementById('image-button');
 
-    controller.getContactName(sessionId);
+    if (remoteId) {
+      controller.getContactName(remoteId);
+    }
     controller.getMessages(sessionId, 20, "");
 
     window.addEventListener('popstate', function(event) {
