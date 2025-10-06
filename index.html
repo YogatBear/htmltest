@@ -361,7 +361,7 @@
             getContactName(remoteId) {
                 const request = {
                     action: "get-contact-name",
-                    body: { localId: this.localId, pid: this.pid, sessionId: remoteId }
+                    body: { localId: this.localId, pid: this.pid, remoteId: remoteId }
                 };
                 this.sendMessageToNativeApp(request);
             }

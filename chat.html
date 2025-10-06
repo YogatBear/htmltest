@@ -652,7 +652,7 @@
     }
 
     .message-clone .message-content {
-      /* Let it inherit naturally from the cloned element */
+      /* Inherits styling from the cloned element */
     }
 
     /* Chosen message - completely separate from blur effects */
@@ -1619,13 +1619,13 @@
     // Set the chat title
     console.log("sessionName:", sessionName);
     console.log("remoteId:", remoteId);
-    if (sessionName) {
+    if (sessionName && sessionName !== 'null') {
       document.getElementById("title").textContent = sessionName;
     }
     else {
       document.getElementById("title").textContent = remoteId;
     }
-
+    
     // Call button logic
     document.getElementById("call-button").addEventListener("click", () => {
       hideContextMenu(); // Hide context menu when calling
