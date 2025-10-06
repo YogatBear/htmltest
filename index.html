@@ -177,10 +177,10 @@
                 this.sendMessageToNativeApp(request);
             }
 
-            sendMessage(to, message) {
+            sendMessage(sessionId, message) {
                 const request = {
                     action: "send-message",
-                    body: { localId: this.localId, pid: this.pid, to: to, content: message }
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId, content: message }
                 };
                 this.sendMessageToNativeApp(request);
             }
@@ -305,13 +305,13 @@
                 this.sendMessageToNativeApp(request);
             }
 
-            sendImageMessage(to, imageId, caption) {
+            sendImageMessage(sessionId, imageId, caption) {
                 if (caption === '') {
                     console.log("Caption is empty 2");
                 }
                 const request = {
                     action: "send-image-message",
-                    body: { localId: this.localId, pid: this.pid, to: to, imageId: imageId, content: caption }
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId, imageId: imageId, content: caption }
                 };
                 this.sendMessageToNativeApp(request);
             }
