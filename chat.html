@@ -886,8 +886,11 @@
 
     if (remoteId) {
       controller.getContactName(remoteId);
+      controller.getMessages(remoteId, 20, "", false);
     }
-    controller.getMessages(sessionId, 20, "");
+    else {
+      controller.getMessages(sessionId, 20, "", true);
+    }
 
     window.addEventListener('popstate', function(event) {
         console.log("back button pressed");
