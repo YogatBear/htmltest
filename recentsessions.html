@@ -517,7 +517,7 @@
                         if (this.deleteMode === msgSessionId) {
                             this.exitDeleteMode();
                         } else if (!this.deleteMode) {
-                            window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId, sessionName: sessionName } }, '*');
+                            window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId, sessionName: sessionName, isSession: true } }, '*');
                         }
                     });
 
@@ -551,7 +551,7 @@
                             } else if (this.deleteMode) {
                                 this.exitDeleteMode();
                             } else {
-                                window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId } }, '*');
+                                window.parent.postMessage({ action: 'chat', body: { sessionId: msgSessionId, sessionName: sessionName, isSession: true } }, '*');
                             }
                         }
                     };

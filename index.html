@@ -137,6 +137,14 @@
                 this.sendMessageToNativeApp(callRequest);
             }
 
+            groupCall(sessionId) {
+                const callRequest = {
+                    action: "group-call",
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId }
+                };
+                this.sendMessageToNativeApp(callRequest);
+            }
+
             acceptCall(callId) {
                 const request = {
                     action: "accept-call",
@@ -177,9 +185,26 @@
                 this.sendMessageToNativeApp(request);
             }
 
-            sendMessage(sessionId, message) {
+            sendMessage(id, message, isSession) {
+                if (isSession) {
+                    const request = {
+                        action: "send-message",
+                        body: { localId: this.localId, pid: this.pid, sessionId: id, content: message }
+                    };
+                }
+                else {
+                    const request = {
+                        action: "send-message",
+                        body: { localId: this.localId, pid: this.pid, remoteId: id, content: message }
+                    };
+                }
+
+                this.sendMessageToNativeApp(request);
+            }
+
+            sendGroupMessage(sessionId, message) {
                 const request = {
-                    action: "send-message",
+                    action: "send-group-message",
                     body: { localId: this.localId, pid: this.pid, sessionId: sessionId, content: message }
                 };
                 this.sendMessageToNativeApp(request);
@@ -242,11 +267,19 @@
                 this.sendMessageToNativeApp(request);
             }
 
-            getMessages(sessionId, range, start) {
-                const request = {
-                    action: "get-messages",
-                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId, range: range, startMessage: start }
-                };
+            getMessages(id, range, start, isSession) {
+                if (isSession) {
+                    const request = {
+                        action: "get-messages",
+                        body: { localId: this.localId, pid: this.pid, sessionId: id, range: range, startMessage: start }
+                    };
+                }
+                else {
+                    const request = {
+                        action: "get-messages",
+                        body: { localId: this.localId, pid: this.pid, remoteId: id, range: range, startMessage: start }
+                    };
+                }
                 this.sendMessageToNativeApp(request);
             }
 
@@ -305,13 +338,13 @@
                 this.sendMessageToNativeApp(request);
             }
 
-            sendImageMessage(sessionId, imageId, caption) {
+            sendImageMessage(to, imageId, caption) {
                 if (caption === '') {
                     console.log("Caption is empty 2");
                 }
                 const request = {
                     action: "send-image-message",
-                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId, imageId: imageId, content: caption }
+                    body: { localId: this.localId, pid: this.pid, to: to, imageId: imageId, content: caption }
                 };
                 this.sendMessageToNativeApp(request);
             }

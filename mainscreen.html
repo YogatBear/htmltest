@@ -418,7 +418,7 @@
 
         if(remoteId != null) {
             console.log("opening chat" + remoteId);
-            openChat(remoteId);
+            openChat(remoteId, "", false);
         }
 
         input.addEventListener('input', function(e) {
@@ -436,7 +436,7 @@
             if (input.value === ""){
                 return
             }
-            openChat(input.value);
+            openChat(input.value, "", false);
         })
 
         domainButtons.forEach(button => {
@@ -460,7 +460,7 @@
                     break;
                     
                 case 'chat':
-                    openChat(event.data.body.sessionId, event.data.body.sessionName);
+                    openChat(event.data.body.sessionId, event.data.body.sessionName, event.data.body.isSession);
                     break;
 
                 case 'closeChat':
@@ -504,11 +504,16 @@
             }
         });
 
-        function openChat(sessionId, sessionName) {
+        function openChat(id, sessionName, isSession) {
             const iframe = document.createElement('iframe');
             iframe.className = 'chat-iframe';
             iframe.style.cssText = 'width:100%;height:100%;border:none;visibility:hidden;';
-            iframe.src = `chat.html?sessionId=${encodeURIComponent(sessionId)}&sessionName=${encodeURIComponent(sessionName)}&localId=${encodeURIComponent(this.localId)}`;
+            if (isSession) {
+                iframe.src = `chat.html?sessionId=${encodeURIComponent(id)}&sessionName=${encodeURIComponent(sessionName)}&localId=${encodeURIComponent(this.localId)}`;
+            }
+            else {
+                iframe.src = `chat.html?remoteId=${encodeURIComponent(id)}&localId=${encodeURIComponent(this.localId)}`;
+            }
             
             chatContainer.innerHTML = '';
             chatContainer.appendChild(iframe);

@@ -878,13 +878,12 @@
     const sessionName = decodeURIComponent(urlParams.get('sessionName'));
     const localId = decodeURIComponent(urlParams.get('localId'));
 
-    // Add contact as a property of the window object so we can access it globally
-    window.contactName = '';
-
     const chatContainer = document.getElementById('chat-container');
     const messageText = document.getElementById('message-text');
     const sendButton = document.getElementById('send-button');
     const imageButton = document.getElementById('image-button');
+
+    controller.getContactName(sessionId);
     controller.getMessages(sessionId, 20, "");
 
     window.addEventListener('popstate', function(event) {
@@ -1621,7 +1620,7 @@
         action: 'call', 
         body: { 
           remoteId: sessionId, 
-          contact: window.contactName  // Use global contact
+          contact: window.sessionName  // Use global contact
         }
       }, '*');
     });
@@ -1831,7 +1830,7 @@
         if (data.contactName) {
             const titleElement = document.getElementById('title');
             titleElement.textContent = data.contactName;
-            window.contactName = data.contactName;  // Update global contact
+            window.sessionName = data.contactName;  // Update global contact
         }
         
         if (data.message) {
