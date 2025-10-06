@@ -1427,6 +1427,15 @@
       }
     }
 
+    function sendMessage(message) {
+      if (sessionId !== 'null') {
+        controller.sendMessage(sessionId, message, true);
+      }
+      else if (remoteId !== 'null') {
+        controller.sendMessage(remoteId, message, false);
+      }
+    }
+
     // Helper function to create message elements
     function createMessageElement(content, author, time, type, status, messageId, animate, contact, caption) {
       const messageElement = document.createElement('div');
@@ -1652,7 +1661,7 @@
       const message = messageText.value.trim();
       if (message) {
         console.log("Sending message:", message);
-        controller.sendMessage(sessionId, message);
+        sendMessage(message);
         messageText.value = '';
       }
     });
