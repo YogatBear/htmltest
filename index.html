@@ -268,14 +268,15 @@
             }
 
             getMessages(id, range, start, isSession) {
+                const request = {};
                 if (isSession) {
-                    const request = {
+                    request = {
                         action: "get-messages",
                         body: { localId: this.localId, pid: this.pid, sessionId: id, range: range, startMessage: start }
                     };
                 }
                 else {
-                    const request = {
+                    request = {
                         action: "get-messages",
                         body: { localId: this.localId, pid: this.pid, remoteId: id, range: range, startMessage: start }
                     };
