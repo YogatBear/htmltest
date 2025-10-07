@@ -1442,7 +1442,7 @@
     // Helper function to create message elements
     function createMessageElement(content, author, time, type, status, messageId, animate, contact, caption) {
       const messageElement = document.createElement('div');
-      messageElement.classList.add('message', author !== localId || author !== 'SYSTEM' ? 'received' : 'sent');
+      messageElement.classList.add('message', author !== localId && author !== 'SYSTEM' ? 'received' : 'sent');
       if (animate) {
         messageElement.classList.add('animate');
       }
@@ -1461,7 +1461,7 @@
       // Store the message type as a data attribute
       messageElement.dataset.messageType = type;
 
-      // Show contact name for messages FROM the other person (where author is NOT sessionId)
+      // Show contact name for messages FROM the other person (where author is NOT localId)
       // Don't show for system messages or consecutive messages from same author
       if (author !== localId && author !== 'SYSTEM' && author !== lastAuthor) {
         const authorElement = document.createElement('div');
