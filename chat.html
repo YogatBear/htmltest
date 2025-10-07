@@ -1326,6 +1326,7 @@
     }
 
     function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false, contact = null, caption = null) {
+      console.log("addMessage called with:", { content, author, time, type, status, messageId, animate, contact, caption });
       const currentDate = formatDate(time);
       
       
@@ -1872,6 +1873,7 @@
           console.log("msgSessionId:", msgSessionId);
           console.log("sessionId:", sessionId);
           if (msgSessionId === sessionId) {
+            console.log("Session IDs match, processing message");
             let fileIdObj;
             
             // Check if fileId is already an object (not a string)
@@ -1905,6 +1907,7 @@
               }
             } else {
               // Normal text message
+              console.log("Calling addMessage for text message:", content, author, time, msgStatus, messageId, shouldAnimate, contact);
               addMessage(content, author, time, "text", msgStatus, messageId, shouldAnimate, contact);
             }
             controller.updateSessionTimestamp(sessionId);
@@ -1927,7 +1930,10 @@
           
           sortedMessages.forEach(msg => {
             const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = msg;
+            console.log("Processing message:", { messageId, time, author, content, msgSessionId, contact, msgStatus, fileId });
+            console.log("Comparing msgSessionId:", msgSessionId, "with sessionId:", sessionId);
             if (msgSessionId === sessionId) {
+              console.log("Session IDs match for multiple messages, processing message");
               let fileIdObj;
               
               // Check if fileId is already an object (not a string)
@@ -1957,6 +1963,7 @@
                 }
               } else {
                 // Normal text message
+                console.log("Calling addMessage for multiple messages text message:", content, author, time, msgStatus, messageId, contact);
                 addMessage(content, author, time, "text", msgStatus, messageId, false, contact);
               }
             }
