@@ -875,7 +875,8 @@
     const urlParams = new URLSearchParams(window.location.search);
     const channel = new BroadcastChannel('myChannel');
     const remoteId = decodeURIComponent(urlParams.get('remoteId'));
-    let sessionId = parseInt(decodeURIComponent(urlParams.get('sessionId')));
+    let sessionId = decodeURIComponent(urlParams.get('sessionId'));
+    sessionId = (sessionId === 'null' || sessionId === null) ? null : parseInt(sessionId);
     const sessionName = decodeURIComponent(urlParams.get('sessionName'));
     const localId = decodeURIComponent(urlParams.get('localId'));
 
@@ -884,7 +885,7 @@
     const sendButton = document.getElementById('send-button');
     const imageButton = document.getElementById('image-button');
 
-    if (remoteId !== 'null') {
+    if (remoteId !== 'null' && remoteId !== null) {
       controller.getContactName(remoteId);
       controller.getSessionId(remoteId);
     }
@@ -1429,10 +1430,10 @@
     }
 
     function sendMessage(message) {
-      if (sessionId !== 'null') {
+      if (sessionId !== null && !isNaN(sessionId)) {
         controller.sendMessage(sessionId, message, true);
       }
-      else if (remoteId !== 'null') {
+      else if (remoteId !== 'null' && remoteId !== null) {
         controller.sendMessage(remoteId, message, false);
       }
     }
@@ -1626,7 +1627,7 @@
     // Set the chat title
     console.log("sessionName:", sessionName);
     console.log("remoteId:", remoteId);
-    if (sessionName && sessionName !== 'null') {
+    if (sessionName && sessionName !== 'null' && sessionName !== null) {
       document.getElementById("title").textContent = sessionName;
     }
     else {
@@ -1863,7 +1864,7 @@
         }
 
         if (data.sessionId) {
-            sessionId = parseInt(data.sessionId);
+            sessionId = (data.sessionId === 'null' || data.sessionId === null) ? null : parseInt(data.sessionId);
         }
         
         if (data.message) {
