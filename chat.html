@@ -875,7 +875,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const channel = new BroadcastChannel('myChannel');
     const remoteId = decodeURIComponent(urlParams.get('remoteId'));
-    let sessionId = decodeURIComponent(urlParams.get('sessionId'));
+    let sessionId = parseInt(decodeURIComponent(urlParams.get('sessionId')));
     const sessionName = decodeURIComponent(urlParams.get('sessionName'));
     const localId = decodeURIComponent(urlParams.get('localId'));
 
@@ -1864,7 +1864,7 @@
         }
 
         if (data.sessionId) {
-            sessionId = data.sessionId;
+            sessionId = parseInt(data.sessionId);
         }
         
         if (data.message) {
@@ -1930,8 +1930,6 @@
           
           sortedMessages.forEach(msg => {
             const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = msg;
-            console.log("Processing message:", { messageId, time, author, content, msgSessionId, contact, msgStatus, fileId });
-            console.log("Comparing msgSessionId:", msgSessionId, "with sessionId:", sessionId);
             if (msgSessionId === sessionId) {
               console.log("Session IDs match for multiple messages, processing message");
               let fileIdObj;
