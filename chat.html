@@ -875,7 +875,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const channel = new BroadcastChannel('myChannel');
     const remoteId = decodeURIComponent(urlParams.get('remoteId'));
-    const sessionId = decodeURIComponent(urlParams.get('sessionId'));
+    let sessionId = decodeURIComponent(urlParams.get('sessionId'));
     const sessionName = decodeURIComponent(urlParams.get('sessionName'));
     const localId = decodeURIComponent(urlParams.get('localId'));
 
