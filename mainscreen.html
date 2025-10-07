@@ -512,6 +512,7 @@
                 iframe.src = `chat.html?sessionId=${encodeURIComponent(id)}&sessionName=${encodeURIComponent(sessionName)}&localId=${encodeURIComponent(this.localId)}`;
             }
             else {
+                log.console("opening chat" + id + " isSession: " + isSession + " sessionName: " + sessionName + " localId: " + this.localId);
                 iframe.src = `chat.html?remoteId=${encodeURIComponent(id)}&localId=${encodeURIComponent(this.localId)}`;
             }
             
