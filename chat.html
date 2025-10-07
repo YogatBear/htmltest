@@ -1863,12 +1863,14 @@
         }
 
         if (data.sessionId) {
-            sessionId = data.sessionId;
+            this.sessionId = data.sessionId;
         }
         
         if (data.message) {
           console.log("Received single message data:", data.message);
           const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = data.message;
+          console.log("msgSessionId:", msgSessionId);
+          console.log("sessionId:", sessionId);
           if (msgSessionId === sessionId) {
             let fileIdObj;
             
