@@ -389,7 +389,7 @@
             </div>
         </div>
         <div class="iframe-container">
-            <iframe src="recentsessions.html?localId=" + encodeURIComponent(localId) class="shimmer"></iframe>
+            <iframe id="recentSessionsIframe" src="recentsessions.html" class="shimmer"></iframe>
         </div>
     </div>
     <div id="chat-container"></div>
@@ -413,6 +413,13 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const remoteId = urlParams.get('remoteId');
+        const localId = urlParams.get('localId');
+
+        // Set the iframe source with the localId
+        const recentSessionsIframe = document.getElementById('recentSessionsIframe');
+        if (localId) {
+            recentSessionsIframe.src = `recentsessions.html?localId=${encodeURIComponent(localId)}`;
+        }
 
         const channel = new BroadcastChannel('myChannel');
 
@@ -509,11 +516,11 @@
             iframe.className = 'chat-iframe';
             iframe.style.cssText = 'width:100%;height:100%;border:none;visibility:hidden;';
             if (isSession) {
-                iframe.src = `chat.html?sessionId=${encodeURIComponent(id)}&sessionName=${encodeURIComponent(sessionName)}&localId=${encodeURIComponent(this.localId)}`;
+                iframe.src = `chat.html?sessionId=${encodeURIComponent(id)}&sessionName=${encodeURIComponent(sessionName)}&localId=${encodeURIComponent(localId)}`;
             }
             else {
-                console.log("opening chat" + id + " isSession: " + isSession + " sessionName: " + sessionName + " localId: " + this.localId);
-                iframe.src = `chat.html?remoteId=${encodeURIComponent(id)}&localId=${encodeURIComponent(this.localId)}`;
+                console.log("opening chat" + id + " isSession: " + isSession + " sessionName: " + sessionName + " localId: " + localId);
+                iframe.src = `chat.html?remoteId=${encodeURIComponent(id)}&localId=${encodeURIComponent(localId)}`;
             }
             
             chatContainer.innerHTML = '';

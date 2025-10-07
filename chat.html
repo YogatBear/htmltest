@@ -878,7 +878,8 @@
     let sessionId = decodeURIComponent(urlParams.get('sessionId'));
     sessionId = (sessionId === 'null' || sessionId === null) ? null : parseInt(sessionId);
     const sessionName = decodeURIComponent(urlParams.get('sessionName'));
-    const localId = decodeURIComponent(urlParams.get('localId'));
+    let localId = decodeURIComponent(urlParams.get('localId'));
+    localId = (localId === 'undefined' || localId === 'null' || localId === null) ? null : localId;
 
     const chatContainer = document.getElementById('chat-container');
     const messageText = document.getElementById('message-text');
