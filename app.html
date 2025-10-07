@@ -46,11 +46,11 @@
 
         switch (screen) {
             case 'MAIN':
-                screenFrame.src = "mainscreen.html";
+                screenFrame.src = "mainscreen.html?localId="+encodeURIComponent(localId);
                 break;
             case 'CHAT':
             //    history.replaceState({}, '', 'app.html?screen=MAIN&localId='+encodeURIComponent(localId)+'&remoteId=null');
-                screenFrame.src = "mainscreen.html?remoteId="+encodeURIComponent(remoteId);
+                screenFrame.src = "mainscreen.html?localId="+encodeURIComponent(localId)+"&remoteId="+encodeURIComponent(remoteId);
             //    screenFrame.onload = function() {
             //        screenFrame.contentWindow.postMessage({
             //            action: 'chat',
