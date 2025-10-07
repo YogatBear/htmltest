@@ -366,6 +366,14 @@
                 this.sendMessageToNativeApp(request);
             }
 
+            getSessionId(remoteId) {
+                const request = {
+                    action: "get-session-id",
+                    body: { localId: this.localId, pid: this.pid, remoteId: remoteId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
             downloadFile(messageId, fileId) {
                 const request = {
                     action: "download-file",

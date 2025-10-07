@@ -886,6 +886,7 @@
 
     if (remoteId !== 'null') {
       controller.getContactName(remoteId);
+      controller.getSessionId(remoteId);
     }
     getMessages(20, "");
 
@@ -1859,6 +1860,10 @@
             const titleElement = document.getElementById('title');
             titleElement.textContent = data.contactName;
             window.sessionName = data.contactName;  // Update global contact
+        }
+
+        if (data.sessionId) {
+            sessionId = data.sessionId;
         }
         
         if (data.message) {
