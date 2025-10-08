@@ -6,6 +6,7 @@
     <title>Recent Sessions</title>
     <link rel="stylesheet" href="assets/fonts/fonts.css">
     <link rel="stylesheet" href="assets/fonts/system-fonts.css">
+    <link rel="stylesheet" href="assets/icons/material-icons.css">
     <style>
         :root {
             --secondary-purple: rgb(115, 66, 160);
@@ -430,7 +431,7 @@
             updateRecentSessions(recentSessions) {
                 this.container.innerHTML = "";
                 recentSessions.forEach(msg => {
-                    const [messageId, time, author, content, msgSessionId, sessionName, unreadCount] = msg;
+                    const [messageId, time, author, content, msgSessionId, sessionName, unreadCount, isGroupSession] = msg;
 
                     const messageDate = new Date(time);
                     const today = new Date();
@@ -461,9 +462,14 @@
                     const li = document.createElement('li');
                     li.className = "message-entry";
 
+                    // Determine profile circle content based on whether it's a group session
+                    const profileContent = isGroupSession === 1 
+                        ? '<i class="material-icons" style="font-size: 24px;">group</i>'
+                        : `<span class="profile-initial">${firstLetter}</span>`;
+
                     li.innerHTML = `
                         <div class="profile-circle" style="background-color: ${profileColor};">
-                            <span class="profile-initial">${firstLetter}</span>
+                            ${profileContent}
                         </div>
                         <div class="message-details">
                             <div class="message-header">
