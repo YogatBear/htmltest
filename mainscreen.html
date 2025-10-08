@@ -466,7 +466,7 @@
         window.addEventListener('message', (event) => {
             switch (event.data.action) {
                 case 'call':
-                    makeCall(event.data.body.remoteId, event.data.body.contact);
+                    makeCall(event.data.body.sessionId, event.data.body.sessionName);
                     break;
                     
                 case 'chat':
@@ -565,10 +565,9 @@
                 input.value = value;
             }
         }
-        function makeCall(remoteId, contact) {
+        function makeCall(sessionId, sessionName) {
             const callingId = document.getElementById('callingId');
-            console.log("contact: "+contact);
-            callingId.textContent = contact && contact !== '' ? contact : remoteId;
+\            callingId.textContent = sessionName;
             overlay.classList.add('show');
             
             // The cancel button will be handled by the controller
@@ -578,7 +577,7 @@
                 // Controller cancel call functionality will be added here
             }, { once: true });  // Remove listener after first click
             
-            controller.call(remoteId);
+            controller.call(sessionId);
         }
         function downloadFile(fileId, cid, messageId) {
             console.log("downloading file: "+fileId);

@@ -1641,8 +1641,8 @@
       window.parent.postMessage({ 
         action: 'call', 
         body: { 
-          remoteId: sessionId, 
-          contact: window.sessionName  // Use global contact
+          sessionId: window.sessionId,
+          sessionName: window.sessionName  // Use global contact
         }
       }, '*');
     });
