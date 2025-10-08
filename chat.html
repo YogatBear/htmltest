@@ -877,7 +877,8 @@
     const remoteId = decodeURIComponent(urlParams.get('remoteId'));
     let sessionId = decodeURIComponent(urlParams.get('sessionId'));
     sessionId = (sessionId === 'null' || sessionId === null) ? null : parseInt(sessionId);
-    const sessionName = decodeURIComponent(urlParams.get('sessionName'));
+    let sessionName = decodeURIComponent(urlParams.get('sessionName'));
+    sessionName = (sessionName === 'undefined' || sessionName === 'null' || sessionName === null) ? null : sessionName;
     let localId = decodeURIComponent(urlParams.get('localId'));
     localId = (localId === 'undefined' || localId === 'null' || localId === null) ? null : localId;
 
@@ -1632,6 +1633,7 @@
       document.getElementById("title").textContent = sessionName;
     }
     else {
+      sessionName = remoteId;
       document.getElementById("title").textContent = remoteId;
     }
 
@@ -1641,8 +1643,8 @@
       window.parent.postMessage({ 
         action: 'call', 
         body: { 
-          sessionId: window.sessionId,
-          sessionName: window.sessionName  // Use global contact
+          sessionId: sessionId,
+          sessionName: sessionName  // Use global contact
         }
       }, '*');
     });
