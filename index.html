@@ -129,10 +129,18 @@
 
             // Native actions
 
-            call(sessionId) {
+            callSession(sessionId) {
                 const callRequest = {
-                    action: "call",
+                    action: "call-session",
                     body: { localId: this.localId, pid: this.pid, sessionId: sessionId }
+                };
+                this.sendMessageToNativeApp(callRequest);
+            }
+
+            callRemote(remoteId) {
+                const callRequest = {
+                    action: "call-remote",
+                    body: { localId: this.localId, pid: this.pid, remoteId: remoteId }
                 };
                 this.sendMessageToNativeApp(callRequest);
             }
