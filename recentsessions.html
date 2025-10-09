@@ -512,7 +512,7 @@
                         if (!this.deleteMode) {
                             window.parent.postMessage({ 
                                 action: 'call', 
-                                body: { remoteId: msgSessionId, contact: sessionName }
+                                body: { sessionId: msgSessionId, sessionName: sessionName }
                             }, '*');
                         }
                     });
@@ -520,7 +520,6 @@
                     // Add click listener to the message content area
                     const messageContent = li.querySelector('.message-details');
                     messageContent.addEventListener('click', () => {
-                        console.log("message content clicked + msgSessionId: " + msgSessionId + " sessionName: " + sessionName);
                         if (this.deleteMode === msgSessionId) {
                             this.exitDeleteMode();
                         } else if (!this.deleteMode) {
