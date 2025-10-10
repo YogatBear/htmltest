@@ -1718,6 +1718,7 @@
       
       // Add reply reference if this is a reply message
       if (replyTo && !isDeleted) {
+        console.log("Creating reply reference for:", replyTo);
         const replyReference = document.createElement('div');
         replyReference.classList.add('reply-reference');
         
@@ -1930,11 +1931,15 @@
     function closeChat() {
         window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
     }
-    // Test messages for reply functionality
+    // Test messages for reply functionality (uncomment to test)
     // addMessage("Encryption key received", "SYSTEM", Date.now(), "text", null, null, false);
     // addMessage("Hey girlll", "testing", Date.now(), "text", null, null, false, null, null);
     // addMessage("Wassup", "dukedennis.eth", Date.now(), "text", null, null, false, null, null);
     // addMessage("This is a reply!", localId, Date.now(), "text", null, null, false, null, null, {author: "testing", content: "Hey girlll", messageType: "text"});
+    
+    // Example of how a reply message from the new data structure would be processed:
+    // const exampleReplyMessage = ["7382395475652879604", 1760100239670, "dude1", "Hey", 1, null, 0, null, [7382395403749487040, "dude2", "Hi"], null, null];
+    // This would create a message with reply information showing "dude2: Hi" as the replied-to message
 
     document.getElementById("back-button").addEventListener("click", () => {
         hideContextMenu(); // Hide context menu when going back
@@ -2172,7 +2177,7 @@
         
         if (data.message) {
           console.log("Received single message data:", data.message);
-          const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = data.message;
+          const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId, replyInfo, editInfo, forwardInfo] = data.message;
           console.log("msgSessionId:", msgSessionId);
           console.log("sessionId:", sessionId);
           if (msgSessionId === sessionId) {
@@ -2190,6 +2195,19 @@
               }
             }
 
+            // Process reply information
+            let replyToData = null;
+            if (replyInfo && Array.isArray(replyInfo) && replyInfo.length >= 3) {
+              const [replyToMessageId, replyAuthor, replyContent] = replyInfo;
+              replyToData = {
+                messageId: replyToMessageId,
+                author: replyAuthor,
+                content: replyContent,
+                messageType: 'text' // Default to text, could be enhanced to detect type
+              };
+              console.log("Processing reply data:", replyToData);
+            }
+
             // Check if this message already exists
             const existingMessage = document.querySelector(`[data-message-id="${messageId}"]`);
             const shouldAnimate = !existingMessage && (time > Date.now() - 2000); // Only animate truly new messages within 2 seconds
@@ -2202,14 +2220,14 @@
                 const fileExtension = fileUrl.split('.').pop().toLowerCase();
                 const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
                 const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
-                addMessage(fileUrl, author, time, messageType, msgStatus, messageId, shouldAnimate, contact, content);
+                addMessage(fileUrl, author, time, messageType, msgStatus, messageId, shouldAnimate, contact, content, replyToData);
               } else {
                 // Pending download - display with file info
-                addMessage(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, shouldAnimate, contact, content);
+                addMessage(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, shouldAnimate, contact, content, replyToData);
               }
             } else {
               // Normal text message
-              addMessage(content, author, time, "text", msgStatus, messageId, shouldAnimate, contact);
+              addMessage(content, author, time, "text", msgStatus, messageId, shouldAnimate, contact, null, replyToData);
             }
             controller.updateSessionTimestamp(sessionId);
           }
@@ -2230,7 +2248,7 @@
           lastAuthor = null;
           
           sortedMessages.forEach(msg => {
-            const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = msg;
+            const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId, replyInfo, editInfo, forwardInfo] = msg;
             if (msgSessionId === sessionId) {
               let fileIdObj;
               
@@ -2246,6 +2264,18 @@
                 }
               }
 
+              // Process reply information for batch messages
+              let replyToData = null;
+              if (replyInfo && Array.isArray(replyInfo) && replyInfo.length >= 3) {
+                const [replyToMessageId, replyAuthor, replyContent] = replyInfo;
+                replyToData = {
+                  messageId: replyToMessageId,
+                  author: replyAuthor,
+                  content: replyContent,
+                  messageType: 'text' // Default to text, could be enhanced to detect type
+                };
+              }
+
               if (Object.keys(fileIdObj).length > 0) {
                 // This is a file message
                 if (fileIdObj.fileUrl) {
@@ -2254,14 +2284,14 @@
                   const fileExtension = fileUrl.split('.').pop().toLowerCase();
                   const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
                   const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
-                  addMessage(fileUrl, author, time, messageType, msgStatus, messageId, false, contact, content);
+                  addMessage(fileUrl, author, time, messageType, msgStatus, messageId, false, contact, content, replyToData);
                 } else {
                   // Pending download - display with file info
-                  addMessage(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content);
+                  addMessage(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content, replyToData);
                 }
               } else {
                 // Normal text message
-                addMessage(content, author, time, "text", msgStatus, messageId, false, contact);
+                addMessage(content, author, time, "text", msgStatus, messageId, false, contact, null, replyToData);
               }
             }
           });
@@ -2279,7 +2309,7 @@
           controller.updateSessionTimestamp(sessionId);
         } else if (data.updatedMessage) {
           console.log("Received updatedMessage data:", data.updatedMessage);
-          const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId] = data.updatedMessage;
+          const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId, replyInfo, editInfo, forwardInfo] = data.updatedMessage;
           if (msgSessionId === sessionId) {
             let fileIdObj;
             
@@ -2293,6 +2323,18 @@
                 console.error("Error parsing fileId JSON:", e);
                 fileIdObj = {};
               }
+            }
+
+            // Process reply information for updated messages
+            let replyToData = null;
+            if (replyInfo && Array.isArray(replyInfo) && replyInfo.length >= 3) {
+              const [replyToMessageId, replyAuthor, replyContent] = replyInfo;
+              replyToData = {
+                messageId: replyToMessageId,
+                author: replyAuthor,
+                content: replyContent,
+                messageType: 'text' // Default to text, could be enhanced to detect type
+              };
             }
 
             // If there's a fileId object with data, we need special handling
@@ -2315,7 +2357,7 @@
                   const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
                   const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
                   
-                  const updatedMessage = createMessageElement(fileUrl, author, time, messageType, msgStatus, messageId, false, contact, content, null);
+                  const updatedMessage = createMessageElement(fileUrl, author, time, messageType, msgStatus, messageId, false, contact, content, replyToData);
                   if (nextElement) {
                     chatContainer.insertBefore(updatedMessage, nextElement);
                   } else {
@@ -2323,7 +2365,7 @@
                   }
                 } else {
                   // Still a pending download
-                  const updatedMessage = createMessageElement(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content, null);
+                  const updatedMessage = createMessageElement(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content, replyToData);
                   if (nextElement) {
                     chatContainer.insertBefore(updatedMessage, nextElement);
                   } else {
@@ -2362,7 +2404,7 @@
                         // Replace the entire message if video element not found
                         const nextElement = existingMsg.nextElementSibling;
                         existingMsg.remove();
-                        const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content, null);
+                        const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content, replyToData);
                         if (nextElement) {
                           chatContainer.insertBefore(updatedMessage, nextElement);
                         } else {
@@ -2373,7 +2415,7 @@
                       // If it's not already a video message, replace the entire message
                       const nextElement = existingMsg.nextElementSibling;
                       existingMsg.remove();
-                      const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content, null);
+                      const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content, replyToData);
                       if (nextElement) {
                         chatContainer.insertBefore(updatedMessage, nextElement);
                       } else {
@@ -2391,7 +2433,7 @@
                         // Replace the entire message if image element not found
                         const nextElement = existingMsg.nextElementSibling;
                         existingMsg.remove();
-                        const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content, null);
+                        const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content, replyToData);
                         if (nextElement) {
                           chatContainer.insertBefore(updatedMessage, nextElement);
                         } else {
@@ -2402,7 +2444,7 @@
                       // If it's not already an image message, replace the entire message
                       const nextElement = existingMsg.nextElementSibling;
                       existingMsg.remove();
-                      const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content, null);
+                      const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content, replyToData);
                       if (nextElement) {
                         chatContainer.insertBefore(updatedMessage, nextElement);
                       } else {
