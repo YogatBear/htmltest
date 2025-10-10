@@ -1129,16 +1129,19 @@
 
     // Long press detection functions
     function startLongPress(e, messageElement) {
+      console.log("Starting long press detection for message:", messageElement.dataset.messageId);
       isLongPress = false;
       messageElement.classList.add('long-pressing');
       
       longPressTimer = setTimeout(() => {
+        console.log("Long press threshold reached for message:", messageElement.dataset.messageId);
         isLongPress = true;
         showContextMenu(e, messageElement);
       }, longPressThreshold);
     }
 
     function endLongPress(messageElement) {
+      console.log("Ending long press detection for message:", messageElement.dataset.messageId);
       if (longPressTimer) {
         clearTimeout(longPressTimer);
         longPressTimer = null;
@@ -1613,6 +1616,7 @@
         
         // Handle left mouse button with long press detection
         if (e.button === 0) {
+          console.log("Mouse down on message:", messageElement.dataset.messageId);
           mouseStartTime = Date.now();
           isLongPress = false;
           startLongPress(e, messageElement);
@@ -1622,10 +1626,12 @@
       messageElement.addEventListener('mouseup', (e) => {
         if (e.button === 0) {
           const mouseDuration = Date.now() - mouseStartTime;
+          console.log("Mouse up on message:", messageElement.dataset.messageId, "Duration:", mouseDuration, "isLongPress:", isLongPress);
           endLongPress(messageElement);
           
           // Only prevent click if it was actually a long press
           if (isLongPress || mouseDuration >= longPressThreshold) {
+            console.log("Preventing click event for long press");
             e.preventDefault();
             e.stopPropagation();
           }
