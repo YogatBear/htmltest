@@ -1061,7 +1061,7 @@
     </button>
   </div>
   <div class="message-input">
-    <button id="image-button"></button>
+    <!-- <button id="image-button"></button> -->
     <input type="text" id="message-text" placeholder="Type a message..." />
     <button id="send-button">
       <i class="material-icons">send</i>
@@ -1083,7 +1083,7 @@
     const chatContainer = document.getElementById('chat-container');
     const messageText = document.getElementById('message-text');
     const sendButton = document.getElementById('send-button');
-    const imageButton = document.getElementById('image-button');
+    //const imageButton = document.getElementById('image-button');
 
     if (remoteId !== 'null' && remoteId !== null) {
       controller.getContactName(remoteId);
@@ -2078,10 +2078,12 @@
       }
     });
 
+    /*
     imageButton.addEventListener('click', () => {
       console.log("Choosing image");
       controller.imagePicker();
     });
+    */
 
     // Hide context menu when typing
     messageText.addEventListener('focus', hideContextMenu);
