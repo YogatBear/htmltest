@@ -354,6 +354,13 @@
       font-size: 15px;
       line-height: 1.4;
     }
+    
+    /* Reply reference should span full width, ignoring the margin */
+    .message-content .reply-reference {
+      margin-right: -75px; /* Counteract the message-content margin */
+      margin-left: 0;
+      width: calc(100% + 75px); /* Extend to full message width */
+    }
     .message-footer {
       position: absolute;
       bottom: 8px;
@@ -2102,7 +2109,7 @@
       }
     }
 
-    function updateMessage(messageId, content, status, caption) {
+    function updateMessage(messageId, content, status, caption, replyTo = null) {
         const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
         if (existingMsg) {
             // Check if this is a deleted message update (status 8)
@@ -2533,13 +2540,47 @@
                     }
                   }
                 } else {
-                  // Update the pending download info display
-                  updateMessage(messageId, fileIdObj, msgStatus, content);
+                  // Still a pending download - if there's reply data, recreate the message
+                  if (replyToData) {
+                    console.log("Recreating file message with reply data:", replyToData);
+                    const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
+                    if (existingMsg) {
+                      const nextElement = existingMsg.nextElementSibling;
+                      const author = existingMsg.classList.contains('sent') ? localId : (contact || 'Unknown');
+                      existingMsg.remove();
+                      const updatedMessage = createMessageElement(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content, replyToData);
+                      if (nextElement) {
+                        chatContainer.insertBefore(updatedMessage, nextElement);
+                      } else {
+                        chatContainer.appendChild(updatedMessage);
+                      }
+                    }
+                  } else {
+                    // Update the pending download info display
+                    updateMessage(messageId, fileIdObj, msgStatus, content, replyToData);
+                  }
                 }
               }
             } else {
               // Regular text message update
-              updateMessage(messageId, content, msgStatus);
+              // If there's reply data, we need to recreate the message to show the reply reference
+              if (replyToData) {
+                console.log("Recreating text message with reply data:", replyToData);
+                const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
+                if (existingMsg) {
+                  const nextElement = existingMsg.nextElementSibling;
+                  const author = existingMsg.classList.contains('sent') ? localId : (contact || 'Unknown');
+                  existingMsg.remove();
+                  const updatedMessage = createMessageElement(content, author, time, "text", msgStatus, messageId, false, contact, null, replyToData);
+                  if (nextElement) {
+                    chatContainer.insertBefore(updatedMessage, nextElement);
+                  } else {
+                    chatContainer.appendChild(updatedMessage);
+                  }
+                }
+              } else {
+                updateMessage(messageId, content, msgStatus, null, replyToData);
+              }
             }
           }
         } else if (data.imagePickerResult) {
