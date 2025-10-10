@@ -151,6 +151,69 @@
     .download-button .material-icons {
       font-size: 20px;
     }
+    /* Reply bar styling */
+    .reply-bar {
+      position: fixed;
+      bottom: 60px; /* Height of input area */
+      left: 0;
+      right: 0;
+      background: rgba(115, 66, 160, 0.1);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(115, 66, 160, 0.3);
+      padding: 8px 12px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      z-index: 999;
+      transition: all 0.3s ease;
+    }
+
+    .reply-bar.active {
+      display: flex;
+    }
+
+    .reply-content {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .reply-to-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--secondary-purple);
+      margin-bottom: 2px;
+    }
+
+    .reply-message-preview {
+      font-size: 14px;
+      color: var(--dark-purple);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      opacity: 0.8;
+    }
+
+    .reply-close-btn {
+      background: none;
+      border: none;
+      color: var(--secondary-purple);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+    }
+
+    .reply-close-btn:hover {
+      background: rgba(115, 66, 160, 0.1);
+    }
+
+    .reply-close-btn .material-icons {
+      font-size: 20px;
+    }
+
     /* Input area */
     .message-input {
       position: fixed;
@@ -411,6 +474,42 @@
       #message-text::placeholder {
         color: rgba(255, 255, 255, 0.5);
       }
+      
+      /* Dark mode reply bar */
+      .reply-bar {
+        background: rgba(40, 40, 50, 0.9);
+        border-top-color: rgba(115, 66, 160, 0.5);
+      }
+      
+      .reply-to-label {
+        color: var(--light-purple);
+      }
+      
+      .reply-message-preview {
+        color: rgba(255, 255, 255, 0.8);
+      }
+      
+      .reply-close-btn {
+        color: var(--light-purple);
+      }
+      
+      .reply-close-btn:hover {
+        background: rgba(115, 66, 160, 0.2);
+      }
+      
+      /* Dark mode reply reference */
+      .received .reply-reference {
+        background: rgba(60, 60, 70, 0.6);
+        border-left-color: var(--light-purple);
+      }
+      
+      .received .reply-reference-author {
+        color: var(--light-purple);
+      }
+      
+      .received .reply-reference-content {
+        color: rgba(255, 255, 255, 0.8);
+      }
     }
     
     /* Spacing between different message types */
@@ -651,10 +750,6 @@
       box-shadow: 0 8px 24px rgba(115, 66, 160, 0.2) !important;
     }
 
-    .message-clone .message-content {
-      /* Inherits styling from the cloned element */
-    }
-
     /* Chosen message - completely separate from blur effects */
     .message.chosen-message {
       background: rgba(255, 255, 255, 0.15) !important;
@@ -823,6 +918,47 @@
       transform: none !important;
     }
 
+    /* Reply message styling */
+    .message.reply {
+      position: relative;
+    }
+    
+    .reply-reference {
+      background: rgba(115, 66, 160, 0.1);
+      border-left: 3px solid var(--secondary-purple);
+      padding: 6px 8px;
+      margin-bottom: 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    .reply-reference-author {
+      font-weight: 600;
+      color: var(--secondary-purple);
+      margin-bottom: 2px;
+    }
+    
+    .reply-reference-content {
+      color: var(--dark-purple);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .sent .reply-reference {
+      background: rgba(255, 255, 255, 0.2);
+      border-left-color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .sent .reply-reference-author {
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .sent .reply-reference-content {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
     /* Deleted message styling */
     .message.deleted {
       opacity: 0.6;
@@ -862,6 +998,15 @@
     </button>
   </div>
   <div id="chat-container"></div>
+  <div id="reply-bar" class="reply-bar">
+    <div class="reply-content">
+      <div class="reply-to-label">Replying to <span id="reply-author"></span></div>
+      <div class="reply-message-preview" id="reply-preview"></div>
+    </div>
+    <button class="reply-close-btn" id="reply-close-btn">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
   <div class="message-input">
     <button id="image-button"></button>
     <input type="text" id="message-text" placeholder="Type a message..." />
@@ -911,6 +1056,13 @@
     let lastDisplayedDate = null;
     let lastAuthor = null;
     let hasMoreMessages = true;
+    
+    // Reply functionality variables
+    let currentReplyMessage = null;
+    const replyBar = document.getElementById('reply-bar');
+    const replyAuthor = document.getElementById('reply-author');
+    const replyPreview = document.getElementById('reply-preview');
+    const replyCloseBtn = document.getElementById('reply-close-btn');
 
     // Context menu variables
     let longPressTimer = null;
@@ -1235,15 +1387,91 @@
       // Function removed - no longer showing copy feedback
     }
 
-    // Placeholder functions for future implementation
+    // Reply functionality implementation
     function replyToMessage(messageElement) {
       console.log('Reply to message:', messageElement.dataset.messageId);
-      // TODO: Implement reply functionality
+      
+      // Store the message being replied to
+      currentReplyMessage = {
+        messageId: messageElement.dataset.messageId,
+        author: getMessageAuthor(messageElement),
+        content: getMessageTextContent(messageElement),
+        messageType: messageElement.dataset.messageType
+      };
+      
+      // Show the reply bar
+      showReplyBar();
+      
+      // Focus on the input field
+      messageText.focus();
+    }
+    
+    function getMessageAuthor(messageElement) {
+      const authorElement = messageElement.querySelector('.message-author');
+      if (authorElement) {
+        return authorElement.textContent;
+      }
+      
+      // If no author element, determine based on message class
+      if (messageElement.classList.contains('sent')) {
+        return 'You';
+      } else {
+        // Try to get from contact name or use localId/remoteId
+        return sessionName || remoteId || 'Unknown';
+      }
+    }
+    
+    function showReplyBar() {
+      if (!currentReplyMessage) return;
+      
+      // Set the author name
+      replyAuthor.textContent = currentReplyMessage.author;
+      
+      // Set the preview content based on message type
+      let previewText = '';
+      switch (currentReplyMessage.messageType) {
+        case 'image':
+          previewText = '📷 Photo';
+          break;
+        case 'video':
+          previewText = '🎥 Video';
+          break;
+        case 'pendingDownload':
+          previewText = '📎 File';
+          break;
+        default:
+          previewText = currentReplyMessage.content;
+          break;
+      }
+      
+      replyPreview.textContent = previewText;
+      
+      // Show the reply bar
+      replyBar.classList.add('active');
+      
+      // Adjust chat container bottom position
+      chatContainer.style.bottom = '120px'; // 60px input + 60px reply bar
+    }
+    
+    function hideReplyBar() {
+      currentReplyMessage = null;
+      replyBar.classList.remove('active');
+      
+      // Reset chat container bottom position
+      chatContainer.style.bottom = '60px'; // Just input bar height
     }
 
     function forwardMessage(messageElement) {
       console.log('Forward message:', messageElement.dataset.messageId);
-      // TODO: Implement forward functionality
+      
+      // Get message content for forwarding
+      const messageContent = getMessageTextContent(messageElement);
+      const messageType = messageElement.dataset.messageType;
+      const messageId = messageElement.dataset.messageId;
+      
+      // For now, we'll implement a simple forward by opening contact picker
+      // In a real app, this would open a contact/session selection interface
+      controller.forwardMessage(messageId, messageContent, messageType);
     }
 
     function deleteMessage(messageElement) {
@@ -1328,7 +1556,7 @@
       });
     }
 
-    function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false, contact = null, caption = null) {
+    function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false, contact = null, caption = null, replyTo = null) {
       const currentDate = formatDate(time);
       
       
@@ -1338,7 +1566,7 @@
         if (existingMsg) {
           const nextElement = existingMsg.nextElementSibling;
           existingMsg.remove();
-          const updatedMessage = createMessageElement(content, author, time, type, status, messageId, false, contact, caption);
+          const updatedMessage = createMessageElement(content, author, time, type, status, messageId, false, contact, caption, replyTo);
           
           if (nextElement) {
             chatContainer.insertBefore(updatedMessage, nextElement);
@@ -1371,7 +1599,7 @@
       } else {
         // Only animate if it's a truly new message (recent timestamp and animate flag is true)
         const isRecentMessage = time > Date.now() - 5000; // Within 5 seconds
-        messageElement = createMessageElement(content, author, time, type, status, messageId, animate && isRecentMessage, contact, caption);
+        messageElement = createMessageElement(content, author, time, type, status, messageId, animate && isRecentMessage, contact, caption, replyTo);
       }
 
       // For older messages (scrolling up) or chronological insertion
@@ -1439,9 +1667,18 @@
         controller.sendMessage(remoteId, message, false);
       }
     }
+    
+    function sendReplyMessage(message, replyToMessageId) {
+      if (sessionId !== null && !isNaN(sessionId)) {
+        controller.sendReplyMessage(sessionId, message, replyToMessageId, true);
+      }
+      else if (remoteId !== 'null' && remoteId !== null) {
+        controller.sendReplyMessage(remoteId, message, replyToMessageId, false);
+      }
+    }
 
     // Helper function to create message elements
-    function createMessageElement(content, author, time, type, status, messageId, animate, contact, caption) {
+    function createMessageElement(content, author, time, type, status, messageId, animate, contact, caption, replyTo = null) {
       const messageElement = document.createElement('div');
       messageElement.classList.add('message', author !== localId && author !== 'SYSTEM' ? 'received' : 'sent');
       if (animate) {
@@ -1452,6 +1689,11 @@
       const isDeleted = status === 8;
       if (isDeleted) {
         messageElement.classList.add('deleted');
+      }
+      
+      // Check if this is a reply message
+      if (replyTo) {
+        messageElement.classList.add('reply');
       }
       
       if (messageId !== null) {
@@ -1473,6 +1715,42 @@
 
       const contentElement = document.createElement('div');
       contentElement.classList.add('message-content');
+      
+      // Add reply reference if this is a reply message
+      if (replyTo && !isDeleted) {
+        const replyReference = document.createElement('div');
+        replyReference.classList.add('reply-reference');
+        
+        const replyAuthor = document.createElement('div');
+        replyAuthor.classList.add('reply-reference-author');
+        replyAuthor.textContent = replyTo.author || 'Unknown';
+        replyReference.appendChild(replyAuthor);
+        
+        const replyContent = document.createElement('div');
+        replyContent.classList.add('reply-reference-content');
+        
+        // Set preview text based on original message type
+        let previewText = '';
+        switch (replyTo.messageType) {
+          case 'image':
+            previewText = '📷 Photo';
+            break;
+          case 'video':
+            previewText = '🎥 Video';
+            break;
+          case 'pendingDownload':
+            previewText = '📎 File';
+            break;
+          default:
+            previewText = replyTo.content || '';
+            break;
+        }
+        
+        replyContent.textContent = previewText;
+        replyReference.appendChild(replyContent);
+        
+        contentElement.appendChild(replyReference);
+      }
       
       // If the message is deleted, show deletion text instead of content
       if (isDeleted) {
@@ -1652,9 +1930,11 @@
     function closeChat() {
         window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
     }
+    // Test messages for reply functionality
     // addMessage("Encryption key received", "SYSTEM", Date.now(), "text", null, null, false);
-    // addMessage("Hey girlll", "testing", Date.now(), "text", null, null, false);
-    // addMessage("Wassup", "dukedennis.eth", Date.now(), "text", null, null, false);
+    // addMessage("Hey girlll", "testing", Date.now(), "text", null, null, false, null, null);
+    // addMessage("Wassup", "dukedennis.eth", Date.now(), "text", null, null, false, null, null);
+    // addMessage("This is a reply!", localId, Date.now(), "text", null, null, false, null, null, {author: "testing", content: "Hey girlll", messageType: "text"});
 
     document.getElementById("back-button").addEventListener("click", () => {
         hideContextMenu(); // Hide context menu when going back
@@ -1666,9 +1946,22 @@
       const message = messageText.value.trim();
       if (message) {
         console.log("Sending message:", message);
-        sendMessage(message);
+        
+        // Check if this is a reply
+        if (currentReplyMessage) {
+          sendReplyMessage(message, currentReplyMessage.messageId);
+          hideReplyBar();
+        } else {
+          sendMessage(message);
+        }
+        
         messageText.value = '';
       }
+    });
+    
+    // Reply close button event listener
+    replyCloseBtn.addEventListener('click', () => {
+      hideReplyBar();
     });
 
     // Add image button event listener
@@ -1688,6 +1981,13 @@
     // Hide context menu when typing
     messageText.addEventListener('focus', hideContextMenu);
     messageText.addEventListener('input', hideContextMenu);
+    
+    // Hide reply bar when pressing Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && currentReplyMessage) {
+        hideReplyBar();
+      }
+    });
 
 
     // Add scroll event listener for infinite scrolling
@@ -2015,7 +2315,7 @@
                   const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
                   const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
                   
-                  const updatedMessage = createMessageElement(fileUrl, author, time, messageType, msgStatus, messageId, false, contact, content);
+                  const updatedMessage = createMessageElement(fileUrl, author, time, messageType, msgStatus, messageId, false, contact, content, null);
                   if (nextElement) {
                     chatContainer.insertBefore(updatedMessage, nextElement);
                   } else {
@@ -2023,7 +2323,7 @@
                   }
                 } else {
                   // Still a pending download
-                  const updatedMessage = createMessageElement(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content);
+                  const updatedMessage = createMessageElement(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content, null);
                   if (nextElement) {
                     chatContainer.insertBefore(updatedMessage, nextElement);
                   } else {
@@ -2062,7 +2362,7 @@
                         // Replace the entire message if video element not found
                         const nextElement = existingMsg.nextElementSibling;
                         existingMsg.remove();
-                        const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content);
+                        const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content, null);
                         if (nextElement) {
                           chatContainer.insertBefore(updatedMessage, nextElement);
                         } else {
@@ -2073,7 +2373,7 @@
                       // If it's not already a video message, replace the entire message
                       const nextElement = existingMsg.nextElementSibling;
                       existingMsg.remove();
-                      const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content);
+                      const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content, null);
                       if (nextElement) {
                         chatContainer.insertBefore(updatedMessage, nextElement);
                       } else {
@@ -2091,7 +2391,7 @@
                         // Replace the entire message if image element not found
                         const nextElement = existingMsg.nextElementSibling;
                         existingMsg.remove();
-                        const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content);
+                        const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content, null);
                         if (nextElement) {
                           chatContainer.insertBefore(updatedMessage, nextElement);
                         } else {
@@ -2102,7 +2402,7 @@
                       // If it's not already an image message, replace the entire message
                       const nextElement = existingMsg.nextElementSibling;
                       existingMsg.remove();
-                      const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content);
+                      const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content, null);
                       if (nextElement) {
                         chatContainer.insertBefore(updatedMessage, nextElement);
                       } else {

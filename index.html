@@ -397,6 +397,31 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+
+            sendReplyMessage(id, message, replyToMessageId, isSession) {
+                let request = {};
+                if (isSession) {
+                    request = {
+                        action: "send-reply-message",
+                        body: { localId: this.localId, pid: this.pid, sessionId: id, content: message, replyToMessageId: replyToMessageId }
+                    };
+                }
+                else {
+                    request = {
+                        action: "send-reply-message",
+                        body: { localId: this.localId, pid: this.pid, remoteId: id, content: message, replyToMessageId: replyToMessageId }
+                    };
+                }
+                this.sendMessageToNativeApp(request);
+            }
+
+            forwardMessage(messageId, content, messageType) {
+                const request = {
+                    action: "forward-message",
+                    body: { localId: this.localId, pid: this.pid, messageId: messageId, content: content, messageType: messageType }
+                };
+                this.sendMessageToNativeApp(request);
+            }
         }
 
     </script>
