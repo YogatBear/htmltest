@@ -403,7 +403,7 @@
                 if (isSession) {
                     request = {
                         action: "send-reply-message",
-                        body: { localId: this.localId, pid: this.pid, sessionId: id, content: message, replyToMessageId: replyToMessageId }
+                        body: { localId: this.localId, pid: this.pid, sessionId: id, content: message, messageId: replyToMessageId }
                     };
                 }
                 else {
