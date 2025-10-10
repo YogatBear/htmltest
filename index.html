@@ -409,7 +409,7 @@
                 else {
                     request = {
                         action: "send-reply-message",
-                        body: { localId: this.localId, pid: this.pid, remoteId: id, content: message, replyToMessageId: replyToMessageId }
+                        body: { localId: this.localId, pid: this.pid, remoteId: id, content: message, messageId: replyToMessageId }
                     };
                 }
                 this.sendMessageToNativeApp(request);
