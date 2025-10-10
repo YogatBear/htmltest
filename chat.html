@@ -1389,17 +1389,27 @@
       const messageType = messageElement.dataset.messageType;
       
       if (messageType === 'text') {
-        return contentElement.textContent || '';
+        // For reply messages, get text from .message-text element to avoid including reply reference
+        const messageTextElement = contentElement.querySelector('.message-text');
+        if (messageTextElement) {
+          const textContent = messageTextElement.textContent || '';
+          console.log("Extracted text from reply message:", textContent);
+          return textContent;
+        }
+        // For regular messages, use the full content
+        const textContent = contentElement.textContent || '';
+        console.log("Extracted text from regular message:", textContent);
+        return textContent;
       } else if (messageType === 'image') {
         const caption = messageElement.querySelector('.image-caption');
-        return caption ? caption.textContent : 'Image';
+        return caption ? caption.textContent : '📷 Photo';
       } else if (messageType === 'video') {
         const caption = messageElement.querySelector('.video-caption');
-        return caption ? caption.textContent : 'Video';
+        return caption ? caption.textContent : '🎥 Video';
       } else if (messageType === 'pendingDownload') {
         const fileName = messageElement.querySelector('.file-name');
         const caption = messageElement.querySelector('.file-caption');
-        let text = fileName ? fileName.textContent : 'File';
+        let text = fileName ? fileName.textContent : '📎 File';
         if (caption && caption.textContent) {
           text += ': ' + caption.textContent;
         }
