@@ -499,8 +499,12 @@
       
       /* Dark mode reply reference */
       .received .reply-reference {
-        background: rgba(60, 60, 70, 0.6);
+        background: rgba(60, 60, 70, 0.4);
         border-left-color: var(--light-purple);
+      }
+      
+      .received .reply-reference:hover {
+        background: rgba(60, 60, 70, 0.6);
       }
       
       .received .reply-reference-author {
@@ -508,7 +512,22 @@
       }
       
       .received .reply-reference-content {
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba(255, 255, 255, 0.85);
+      }
+      
+      .sent .reply-reference {
+        background: rgba(255, 255, 255, 0.1);
+        border-left-color: rgba(255, 255, 255, 0.8);
+      }
+      
+      .sent .reply-reference:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      
+      /* Dark mode highlighted message */
+      .message.highlighted {
+        background: rgba(115, 66, 160, 0.3) !important;
+        box-shadow: 0 4px 12px rgba(115, 66, 160, 0.4) !important;
       }
     }
     
@@ -924,39 +943,67 @@
     }
     
     .reply-reference {
-      background: rgba(115, 66, 160, 0.1);
-      border-left: 3px solid var(--secondary-purple);
-      padding: 6px 8px;
-      margin-bottom: 6px;
-      border-radius: 4px;
-      font-size: 12px;
-      opacity: 0.8;
+      background: rgba(115, 66, 160, 0.08);
+      border-left: 4px solid var(--secondary-purple);
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      position: relative;
+    }
+    
+    .reply-reference:hover {
+      background: rgba(115, 66, 160, 0.12);
     }
     
     .reply-reference-author {
       font-weight: 600;
       color: var(--secondary-purple);
-      margin-bottom: 2px;
+      margin-bottom: 3px;
+      font-size: 12px;
     }
     
     .reply-reference-content {
       color: var(--dark-purple);
-      white-space: nowrap;
+      line-height: 1.3;
+      font-size: 13px;
+      max-height: 40px;
       overflow: hidden;
-      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    
+    .message-text {
+      margin-top: 2px;
+    }
+    
+    /* Highlighted message effect when scrolling to replied message */
+    .message.highlighted {
+      background: rgba(115, 66, 160, 0.2) !important;
+      transform: scale(1.02);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(115, 66, 160, 0.3) !important;
     }
     
     .sent .reply-reference {
-      background: rgba(255, 255, 255, 0.2);
-      border-left-color: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.15);
+      border-left-color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .sent .reply-reference:hover {
+      background: rgba(255, 255, 255, 0.25);
     }
     
     .sent .reply-reference-author {
-      color: rgba(255, 255, 255, 0.9);
+      color: rgba(255, 255, 255, 0.95);
     }
     
     .sent .reply-reference-content {
-      color: rgba(255, 255, 255, 0.8);
+      color: rgba(255, 255, 255, 0.85);
     }
 
     /* Deleted message styling */
@@ -1460,6 +1507,28 @@
       // Reset chat container bottom position
       chatContainer.style.bottom = '60px'; // Just input bar height
     }
+    
+    function scrollToMessage(messageId) {
+      const targetMessage = document.querySelector(`[data-message-id="${messageId}"]`);
+      if (targetMessage) {
+        // Highlight the message briefly
+        targetMessage.classList.add('highlighted');
+        
+        // Scroll to the message
+        targetMessage.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+        
+        // Remove highlight after animation
+        setTimeout(() => {
+          targetMessage.classList.remove('highlighted');
+        }, 2000);
+      } else {
+        console.log('Original message not found in current view');
+        // Could potentially load older messages here if needed
+      }
+    }
 
     function forwardMessage(messageElement) {
       console.log('Forward message:', messageElement.dataset.messageId);
@@ -1718,7 +1787,7 @@
       
       // Add reply reference if this is a reply message
       if (replyTo && !isDeleted) {
-        console.log("Creating reply reference for:", replyTo);
+        console.log("Creating reply reference - Author:", replyTo.author, "Content:", replyTo.content);
         const replyReference = document.createElement('div');
         replyReference.classList.add('reply-reference');
         
@@ -1750,6 +1819,12 @@
         replyContent.textContent = previewText;
         replyReference.appendChild(replyContent);
         
+        // Add click handler to scroll to original message
+        replyReference.addEventListener('click', (e) => {
+          e.stopPropagation();
+          scrollToMessage(replyTo.messageId);
+        });
+        
         contentElement.appendChild(replyReference);
       }
       
@@ -1757,7 +1832,12 @@
       if (isDeleted) {
         contentElement.textContent = 'This message has been deleted';
       } else if (type === 'text') {
-        contentElement.textContent = content;
+        // For text messages, create a separate div for the actual text content
+        // so it doesn't overwrite the reply reference
+        const textContent = document.createElement('div');
+        textContent.classList.add('message-text');
+        textContent.textContent = content;
+        contentElement.appendChild(textContent);
       } else if (type === 'image') {
         // Create a container for the image and caption
         const imageContainer = document.createElement('div');
@@ -2205,7 +2285,7 @@
                 content: replyContent,
                 messageType: 'text' // Default to text, could be enhanced to detect type
               };
-              console.log("Processing reply data:", replyToData);
+              console.log("Processing reply data - Author:", replyToData.author, "Content:", replyToData.content);
             }
 
             // Check if this message already exists
