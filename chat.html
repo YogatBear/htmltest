@@ -214,6 +214,69 @@
       font-size: 20px;
     }
 
+    /* Edit bar styling */
+    .edit-bar {
+      position: fixed;
+      bottom: 60px; /* Height of input area */
+      left: 0;
+      right: 0;
+      background: rgba(255, 165, 0, 0.1); /* Orange tint to distinguish from reply */
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 165, 0, 0.3);
+      padding: 8px 12px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      z-index: 999;
+      transition: all 0.3s ease;
+    }
+
+    .edit-bar.active {
+      display: flex;
+    }
+
+    .edit-content {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .edit-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #ff8c00; /* Orange color for edit */
+      margin-bottom: 2px;
+    }
+
+    .edit-message-preview {
+      font-size: 14px;
+      color: var(--dark-purple);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      opacity: 0.8;
+    }
+
+    .edit-close-btn {
+      background: none;
+      border: none;
+      color: #ff8c00; /* Orange color for edit */
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+    }
+
+    .edit-close-btn:hover {
+      background: rgba(255, 140, 0, 0.1);
+    }
+
+    .edit-close-btn .material-icons {
+      font-size: 20px;
+    }
+
     /* Input area */
     .message-input {
       position: fixed;
@@ -502,6 +565,28 @@
       
       .reply-close-btn:hover {
         background: rgba(115, 66, 160, 0.2);
+      }
+      
+      /* Dark mode edit bar */
+      .edit-bar {
+        background: rgba(60, 40, 20, 0.9); /* Dark orange tint */
+        border-top-color: rgba(255, 140, 0, 0.5);
+      }
+      
+      .edit-label {
+        color: #ffa500; /* Lighter orange for dark mode */
+      }
+      
+      .edit-message-preview {
+        color: rgba(255, 255, 255, 0.8);
+      }
+      
+      .edit-close-btn {
+        color: #ffa500; /* Lighter orange for dark mode */
+      }
+      
+      .edit-close-btn:hover {
+        background: rgba(255, 165, 0, 0.2);
       }
       
       /* Dark mode reply reference */
@@ -1060,6 +1145,15 @@
       <span class="material-icons">close</span>
     </button>
   </div>
+  <div id="edit-bar" class="edit-bar">
+    <div class="edit-content">
+      <div class="edit-label">Editing Message</div>
+      <div class="edit-message-preview" id="edit-preview"></div>
+    </div>
+    <button class="edit-close-btn" id="edit-close-btn">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
   <div class="message-input">
     <!-- <button id="image-button"></button> -->
     <input type="text" id="message-text" placeholder="Type a message..." />
@@ -1116,6 +1210,12 @@
     const replyAuthor = document.getElementById('reply-author');
     const replyPreview = document.getElementById('reply-preview');
     const replyCloseBtn = document.getElementById('reply-close-btn');
+    
+    // Edit functionality variables
+    let currentEditMessage = null;
+    const editBar = document.getElementById('edit-bar');
+    const editPreview = document.getElementById('edit-preview');
+    const editCloseBtn = document.getElementById('edit-close-btn');
 
     // Context menu variables
     let longPressTimer = null;
@@ -1502,6 +1602,11 @@
     function showReplyBar() {
       if (!currentReplyMessage) return;
       
+      // Hide edit bar if it's open
+      if (currentEditMessage) {
+        hideEditBar();
+      }
+      
       // Set the author name
       replyAuthor.textContent = currentReplyMessage.author;
       
@@ -1535,8 +1640,36 @@
       currentReplyMessage = null;
       replyBar.classList.remove('active');
       
-      // Reset chat container bottom position
-      chatContainer.style.bottom = '60px'; // Just input bar height
+      // Reset chat container bottom position if edit bar is not active
+      if (!currentEditMessage) {
+        chatContainer.style.bottom = '60px'; // Just input bar height
+      }
+    }
+    
+    function showEditBar() {
+      if (!currentEditMessage) return;
+      
+      // Set the preview content
+      editPreview.textContent = currentEditMessage.content;
+      
+      // Show the edit bar
+      editBar.classList.add('active');
+      
+      // Adjust chat container bottom position
+      chatContainer.style.bottom = '120px'; // 60px input + 60px edit bar
+    }
+    
+    function hideEditBar() {
+      currentEditMessage = null;
+      editBar.classList.remove('active');
+      
+      // Clear the input field
+      messageText.value = '';
+      
+      // Reset chat container bottom position if reply bar is not active
+      if (!currentReplyMessage) {
+        chatContainer.style.bottom = '60px'; // Just input bar height
+      }
     }
     
     function scrollToMessage(messageId) {
@@ -1576,9 +1709,25 @@
 
     function editMessage(messageElement) {
       console.log('Edit message:', messageElement.dataset.messageId);
-      // TODO: Implement edit functionality
-      // For now, we'll call a controller method to handle editing
-      controller.editMessage(messageElement.dataset.messageId);
+      
+      // Hide reply bar if it's open
+      hideReplyBar();
+      
+      // Store the message being edited
+      currentEditMessage = {
+        messageId: messageElement.dataset.messageId,
+        content: getMessageTextContent(messageElement),
+        element: messageElement
+      };
+      
+      // Show the edit bar
+      showEditBar();
+      
+      // Pre-fill the input with the current message content
+      messageText.value = currentEditMessage.content;
+      
+      // Focus on the input field
+      messageText.focus();
     }
 
     function deleteMessage(messageElement) {
@@ -1782,6 +1931,10 @@
       else if (remoteId !== 'null' && remoteId !== null) {
         controller.sendReplyMessage(remoteId, message, replyToMessageId, false);
       }
+    }
+    
+    function sendEditMessage(message, messageId) {
+      controller.sendEditMessage(messageId, message);
     }
 
     // Helper function to create message elements
@@ -2074,11 +2227,18 @@
       if (message) {
         console.log("Sending message:", message);
         
+        // Check if this is an edit
+        if (currentEditMessage) {
+          sendEditMessage(message, currentEditMessage.messageId);
+          hideEditBar();
+        }
         // Check if this is a reply
-        if (currentReplyMessage) {
+        else if (currentReplyMessage) {
           sendReplyMessage(message, currentReplyMessage.messageId);
           hideReplyBar();
-        } else {
+        } 
+        // Regular message
+        else {
           sendMessage(message);
         }
         
@@ -2089,6 +2249,11 @@
     // Reply close button event listener
     replyCloseBtn.addEventListener('click', () => {
       hideReplyBar();
+    });
+    
+    // Edit close button event listener
+    editCloseBtn.addEventListener('click', () => {
+      hideEditBar();
     });
 
     // Add image button event listener
@@ -2111,10 +2276,14 @@
     messageText.addEventListener('focus', hideContextMenu);
     messageText.addEventListener('input', hideContextMenu);
     
-    // Hide reply bar when pressing Escape
+    // Hide reply/edit bar when pressing Escape
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && currentReplyMessage) {
-        hideReplyBar();
+      if (e.key === 'Escape') {
+        if (currentEditMessage) {
+          hideEditBar();
+        } else if (currentReplyMessage) {
+          hideReplyBar();
+        }
       }
     });
 

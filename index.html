@@ -423,10 +423,11 @@
                 this.sendMessageToNativeApp(request);
             }
 
-            editMessage(messageId) {
+
+            sendEditMessage(messageId, newContent) {
                 const request = {
-                    action: "edit-message",
-                    body: { localId: this.localId, pid: this.pid, messageId: messageId }
+                    action: "send-edit-message",
+                    body: { localId: this.localId, pid: this.pid, messageId: messageId, content: newContent }
                 };
                 this.sendMessageToNativeApp(request);
             }
