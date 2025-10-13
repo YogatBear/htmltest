@@ -439,6 +439,15 @@
     .message.sent .message-time {
       color: rgba(255, 255, 255, 0.7);
     }
+    .message-edited {
+      font-size: 10px;
+      color: rgba(0, 0, 0, 0.4);
+      margin-left: 4px;
+      font-style: italic;
+    }
+    .message.sent .message-edited {
+      color: rgba(255, 255, 255, 0.5);
+    }
     .message-status-icon {
       font-size: 14px;
       color: rgba(255, 255, 255, 0.7);
@@ -533,6 +542,10 @@
 
       .message.received .message-time {
         color: rgba(255, 255, 255, 0.7);
+      }
+      
+      .message.received .message-edited {
+        color: rgba(255, 255, 255, 0.4);
       }
       
       #message-text {
@@ -1812,7 +1825,7 @@
       });
     }
 
-    function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false, contact = null, caption = null, replyTo = null) {
+    function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false, contact = null, caption = null, replyTo = null, isEdited = false) {
       const currentDate = formatDate(time);
       
       
@@ -1822,7 +1835,7 @@
         if (existingMsg) {
           const nextElement = existingMsg.nextElementSibling;
           existingMsg.remove();
-          const updatedMessage = createMessageElement(content, author, time, type, status, messageId, false, contact, caption, replyTo);
+          const updatedMessage = createMessageElement(content, author, time, type, status, messageId, false, contact, caption, replyTo, isEdited);
           
           if (nextElement) {
             chatContainer.insertBefore(updatedMessage, nextElement);
@@ -1855,7 +1868,7 @@
       } else {
         // Only animate if it's a truly new message (recent timestamp and animate flag is true)
         const isRecentMessage = time > Date.now() - 5000; // Within 5 seconds
-        messageElement = createMessageElement(content, author, time, type, status, messageId, animate && isRecentMessage, contact, caption, replyTo);
+        messageElement = createMessageElement(content, author, time, type, status, messageId, animate && isRecentMessage, contact, caption, replyTo, isEdited);
       }
 
       // For older messages (scrolling up) or chronological insertion
@@ -1938,7 +1951,7 @@
     }
 
     // Helper function to create message elements
-    function createMessageElement(content, author, time, type, status, messageId, animate, contact, caption, replyTo = null) {
+    function createMessageElement(content, author, time, type, status, messageId, animate, contact, caption, replyTo = null, isEdited = false) {
       const messageElement = document.createElement('div');
       messageElement.classList.add('message', author !== localId && author !== 'SYSTEM' ? 'received' : 'sent');
       if (animate) {
@@ -2148,6 +2161,14 @@
       timeElement.classList.add('message-time');
       timeElement.textContent = formatTime(time);
       footerElement.appendChild(timeElement);
+
+      // Add edited indicator if the message was edited
+      if (isEdited) {
+        const editedElement = document.createElement('span');
+        editedElement.classList.add('message-edited');
+        editedElement.textContent = 'edited';
+        footerElement.appendChild(editedElement);
+      }
 
       // Don't show status icons for deleted messages, and handle status 8 case
       if (messageElement.classList.contains('sent') && status !== null && status !== 8) {
@@ -2473,6 +2494,7 @@
           const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId, replyInfo, editInfo, forwardInfo] = data.message;
           console.log("msgSessionId:", msgSessionId);
           console.log("sessionId:", sessionId);
+          const isEdited = editInfo === 1;
           if (msgSessionId === sessionId) {
             let fileIdObj;
             
@@ -2513,14 +2535,14 @@
                 const fileExtension = fileUrl.split('.').pop().toLowerCase();
                 const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
                 const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
-                addMessage(fileUrl, author, time, messageType, msgStatus, messageId, shouldAnimate, contact, content, replyToData);
+                addMessage(fileUrl, author, time, messageType, msgStatus, messageId, shouldAnimate, contact, content, replyToData, isEdited);
               } else {
                 // Pending download - display with file info
-                addMessage(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, shouldAnimate, contact, content, replyToData);
+                addMessage(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, shouldAnimate, contact, content, replyToData, isEdited);
               }
             } else {
               // Normal text message
-              addMessage(content, author, time, "text", msgStatus, messageId, shouldAnimate, contact, null, replyToData);
+              addMessage(content, author, time, "text", msgStatus, messageId, shouldAnimate, contact, null, replyToData, isEdited);
             }
             controller.updateSessionTimestamp(sessionId);
           }
@@ -2542,6 +2564,7 @@
           
           sortedMessages.forEach(msg => {
             const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId, replyInfo, editInfo, forwardInfo] = msg;
+            const isEdited = editInfo === 1;
             if (msgSessionId === sessionId) {
               let fileIdObj;
               
@@ -2577,14 +2600,14 @@
                   const fileExtension = fileUrl.split('.').pop().toLowerCase();
                   const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
                   const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
-                  addMessage(fileUrl, author, time, messageType, msgStatus, messageId, false, contact, content, replyToData);
+                  addMessage(fileUrl, author, time, messageType, msgStatus, messageId, false, contact, content, replyToData, isEdited);
                 } else {
                   // Pending download - display with file info
-                  addMessage(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content, replyToData);
+                  addMessage(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content, replyToData, isEdited);
                 }
               } else {
                 // Normal text message
-                addMessage(content, author, time, "text", msgStatus, messageId, false, contact, null, replyToData);
+                addMessage(content, author, time, "text", msgStatus, messageId, false, contact, null, replyToData, isEdited);
               }
             }
           });
@@ -2603,6 +2626,7 @@
         } else if (data.updatedMessage) {
           console.log("Received updatedMessage data:", data.updatedMessage);
           const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId, replyInfo, editInfo, forwardInfo] = data.updatedMessage;
+          const isEdited = editInfo === 1;
           if (msgSessionId === sessionId) {
             let fileIdObj;
             
@@ -2650,7 +2674,7 @@
                   const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
                   const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
                   
-                  const updatedMessage = createMessageElement(fileUrl, author, time, messageType, msgStatus, messageId, false, contact, content, replyToData);
+                  const updatedMessage = createMessageElement(fileUrl, author, time, messageType, msgStatus, messageId, false, contact, content, replyToData, isEdited);
                   if (nextElement) {
                     chatContainer.insertBefore(updatedMessage, nextElement);
                   } else {
@@ -2658,7 +2682,7 @@
                   }
                 } else {
                   // Still a pending download
-                  const updatedMessage = createMessageElement(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content, replyToData);
+                  const updatedMessage = createMessageElement(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content, replyToData, isEdited);
                   if (nextElement) {
                     chatContainer.insertBefore(updatedMessage, nextElement);
                   } else {
@@ -2697,7 +2721,7 @@
                         // Replace the entire message if video element not found
                         const nextElement = existingMsg.nextElementSibling;
                         existingMsg.remove();
-                        const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content, replyToData);
+                        const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content, replyToData, isEdited);
                         if (nextElement) {
                           chatContainer.insertBefore(updatedMessage, nextElement);
                         } else {
@@ -2708,7 +2732,7 @@
                       // If it's not already a video message, replace the entire message
                       const nextElement = existingMsg.nextElementSibling;
                       existingMsg.remove();
-                      const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content, replyToData);
+                      const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content, replyToData, isEdited);
                       if (nextElement) {
                         chatContainer.insertBefore(updatedMessage, nextElement);
                       } else {
@@ -2726,7 +2750,7 @@
                         // Replace the entire message if image element not found
                         const nextElement = existingMsg.nextElementSibling;
                         existingMsg.remove();
-                        const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content, replyToData);
+                        const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content, replyToData, isEdited);
                         if (nextElement) {
                           chatContainer.insertBefore(updatedMessage, nextElement);
                         } else {
@@ -2737,7 +2761,7 @@
                       // If it's not already an image message, replace the entire message
                       const nextElement = existingMsg.nextElementSibling;
                       existingMsg.remove();
-                      const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content, replyToData);
+                      const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content, replyToData, isEdited);
                       if (nextElement) {
                         chatContainer.insertBefore(updatedMessage, nextElement);
                       } else {
@@ -2754,7 +2778,7 @@
                       const nextElement = existingMsg.nextElementSibling;
                       const author = existingMsg.classList.contains('sent') ? localId : (contact || 'Unknown');
                       existingMsg.remove();
-                      const updatedMessage = createMessageElement(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content, replyToData);
+                      const updatedMessage = createMessageElement(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content, replyToData, isEdited);
                       if (nextElement) {
                         chatContainer.insertBefore(updatedMessage, nextElement);
                       } else {
@@ -2777,7 +2801,7 @@
                   const nextElement = existingMsg.nextElementSibling;
                   const author = existingMsg.classList.contains('sent') ? localId : (contact || 'Unknown');
                   existingMsg.remove();
-                  const updatedMessage = createMessageElement(content, author, time, "text", msgStatus, messageId, false, contact, null, replyToData);
+                  const updatedMessage = createMessageElement(content, author, time, "text", msgStatus, messageId, false, contact, null, replyToData, isEdited);
                   if (nextElement) {
                     chatContainer.insertBefore(updatedMessage, nextElement);
                   } else {
