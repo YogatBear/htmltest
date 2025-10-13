@@ -1199,7 +1199,10 @@
       // Get message content for copying
       const messageContent = getMessageTextContent(messageElement);
       
-      // Create menu items
+      // Create menu items based on message type and ownership
+      const isSentMessage = messageElement.classList.contains('sent');
+      const isTextMessage = messageElement.dataset.messageType === 'text';
+      
       const menuItems = [
         {
           icon: 'content_copy',
@@ -1210,7 +1213,19 @@
           icon: 'reply',
           text: 'Reply',
           action: () => replyToMessage(messageElement)
-        },
+        }
+      ];
+      
+      // Only show Edit for text messages sent by the current user
+      if (isSentMessage && isTextMessage) {
+        menuItems.push({
+          icon: 'edit',
+          text: 'Edit',
+          action: () => editMessage(messageElement)
+        });
+      }
+      
+      menuItems.push(
         {
           icon: 'forward',
           text: 'Forward',
@@ -1221,7 +1236,7 @@
           text: 'Delete',
           action: () => deleteMessage(messageElement)
         }
-      ];
+      );
 
       menuItems.forEach(item => {
         const menuItem = document.createElement('button');
@@ -1559,14 +1574,21 @@
       controller.forwardMessage(messageId, messageContent, messageType);
     }
 
+    function editMessage(messageElement) {
+      console.log('Edit message:', messageElement.dataset.messageId);
+      // TODO: Implement edit functionality
+      // For now, we'll call a controller method to handle editing
+      controller.editMessage(messageElement.dataset.messageId);
+    }
+
     function deleteMessage(messageElement) {
       console.log('Delete message:', messageElement.dataset.messageId);
       controller.deleteMessage(messageElement.dataset.messageId);
     }
 
     function addLongPressListeners(messageElement) {
-      // Skip system messages
-      if (messageElement.classList.contains('system-message')) {
+      // Skip system messages and deleted messages
+      if (messageElement.classList.contains('system-message') || messageElement.classList.contains('deleted')) {
         return;
       }
 

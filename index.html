@@ -422,6 +422,14 @@
                 };
                 this.sendMessageToNativeApp(request);
             }
+
+            editMessage(messageId) {
+                const request = {
+                    action: "edit-message",
+                    body: { localId: this.localId, pid: this.pid, messageId: messageId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
         }
 
     </script>
