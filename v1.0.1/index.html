@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Native Communication</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Native Communication Web App">
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Arnacon">
+    <meta name="msapplication-TileColor" content="#000000">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        html, body {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <iframe id="guiFrame" frameBorder="0" style="width:100%; height:100vh;"></iframe>
+    <script>
+
+        guiFrame = document.getElementById('guiFrame');
+
+        // Initialize route from current location
+        pid = null;
+        screen = null;
+        localId = null;
+        remoteId = null;
+        applyRouteFromLocation();
+
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function getHashParameter(name) {
+            const raw = window.location.hash && window.location.hash.charAt(0) === '#' ? window.location.hash.slice(1) : window.location.hash;
+            if (!raw) return null;
+            const hashParams = new URLSearchParams(raw);
+            return hashParams.get(name);
+        }
+
+        function getParam(name) {
+            const q = getUrlParameter(name);
+            if (q !== null && q !== '') return q;
+            const h = getHashParameter(name);
+            if (h !== null && h !== '') return h;
+            return null;
+        }
+
+        function applyRouteFromLocation() {
+            // Prefer hash params (for offline-friendly deep links), fallback to search params
+            pid = getParam('pid');
+            screen = getParam('screen') || 'MAIN';
+            localId = getParam('localId');
+            remoteId = getParam('remoteId');
+
+            let newSrc;
+            if (screen === 'TEST') {
+                newSrc = 'test.html';
+            } else {
+                newSrc = 'app.html?screen=' + screen + '&localId=' + encodeURIComponent(localId || '') + '&remoteId=' + encodeURIComponent(remoteId || '');
+            }
+
+            // Always update iframe src to ensure navigation happens
+            guiFrame.src = newSrc;
+
+            // Keep controller state in sync if already constructed
+            if (window.top.controller) {
+                window.top.controller.pid = pid;
+                window.top.controller.localId = localId;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            window.top.controller = new Controller();
+        });
+
+        // React to in-app deep links without reloading the page
+        window.addEventListener('hashchange', function() {
+            applyRouteFromLocation();
+        });
+                
+        class Controller {
+
+            constructor() {
+                this.guiFrame = guiFrame;
+                this.pid = pid;
+                this.localId = localId;
+            }
+
+            receiveData(_data) {
+                const data = JSON.parse(_data);
+                this.guiFrame.contentWindow.postMessage(data, '*');
+            }
+
+            sendMessageToNativeApp(jsonData) {
+
+                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+                    window.webkit.messageHandlers.nativeHandler.postMessage(JSON.stringify(jsonData));
+                } else if (window.AndroidBridge && window.AndroidBridge.processAction) {
+                    console.log(JSON.stringify(jsonData));
+                    window.AndroidBridge.processAction(JSON.stringify(jsonData));
+                } else {
+                    console.log("Native interface not available");
+                }
+            }
+
+            // Native actions
+
+            callSession(sessionId) {
+                const callRequest = {
+                    action: "call-session",
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId }
+                };
+                this.sendMessageToNativeApp(callRequest);
+            }
+
+            callRemote(remoteId) {
+                const callRequest = {
+                    action: "call-remote",
+                    body: { localId: this.localId, pid: this.pid, remoteId: remoteId }
+                };
+                this.sendMessageToNativeApp(callRequest);
+            }
+
+            groupCall(sessionId) {
+                const callRequest = {
+                    action: "group-call",
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId }
+                };
+                this.sendMessageToNativeApp(callRequest);
+            }
+
+            acceptCall(callId) {
+                const request = {
+                    action: "accept-call",
+                    body: { localId: this.localId, pid: this.pid, callId: callId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            
+            rejectCall(callId) {
+                const request = {
+                    action: "reject-call",
+                    body: { localId: this.localId, pid: this.pid, callId: callId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            setMute(callId, bool) {
+                const request = {
+                    action: "set-mute",
+                    body: { localId: this.localId, pid: this.pid, callId: callId, mute: bool}
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            
+            setHold(callId, bool) {
+                const request = {
+                    action: "set-hold",
+                    body: { localId: this.localId, pid: this.pid, callId: callId, hold: bool }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            
+            setActiveCall(callId) {
+                const request = {
+                    action: "set-active-call",
+                    body: { localId: this.localId, pid: this.pid, callId: callId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            sendMessage(id, message, isSession) {
+                let request = {};
+                if (isSession) {
+                    request = {
+                        action: "send-message",
+                        body: { localId: this.localId, pid: this.pid, sessionId: id, content: message }
+                    };
+                }
+                else {
+                    request = {
+                        action: "send-message",
+                        body: { localId: this.localId, pid: this.pid, remoteId: id, content: message }
+                    };
+                }
+
+                this.sendMessageToNativeApp(request);
+            }
+
+            sendGroupMessage(sessionId, message) {
+                const request = {
+                    action: "send-group-message",
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId, content: message }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            deleteMessage(messageId) {
+                const request = {
+                    action: "delete-message",
+                    body: { localId: this.localId, pid: this.pid, messageId: messageId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            store(key, value) {
+                const request = {
+                    action: "store",
+                    body: { localId: this.localId, pid: this.pid, key: key, value: value }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+        
+            changeAudioDevice(callId, deviceId) {
+                const request = {
+                    action: "set-audio-device",
+                    body: { localId: this.localId, pid: this.pid, callId: callId, deviceId: deviceId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            sendDtmf(callId, digit) {
+                const request = {
+                    action: "send-dtmf",
+                    body: { localId: this.localId, pid: this.pid, callId: callId, digit: digit }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            // Fetch data
+
+            getActiveCalls() {
+                const request = {
+                    action: "get-active-calls",
+                    body: { localId: this.localId, pid: this.pid }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getLogs(remoteId = null) {
+                const request = {
+                    action: "get-logs",
+                    body: { localId: this.localId, pid: this.pid, remoteId: remoteId, range: 10 }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getRecentCalls() {
+                const request = {
+                    action: "get-recent-calls",
+                    body: { localId: this.localId, pid: this.pid, range: 10 }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getMessages(id, range, start, isSession) {
+                let request = {};
+                if (isSession) {
+                    request = {
+                        action: "get-messages",
+                        body: { localId: this.localId, pid: this.pid, sessionId: id, range: range, startMessage: start }
+                    };
+                }
+                else {
+                    request = {
+                        action: "get-messages",
+                        body: { localId: this.localId, pid: this.pid, remoteId: id, range: range, startMessage: start }
+                    };
+                }
+                this.sendMessageToNativeApp(request);
+            }
+
+            getRecentSessions(range) {
+                const request = {
+                    action: "get-recent-sessions",
+                    body: { localId: this.localId, pid: this.pid, range: range }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getAudioDevices() {
+                const request = {
+                    action: "get-audio-devices",
+                    body: { localId: this.localId, pid: this.pid }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            // Webview capabilities
+
+            displayBackButton(bool) {
+                const request = {
+                    action: "display-back-button",
+                    body: { localId: this.localId, pid: this.pid, display: bool }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            receiveMessage(event) {
+                const { action, body} = event.data;
+                this.sendMessage(action, body);
+            }
+
+            updateSessionTimestamp(sessionId){
+                const openChatRequest = {
+                    action: "update-session-timestamp",
+                    body: { localId:this.localId, pid: this.pid, sessionId: sessionId }
+                };
+                this.sendMessageToNativeApp(openChatRequest);
+            }
+
+            deleteSession(sessionId) {
+                const deleteSessionRequest = {
+                    action: "delete-session",
+                    body: { localId: this.localId, pid: this.pid, sessionId: sessionId }
+                };
+                this.sendMessageToNativeApp(deleteSessionRequest);
+            }
+
+            imagePicker() {
+                const request = {
+                    action: "image-picker",
+                    body: { localId: this.localId, pid: this.pid }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            sendImageMessage(to, imageId, caption) {
+                if (caption === '') {
+                    console.log("Caption is empty 2");
+                }
+                const request = {
+                    action: "send-image-message",
+                    body: { localId: this.localId, pid: this.pid, to: to, imageId: imageId, content: caption }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+            contactPicker(type) {
+                const request = {
+                    action: "contact-picker",
+                    body: { localId: this.localId, pid: this.pid, contactType: type }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getContactName(remoteId) {
+                const request = {
+                    action: "get-contact-name",
+                    body: { localId: this.localId, pid: this.pid, remoteId: remoteId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            getSessionId(remoteId) {
+                const request = {
+                    action: "get-session-id",
+                    body: { localId: this.localId, pid: this.pid, remoteId: remoteId }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            downloadFile(messageId, fileId) {
+                const request = {
+                    action: "download-file",
+                    body: { localId: this.localId, pid: this.pid, messageId: messageId, fileId: fileId}
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            createGroup(groupData) {
+                const request = {
+                    action: "create-group",
+                    body: { localId: this.localId, pid: this.pid, groupData: groupData }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+            sendReplyMessage(id, message, replyToMessageId, isSession) {
+                let request = {};
+                if (isSession) {
+                    request = {
+                        action: "send-reply-message",
+                        body: { localId: this.localId, pid: this.pid, sessionId: id, content: message, messageId: replyToMessageId }
+                    };
+                }
+                else {
+                    request = {
+                        action: "send-reply-message",
+                        body: { localId: this.localId, pid: this.pid, remoteId: id, content: message, messageId: replyToMessageId }
+                    };
+                }
+                this.sendMessageToNativeApp(request);
+            }
+
+            forwardMessage(messageId, content, messageType) {
+                const request = {
+                    action: "forward-message",
+                    body: { localId: this.localId, pid: this.pid, messageId: messageId, content: content, messageType: messageType }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+
+
+            sendEditMessage(messageId, newContent) {
+                const request = {
+                    action: "send-edit-message",
+                    body: { localId: this.localId, pid: this.pid, messageId: messageId, content: newContent }
+                };
+                this.sendMessageToNativeApp(request);
+            }
+        }
+
+    </script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        // Register service worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                        
+                        // Debug: Check cache contents after a delay
+                        setTimeout(function() {
+                            if (navigator.serviceWorker.controller) {
+                                const channel = new MessageChannel();
+                                channel.port1.onmessage = function(event) {
+                                    if (event.data.type === 'CACHE_CONTENTS') {
+                                        console.log('Cached files:', event.data.urls);
+                                        console.log('Total cached files:', event.data.urls.length);
+                                    }
+                                };
+                                navigator.serviceWorker.controller.postMessage(
+                                    {type: 'GET_CACHE_CONTENTS'}, 
+                                    [channel.port2]
+                                );
+                            }
+                        }, 3000); // Wait 3 seconds for caching to complete
+                        
+                        // Listen for updates
+                        registration.addEventListener('updatefound', function() {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', function() {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New content is available, prompt user to refresh
+                                    console.log('New content is available; please refresh.');
+                                }
+                            });
+                        });
+                    })
+                    .catch(function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

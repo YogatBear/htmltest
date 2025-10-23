@@ -1,0 +1,3006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WhatsApp-style Chat Room</title>
+  <link rel="stylesheet" href="assets/fonts/fonts.css">
+  <style>
+    :root {
+      --primary-white: #ffffff;
+      --secondary-purple: rgb(115, 66, 160);
+      --light-purple: #9370db;
+      --dark-purple: #4b0082;
+      --purple-gradient: linear-gradient(135deg, var(--primary-white) 0%, var(--light-purple) 100%);
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(200, 200, 200, 0.7);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      /* background: var(--purple-gradient); */
+      background-size: 200% 200%;
+      animation: gradientAnimation 15s ease infinite;
+      height: 100vh;
+      overflow: hidden;
+    }
+    /* Enhanced top bar */
+    #top-bar {
+      background: rgba(106, 90, 205, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    /* Message container */
+    #chat-container {
+      position: fixed;
+      top: 50px; /* Height of top bar */
+      bottom: 60px; /* Height of input area */
+      left: 0;
+      right: 0;
+      overflow-y: auto;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(5px);
+    }
+    /* Message bubbles */
+    .message {
+      max-width: 75%;
+      margin: 2px 8px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      position: relative;
+      clear: both;
+      word-wrap: break-word;
+      user-select: none; /* Make message content not selectable */
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+    .message.sent {
+      float: right;
+      background: var(--secondary-purple);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .message.received {
+      float: left;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(200, 200, 200, 0.8);
+      color: var(--dark-purple);
+      border-bottom-left-radius: 4px;
+    }
+    .message.animate {
+      animation: messageAppear 0.3s ease-out forwards;
+    }
+    @keyframes messageAppear {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    /* File container styling */
+    .file-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 220px;
+      max-width: 100%;
+    }
+    
+    .file-container .material-icons {
+      font-size: 28px;
+    }
+    
+    .file-info {
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    .file-name {
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+    
+    .file-size {
+      font-size: 11px;
+      opacity: 0.7;
+    }
+    
+    /* Image styling in messages */
+    .message-content img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    
+    .download-button {
+      background: transparent;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+    }
+    
+    .download-button:hover {
+      background: rgba(0, 0, 0, 0.1);
+    }
+    
+    .sent .download-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .download-button .material-icons {
+      font-size: 20px;
+    }
+    /* Reply bar styling */
+    .reply-bar {
+      position: fixed;
+      bottom: 60px; /* Height of input area */
+      left: 0;
+      right: 0;
+      background: rgba(115, 66, 160, 0.1);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(115, 66, 160, 0.3);
+      padding: 8px 12px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      z-index: 999;
+      transition: all 0.3s ease;
+    }
+
+    .reply-bar.active {
+      display: flex;
+    }
+
+    .reply-content {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .reply-to-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--secondary-purple);
+      margin-bottom: 2px;
+    }
+
+    .reply-message-preview {
+      font-size: 14px;
+      color: var(--dark-purple);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      opacity: 0.8;
+    }
+
+    .reply-close-btn {
+      background: none;
+      border: none;
+      color: var(--secondary-purple);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+    }
+
+    .reply-close-btn:hover {
+      background: rgba(115, 66, 160, 0.1);
+    }
+
+    .reply-close-btn .material-icons {
+      font-size: 20px;
+    }
+
+    /* Edit bar styling */
+    .edit-bar {
+      position: fixed;
+      bottom: 60px; /* Height of input area */
+      left: 0;
+      right: 0;
+      background: rgba(255, 165, 0, 0.1); /* Orange tint to distinguish from reply */
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 165, 0, 0.3);
+      padding: 8px 12px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      z-index: 999;
+      transition: all 0.3s ease;
+    }
+
+    .edit-bar.active {
+      display: flex;
+    }
+
+    .edit-content {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .edit-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #ff8c00; /* Orange color for edit */
+      margin-bottom: 2px;
+    }
+
+    .edit-message-preview {
+      font-size: 14px;
+      color: var(--dark-purple);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      opacity: 0.8;
+    }
+
+    .edit-close-btn {
+      background: none;
+      border: none;
+      color: #ff8c00; /* Orange color for edit */
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+    }
+
+    .edit-close-btn:hover {
+      background: rgba(255, 140, 0, 0.1);
+    }
+
+    .edit-close-btn .material-icons {
+      font-size: 20px;
+    }
+
+    /* Input area */
+    .message-input {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+    #image-button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: var(--secondary-purple);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    #image-button i {
+      font-size: 20px;
+    }
+    #message-text {
+      flex: 1;
+      height: 40px;
+      padding: 8px 16px;
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      font-size: 16px;
+      background: white;
+      outline: none;
+    }
+    #send-button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: var(--secondary-purple);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    #send-button i {
+      font-size: 20px;
+
+    }
+    /* Scrollbar styling */
+    #chat-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    #chat-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #chat-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+    /* Gradient animation */
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    /* Fixed top bar with no rounded corners */
+    #top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px; /* Set a fixed height */
+      background-color: var(--secondary-purple);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 0;
+      padding: 0 10px;
+      z-index: 1000;
+    }
+    /* Back button styling */
+    #back-button {
+      padding: 15px;
+      border: none;
+      background-color: transparent;
+      color: var(--primary-white);
+      cursor: pointer;
+      outline: none;
+    }
+    /* Title styling with truncation if too long */
+    #title {
+      flex: 1;
+      color: white;
+      text-align: center;
+      margin: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* Call button now with an icon */
+    #call-button {
+      padding: 15px;
+      border: none;
+      background-color: transparent;
+      color: var(--primary-white);
+      cursor: pointer;
+      outline: none;
+    }
+    .date-separator {
+      text-align: center;
+      margin: 16px 0;
+      position: relative;
+      clear: both;
+    }
+    .date-separator span {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--dark-purple);
+    }
+    .message-author {
+      font-weight: bold;
+      font-size: 13px;
+      margin-bottom: 2px;
+      color: black;
+    }
+    .message-content {
+      margin-right: 75px;  /* Increased from 65px to 75px to create more horizontal space */
+      font-size: 15px;
+      line-height: 1.4;
+    }
+    
+    /* Increase margin when message has edited indicator */
+    .message:has(.message-edited) .message-content {
+      margin-right: 110px;  /* Extra space for "edited" + time + status icon */
+    }
+    
+    /* Reply reference should span full width, ignoring the margin */
+    .message-content .reply-reference {
+      margin-right: -75px; /* Counteract the message-content margin */
+      margin-left: 0;
+      width: calc(100% + 75px); /* Extend to full message width */
+    }
+    
+    /* Reply reference in edited messages */
+    .message:has(.message-edited) .message-content .reply-reference {
+      margin-right: -110px; /* Counteract the larger margin for edited messages */
+      width: calc(100% + 110px); /* Extend to full message width */
+    }
+    .message-footer {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .message-time {
+      font-size: 11px;
+      color: rgba(0, 0, 0, 0.5);
+    }
+    .message.sent .message-time {
+      color: rgba(255, 255, 255, 0.7);
+    }
+    .message-edited {
+      font-size: 10px;
+      color: rgba(0, 0, 0, 0.4);
+      margin-right: 4px;
+      font-style: italic;
+    }
+    .message.sent .message-edited {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .message-status-icon {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    @media (max-width: 600px) {
+      .message {
+        max-width: 80%;
+        min-width: 30px;
+      }
+    }
+    .system-message {
+      text-align: center;
+      padding: 8px 0;
+      position: relative;
+      display: block;
+      clear: both;
+      overflow: hidden;
+    }
+    .system-message span {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--dark-purple);
+    }
+    .system-message-time {
+      font-size: 11px;
+      color: rgba(0, 0, 0, 0.5);
+      margin-top: 4px;
+    }
+    @media (prefers-color-scheme: dark) {
+      #top-bar {            
+        background-color: var(--purple-gradient);
+        background: rgba(20, 20, 30, 1);
+
+      }
+      #chat-container {
+        background-color: var(--purple-gradient);
+        background: rgb(23, 23, 23);
+      }
+      .message-input {
+        background-color: var(--purple-gradient);
+        background: rgba(20, 20, 30, 1);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+      }
+      #send-button {
+        background-color: var(--purple-gradient);
+        background: rgba(20, 20, 30, 1);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+      }
+      .system-message-time {
+        color: rgba(255, 255, 255, 0.7);
+      }
+      #image-button {
+        background-color: var(--purple-gradient);
+        background: rgba(20, 20, 30, 1);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+      }
+      .system-message-content {
+        color: rgba(255, 255, 255, 0.9);
+      }
+      .date-separator span {
+        color: rgba(255, 255, 255, 0.9);
+        background: none;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+      }
+      
+      /* Dark mode styles for message content */
+      .message.received {
+        background: rgba(40, 40, 50, 0.9);
+        border-color: rgba(60, 60, 70, 0.8);
+        color: rgba(255, 255, 255, 0.9);
+      }
+      
+      /* Dark mode styles for file container */
+      .message.received .file-container {
+        color: rgba(255, 255, 255, 0.9);
+      }
+      
+      .message.received .file-size {
+        color: rgba(255, 255, 255, 0.7);
+      }
+      
+      .message.received .download-button:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .message.received .message-author {
+        color: var(--light-purple);
+      }
+
+      .message.received .message-time {
+        color: rgba(255, 255, 255, 0.7);
+      }
+      
+      .message.received .message-edited {
+        color: rgba(255, 255, 255, 0.4);
+      }
+      
+      #message-text {
+        background: rgba(40, 40, 50, 0.8);
+        color: white;
+        border-color: rgba(60, 60, 70, 0.8);
+      }
+      
+      #message-text::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+      
+      /* Dark mode reply bar */
+      .reply-bar {
+        background: rgba(40, 40, 50, 0.9);
+        border-top-color: rgba(115, 66, 160, 0.5);
+      }
+      
+      .reply-to-label {
+        color: var(--light-purple);
+      }
+      
+      .reply-message-preview {
+        color: rgba(255, 255, 255, 0.8);
+      }
+      
+      .reply-close-btn {
+        color: var(--light-purple);
+      }
+      
+      .reply-close-btn:hover {
+        background: rgba(115, 66, 160, 0.2);
+      }
+      
+      /* Dark mode edit bar */
+      .edit-bar {
+        background: rgba(60, 40, 20, 0.9); /* Dark orange tint */
+        border-top-color: rgba(255, 140, 0, 0.5);
+      }
+      
+      .edit-label {
+        color: #ffa500; /* Lighter orange for dark mode */
+      }
+      
+      .edit-message-preview {
+        color: rgba(255, 255, 255, 0.8);
+      }
+      
+      .edit-close-btn {
+        color: #ffa500; /* Lighter orange for dark mode */
+      }
+      
+      .edit-close-btn:hover {
+        background: rgba(255, 165, 0, 0.2);
+      }
+      
+      /* Dark mode reply reference */
+      .received .reply-reference {
+        background: rgba(60, 60, 70, 0.4);
+        border-left-color: var(--light-purple);
+      }
+      
+      .received .reply-reference:hover {
+        background: rgba(60, 60, 70, 0.6);
+      }
+      
+      .received .reply-reference-author {
+        color: var(--light-purple);
+      }
+      
+      .received .reply-reference-content {
+        color: rgba(255, 255, 255, 0.85);
+      }
+      
+      .sent .reply-reference {
+        background: rgba(255, 255, 255, 0.1);
+        border-left-color: rgba(255, 255, 255, 0.8);
+      }
+      
+      .sent .reply-reference:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      
+      /* Dark mode highlighted message */
+      .message.highlighted {
+        background: rgba(115, 66, 160, 0.3) !important;
+        box-shadow: 0 4px 12px rgba(115, 66, 160, 0.4) !important;
+      }
+    }
+    
+    /* Spacing between different message types */
+    .message + .system-message,
+    .system-message + .message {
+      margin-top: 8px;
+    }
+
+    /* Add a wrapper div for system message content */
+    .system-message-content {
+      display: inline-block;
+      border: 1px solid rgba(200, 200, 200, 0.5);
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--dark-purple);
+    }
+
+    /* Add new specific rule for system message timestamp spacing */
+    .system-message-time + .message,
+    .system-message-time + .system-message {
+      margin-top: 4px;  /* Reduced margin after timestamp */
+    }
+
+    /* Fullscreen Image Viewer Styles */
+    .fullscreen-image-viewer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .fullscreen-image-viewer.active {
+      opacity: 1;
+    }
+
+    .fullscreen-image-viewer img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+    }
+
+    .close-viewer {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      color: white;
+      transition: background-color 0.3s;
+    }
+
+    .close-viewer:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Caption styling for images and files */
+    .image-caption, .file-caption {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(200, 200, 200, 0.3);
+      font-size: 14px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    
+    .sent .image-caption, .sent .file-caption {
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .received .image-caption, .received .file-caption {
+      color: var(--dark-purple);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .received .image-caption, .received .file-caption {
+        color: rgba(255, 255, 255, 0.9);
+      }
+    }
+    
+    /* Adjust image container */
+    .image-container {
+      margin-bottom: 4px;
+    }
+    
+    /* Ensure file container has proper spacing */
+    .file-container {
+      margin-bottom: 4px;
+    }
+
+    /* Video styling in messages */
+    .message-content video {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    
+    .video-container {
+      margin-bottom: 4px;
+    }
+    
+    .video-caption {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(200, 200, 200, 0.3);
+      font-size: 14px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    
+    .sent .video-caption {
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .received .video-caption {
+      color: var(--dark-purple);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .received .video-caption {
+        color: rgba(255, 255, 255, 0.9);
+      }
+    }
+
+    /* Context Menu Styles */
+    .context-menu-blur-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1998;
+      opacity: 0;
+      transition: opacity 0.2s ease-out;
+    }
+
+    .context-menu-blur-wrapper.active {
+      opacity: 1;
+    }
+
+    .context-menu-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0);
+      backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+      opacity: 0;
+      transition: background 0.2s ease-out, opacity 0.2s ease-out;
+    }
+
+    .context-menu-overlay::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: inherit;
+      filter: blur(0px);
+      transition: filter 0.2s ease-out;
+      z-index: -1;
+    }
+
+    .context-menu-blur-wrapper.active .context-menu-overlay {
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 1;
+    }
+
+    .context-menu-blur-wrapper.active .context-menu-overlay::before {
+      filter: blur(4px);
+    }
+
+    .context-menu {
+      position: fixed;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      z-index: 2001;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.2s ease-out;
+      min-width: 160px;
+      overflow: hidden;
+    }
+
+    .context-menu.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Original message hidden behind blur */
+    .message.hidden-behind-blur {
+      opacity: 0.3 !important;
+      transition: opacity 0.2s ease-out;
+    }
+
+    /* Cloned message appears above blur */
+    .message-clone {
+      position: fixed !important;
+      z-index: 2000 !important;
+      opacity: 0;
+      transition: opacity 0.2s ease-out;
+      margin: 0 !important; /* Only override margin to prevent offset */
+      float: none !important; /* Remove any float */
+      /* Don't override anything else - let it inherit all original styling */
+    }
+
+    .message-clone.active {
+      opacity: 1;
+    }
+
+    /* Enhanced styling only for visual elevation - don't change layout */
+    .message-clone.sent {
+      box-shadow: 0 8px 24px rgba(115, 66, 160, 0.3) !important;
+    }
+
+    .message-clone.received {
+      box-shadow: 0 8px 24px rgba(115, 66, 160, 0.2) !important;
+    }
+
+    /* Chosen message - completely separate from blur effects */
+    .message.chosen-message {
+      background: rgba(255, 255, 255, 0.15) !important;
+      border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+      transition: all 0.2s ease-out;
+      z-index: 2000 !important;
+      position: relative !important;
+      transform: translateZ(0) !important; /* Force new stacking context */
+    }
+
+    .message.chosen-message.sent {
+      background: rgba(115, 66, 160, 0.9) !important;
+      border-color: rgba(255, 255, 255, 0.5) !important;
+      box-shadow: 0 8px 24px rgba(115, 66, 160, 0.3) !important;
+    }
+
+    .message.chosen-message.received {
+      background: rgba(255, 255, 255, 0.98) !important;
+      border-color: rgba(115, 66, 160, 0.4) !important;
+      box-shadow: 0 8px 24px rgba(115, 66, 160, 0.2) !important;
+    }
+
+    /* Legacy selected class - remove if not needed elsewhere */
+    .message.selected {
+      background: rgba(255, 255, 255, 0.15) !important;
+      border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+      transition: all 0.2s ease-out;
+      z-index: 2000 !important;
+      position: relative !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    .message.selected.sent {
+      background: rgba(115, 66, 160, 0.9) !important;
+      border-color: rgba(255, 255, 255, 0.5) !important;
+      box-shadow: 0 8px 24px rgba(115, 66, 160, 0.3) !important;
+    }
+
+    .message.selected.received {
+      background: rgba(255, 255, 255, 0.98) !important;
+      border-color: rgba(115, 66, 160, 0.4) !important;
+      box-shadow: 0 8px 24px rgba(115, 66, 160, 0.2) !important;
+    }
+
+    .context-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--dark-purple);
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+
+    .context-menu-item:hover {
+      background: rgba(115, 66, 160, 0.1);
+    }
+
+    .context-menu-item .material-icons {
+      font-size: 20px;
+      color: var(--secondary-purple);
+    }
+
+    .context-menu-item:not(:last-child) {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* Dark mode context menu */
+    @media (prefers-color-scheme: dark) {
+      .context-menu-overlay {
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+      }
+
+      .context-menu {
+        background: rgba(30, 30, 40, 0.95);
+        border-color: rgba(60, 60, 70, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+
+      .context-menu-item {
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .context-menu-item:hover {
+        background: rgba(115, 66, 160, 0.2);
+      }
+
+      .context-menu-item:not(:last-child) {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .context-menu-item .material-icons {
+        color: var(--light-purple);
+      }
+
+      /* Dark mode cloned message */
+      .message-clone.sent {
+        background: rgba(115, 66, 160, 0.95) !important;
+        border-color: rgba(255, 255, 255, 0.6) !important;
+        box-shadow: 0 8px 24px rgba(115, 66, 160, 0.4) !important;
+        color: white !important;
+      }
+
+      .message-clone.received {
+        background: rgba(50, 50, 60, 0.98) !important;
+        border-color: rgba(115, 66, 160, 0.6) !important;
+        box-shadow: 0 8px 24px rgba(115, 66, 160, 0.3) !important;
+        color: rgba(255, 255, 255, 0.9) !important;
+      }
+
+      /* Dark mode chosen message - above blur */
+      .message.chosen-message.sent {
+        background: rgba(115, 66, 160, 0.95) !important;
+        border-color: rgba(255, 255, 255, 0.6) !important;
+        box-shadow: 0 8px 24px rgba(115, 66, 160, 0.4) !important;
+      }
+
+      .message.chosen-message.received {
+        background: rgba(50, 50, 60, 0.98) !important;
+        border-color: rgba(115, 66, 160, 0.6) !important;
+        box-shadow: 0 8px 24px rgba(115, 66, 160, 0.3) !important;
+      }
+
+      /* Legacy selected class dark mode */
+      .message.selected.sent {
+        background: rgba(115, 66, 160, 0.95) !important;
+        border-color: rgba(255, 255, 255, 0.6) !important;
+        box-shadow: 0 8px 24px rgba(115, 66, 160, 0.4) !important;
+      }
+
+      .message.selected.received {
+        background: rgba(50, 50, 60, 0.98) !important;
+        border-color: rgba(115, 66, 160, 0.6) !important;
+        box-shadow: 0 8px 24px rgba(115, 66, 160, 0.3) !important;
+      }
+    }
+
+    /* Prevent text selection during long press */
+    .message.long-pressing {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    /* Prevent visual glitches during interactions */
+    .message.long-pressing {
+      animation-play-state: paused !important;
+    }
+
+    /* Reply message styling */
+    .message.reply {
+      position: relative;
+    }
+    
+    .reply-reference {
+      background: rgba(115, 66, 160, 0.08);
+      border-left: 4px solid var(--secondary-purple);
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      position: relative;
+    }
+    
+    .reply-reference:hover {
+      background: rgba(115, 66, 160, 0.12);
+    }
+    
+    .reply-reference-author {
+      font-weight: 600;
+      color: var(--secondary-purple);
+      margin-bottom: 3px;
+      font-size: 12px;
+    }
+    
+    .reply-reference-content {
+      color: var(--dark-purple);
+      line-height: 1.3;
+      font-size: 13px;
+      max-height: 40px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    
+    .message-text {
+      margin-top: 2px;
+    }
+    
+    /* Highlighted message effect when scrolling to replied message */
+    .message.highlighted {
+      background: rgba(115, 66, 160, 0.2) !important;
+      transform: scale(1.02);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(115, 66, 160, 0.3) !important;
+    }
+    
+    .sent .reply-reference {
+      background: rgba(255, 255, 255, 0.15);
+      border-left-color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .sent .reply-reference:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+    
+    .sent .reply-reference-author {
+      color: rgba(255, 255, 255, 0.95);
+    }
+    
+    .sent .reply-reference-content {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    /* Deleted message styling */
+    .message.deleted {
+      opacity: 0.6;
+    }
+    
+    .message.deleted .message-content {
+      color: #888888 !important;
+      font-style: italic;
+    }
+    
+    .message.deleted.sent .message-content {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .message.deleted .message-content {
+        color: #666666 !important;
+      }
+      
+      .message.deleted.sent .message-content {
+        color: rgba(255, 255, 255, 0.5) !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="top-bar">
+    <!-- New back button on the far left -->
+    <button id="back-button">
+      <span class="material-icons">arrow_back</span>
+    </button>
+    <h5 id="title"></h5>
+    <!-- Call button now displays an icon -->
+    <button id="call-button">
+      <span class="material-icons">call</span>
+    </button>
+  </div>
+  <div id="chat-container"></div>
+  <div id="reply-bar" class="reply-bar">
+    <div class="reply-content">
+      <div class="reply-to-label">Replying to <span id="reply-author"></span></div>
+      <div class="reply-message-preview" id="reply-preview"></div>
+    </div>
+    <button class="reply-close-btn" id="reply-close-btn">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+  <div id="edit-bar" class="edit-bar">
+    <div class="edit-content">
+      <div class="edit-label">Editing Message</div>
+      <div class="edit-message-preview" id="edit-preview"></div>
+    </div>
+    <button class="edit-close-btn" id="edit-close-btn">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+  <div class="message-input">
+    <!-- <button id="image-button"></button> -->
+    <input type="text" id="message-text" placeholder="Type a message..." />
+    <button id="send-button">
+      <i class="material-icons">send</i>
+    </button>
+  </div>
+
+  <script>
+    const controller = window.top.controller;
+    const urlParams = new URLSearchParams(window.location.search);
+    const channel = new BroadcastChannel('myChannel');
+    const remoteId = decodeURIComponent(urlParams.get('remoteId'));
+    let sessionId = decodeURIComponent(urlParams.get('sessionId'));
+    sessionId = (sessionId === 'null' || sessionId === null) ? null : parseInt(sessionId);
+    let sessionName = decodeURIComponent(urlParams.get('sessionName'));
+    sessionName = (sessionName === 'undefined' || sessionName === 'null' || sessionName === null) ? null : sessionName;
+    let localId = decodeURIComponent(urlParams.get('localId'));
+    localId = (localId === 'undefined' || localId === 'null' || localId === null) ? null : localId;
+
+    const chatContainer = document.getElementById('chat-container');
+    const messageText = document.getElementById('message-text');
+    const sendButton = document.getElementById('send-button');
+    //const imageButton = document.getElementById('image-button');
+
+    if (remoteId !== 'null' && remoteId !== null) {
+      controller.getContactName(remoteId);
+      controller.getSessionId(remoteId);
+    }
+    getMessages(20, "");
+
+    window.addEventListener('popstate', function(event) {
+        console.log("back button pressed");
+        closeChat();
+    });
+
+    function formatTime(timestamp) {
+      const date = new Date(parseInt(timestamp));
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatDate(timestamp) {
+      const date = new Date(parseInt(timestamp));
+      return date.toLocaleDateString();
+    }
+
+    let lastDisplayedDate = null;
+    let lastAuthor = null;
+    let hasMoreMessages = true;
+    
+    // Reply functionality variables
+    let currentReplyMessage = null;
+    const replyBar = document.getElementById('reply-bar');
+    const replyAuthor = document.getElementById('reply-author');
+    const replyPreview = document.getElementById('reply-preview');
+    const replyCloseBtn = document.getElementById('reply-close-btn');
+    
+    // Edit functionality variables
+    let currentEditMessage = null;
+    const editBar = document.getElementById('edit-bar');
+    const editPreview = document.getElementById('edit-preview');
+    const editCloseBtn = document.getElementById('edit-close-btn');
+
+    // Context menu variables
+    let longPressTimer = null;
+    let isLongPress = false;
+    let currentContextMenu = null;
+    let currentBlurWrapper = null;
+    let originalMessage = null;
+    let messageClone = null;
+    let longPressThreshold = 500; // 500ms for long press
+
+    // Long press detection functions
+    function startLongPress(e, messageElement) {
+      isLongPress = false;
+      messageElement.classList.add('long-pressing');
+      
+      longPressTimer = setTimeout(() => {
+        isLongPress = true;
+        showContextMenu(e, messageElement);
+      }, longPressThreshold);
+    }
+
+    function endLongPress(messageElement) {
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
+      messageElement.classList.remove('long-pressing');
+    }
+
+    function showContextMenu(e, messageElement) {
+      // Remove any existing context menu
+      hideContextMenu();
+
+      // Create blur wrapper with overlay inside
+      currentBlurWrapper = document.createElement('div');
+      currentBlurWrapper.classList.add('context-menu-blur-wrapper');
+      
+      const overlay = document.createElement('div');
+      overlay.classList.add('context-menu-overlay');
+      currentBlurWrapper.appendChild(overlay);
+      
+      document.body.appendChild(currentBlurWrapper);
+
+      // Hide original message behind blur and create clone above it
+      originalMessage = messageElement;
+      messageElement.classList.add('hidden-behind-blur');
+      
+      // Create a clone of the message
+      messageClone = messageElement.cloneNode(true);
+      messageClone.classList.remove('hidden-behind-blur');
+      messageClone.classList.add('message-clone');
+      
+      // Copy classes from original for styling
+      if (messageElement.classList.contains('sent')) {
+        messageClone.classList.add('sent');
+      }
+      if (messageElement.classList.contains('received')) {
+        messageClone.classList.add('received');
+      }
+      
+      // Position the clone exactly where the original message is
+      const originalRect = messageElement.getBoundingClientRect();
+      
+      // Position clone exactly over original using visual bounds
+      messageClone.style.top = originalRect.top + 'px';
+      messageClone.style.left = originalRect.left + 'px';
+      messageClone.style.width = originalRect.width + 'px';
+      messageClone.style.height = originalRect.height + 'px';
+      
+      // Only override what's absolutely necessary for positioning
+      messageClone.style.margin = '0';
+      messageClone.style.position = 'fixed';
+      messageClone.style.zIndex = '2000';
+      
+      document.body.appendChild(messageClone);
+
+      // Create context menu
+      currentContextMenu = document.createElement('div');
+      currentContextMenu.className = 'context-menu';
+      
+      // Get message content for copying
+      const messageContent = getMessageTextContent(messageElement);
+      
+      // Create menu items based on message type and ownership
+      const isSentMessage = messageElement.classList.contains('sent');
+      const isTextMessage = messageElement.dataset.messageType === 'text';
+      
+      const menuItems = [
+        {
+          icon: 'content_copy',
+          text: 'Copy',
+          action: () => copyMessageContent(messageContent)
+        },
+        {
+          icon: 'reply',
+          text: 'Reply',
+          action: () => replyToMessage(messageElement)
+        }
+      ];
+      
+      // Only show Edit for text messages sent by the current user
+      if (isSentMessage && isTextMessage) {
+        menuItems.push({
+          icon: 'edit',
+          text: 'Edit',
+          action: () => editMessage(messageElement)
+        });
+      }
+      
+      menuItems.push(
+        {
+          icon: 'forward',
+          text: 'Forward',
+          action: () => forwardMessage(messageElement)
+        },
+        {
+          icon: 'delete',
+          text: 'Delete',
+          action: () => deleteMessage(messageElement)
+        }
+      );
+
+      menuItems.forEach(item => {
+        const menuItem = document.createElement('button');
+        menuItem.className = 'context-menu-item';
+        menuItem.innerHTML = `
+          <span class="material-icons">${item.icon}</span>
+          <span>${item.text}</span>
+        `;
+        menuItem.addEventListener('click', () => {
+          item.action();
+          hideContextMenu();
+        });
+        currentContextMenu.appendChild(menuItem);
+      });
+
+      // Add menu to DOM
+      document.body.appendChild(currentContextMenu);
+
+      // Force reflow to ensure menu is rendered and has proper dimensions
+      void currentContextMenu.offsetHeight;
+
+      // Position the menu relative to the cloned message
+      positionContextMenuUnderMessage(currentContextMenu, messageClone);
+
+      // Show all elements simultaneously with animation
+      setTimeout(() => {
+        if (currentBlurWrapper) {
+          currentBlurWrapper.classList.add('active');
+        }
+        if (messageClone) {
+          messageClone.classList.add('active');
+        }
+        if (currentContextMenu) {
+          currentContextMenu.classList.add('active');
+        }
+        
+        // Manually animate the blur effect for smooth animation
+        animateBlurEffect();
+      }, 10);
+
+    // Function to manually animate blur effect
+    function animateBlurEffect() {
+      if (!currentBlurWrapper) return;
+      
+      const overlay = currentBlurWrapper.querySelector('.context-menu-overlay');
+      if (!overlay) return;
+      
+      const duration = 200; // 200ms animation
+      const startTime = performance.now();
+      const startBlur = 0;
+      const endBlur = 4;
+      
+      function animate(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Ease-out function
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        
+        const currentBlur = startBlur + (endBlur - startBlur) * easeOut;
+        
+        overlay.style.backdropFilter = `blur(${currentBlur}px)`;
+        overlay.style.webkitBackdropFilter = `blur(${currentBlur}px)`;
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      }
+      
+      requestAnimationFrame(animate);
+    }
+
+      // Add click listener to blur wrapper to hide menu when clicking outside
+      setTimeout(() => {
+        if (currentBlurWrapper) {
+          currentBlurWrapper.addEventListener('click', hideContextMenu);
+        }
+      }, 100);
+    }
+
+    function positionContextMenuUnderMessage(menu, messageElement) {
+      // Get message position and dimensions
+      const messageRect = messageElement.getBoundingClientRect();
+      const menuRect = menu.getBoundingClientRect();
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      
+      const spacing = 8; // Gap between message and menu
+      
+      // Position under the message by default
+      let left = messageRect.left;
+      let top = messageRect.bottom + spacing;
+      
+      // Adjust horizontally if menu would go off screen
+      if (left + menuRect.width > windowWidth) {
+        left = windowWidth - menuRect.width - 10;
+      }
+      if (left < 10) {
+        left = 10;
+      }
+      
+      // Adjust vertically if menu would go off screen
+      if (top + menuRect.height > windowHeight) {
+        // Position above the message instead - ensure menu bottom is above message top
+        // Use larger spacing when above to ensure clear separation
+        const aboveSpacing = Math.max(spacing, 12);
+        top = messageRect.top - menuRect.height - aboveSpacing;
+        
+        // If still off screen at the top, position with minimum top margin
+        if (top < 10) {
+          top = 10;
+        }
+      }
+      
+      menu.style.left = left + 'px';
+      menu.style.top = top + 'px';
+    }
+
+    function hideContextMenu() {
+      if (currentContextMenu) {
+        currentContextMenu.classList.remove('active');
+        setTimeout(() => {
+          if (currentContextMenu && currentContextMenu.parentNode) {
+            currentContextMenu.parentNode.removeChild(currentContextMenu);
+          }
+          currentContextMenu = null;
+        }, 200);
+      }
+      
+      if (currentBlurWrapper) {
+        currentBlurWrapper.classList.remove('active');
+        setTimeout(() => {
+          if (currentBlurWrapper && currentBlurWrapper.parentNode) {
+            currentBlurWrapper.parentNode.removeChild(currentBlurWrapper);
+          }
+          currentBlurWrapper = null;
+        }, 200);
+      }
+      
+      if (originalMessage) {
+        originalMessage.classList.remove('hidden-behind-blur');
+        originalMessage = null;
+      }
+      
+      if (messageClone) {
+        messageClone.classList.remove('active');
+        setTimeout(() => {
+          if (messageClone && messageClone.parentNode) {
+            messageClone.parentNode.removeChild(messageClone);
+          }
+          messageClone = null;
+        }, 200);
+      }
+      
+      // Remove any lingering event listeners
+      document.removeEventListener('click', hideContextMenu);
+    }
+
+    function getMessageTextContent(messageElement) {
+      const contentElement = messageElement.querySelector('.message-content');
+      if (!contentElement) return '';
+      
+      // Handle different message types
+      const messageType = messageElement.dataset.messageType;
+      
+      if (messageType === 'text') {
+        // For reply messages, get text from .message-text element to avoid including reply reference
+        const messageTextElement = contentElement.querySelector('.message-text');
+        if (messageTextElement) {
+          const textContent = messageTextElement.textContent || '';
+          console.log("Extracted text from reply message:", textContent);
+          return textContent;
+        }
+        // For regular messages, use the full content
+        const textContent = contentElement.textContent || '';
+        console.log("Extracted text from regular message:", textContent);
+        return textContent;
+      } else if (messageType === 'image') {
+        const caption = messageElement.querySelector('.image-caption');
+        return caption ? caption.textContent : '📷 Photo';
+      } else if (messageType === 'video') {
+        const caption = messageElement.querySelector('.video-caption');
+        return caption ? caption.textContent : '🎥 Video';
+      } else if (messageType === 'pendingDownload') {
+        const fileName = messageElement.querySelector('.file-name');
+        const caption = messageElement.querySelector('.file-caption');
+        let text = fileName ? fileName.textContent : '📎 File';
+        if (caption && caption.textContent) {
+          text += ': ' + caption.textContent;
+        }
+        return text;
+      }
+      
+      return contentElement.textContent || '';
+    }
+
+    async function copyMessageContent(content) {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(content);
+        } else {
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = content;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-999999px';
+          textArea.style.top = '-999999px';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          
+          try {
+            document.execCommand('copy');
+          } catch (err) {
+            console.error('Failed to copy text: ', err);
+          }
+          
+          document.body.removeChild(textArea);
+        }
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+      }
+    }
+
+    function showCopyFeedback() {
+      // Function removed - no longer showing copy feedback
+    }
+
+    // Reply functionality implementation
+    function replyToMessage(messageElement) {
+      console.log('Reply to message:', messageElement.dataset.messageId);
+      
+      // Store the message being replied to
+      currentReplyMessage = {
+        messageId: messageElement.dataset.messageId,
+        author: getMessageAuthor(messageElement),
+        content: getMessageTextContent(messageElement),
+        messageType: messageElement.dataset.messageType
+      };
+      
+      // Show the reply bar
+      showReplyBar();
+      
+      // Focus on the input field
+      messageText.focus();
+    }
+    
+    function getMessageAuthor(messageElement) {
+      const authorElement = messageElement.querySelector('.message-author');
+      if (authorElement) {
+        return authorElement.textContent;
+      }
+      
+      // If no author element, determine based on message class
+      if (messageElement.classList.contains('sent')) {
+        return 'You';
+      } else {
+        // Try to get from contact name or use localId/remoteId
+        return sessionName || remoteId || 'Unknown';
+      }
+    }
+    
+    function showReplyBar() {
+      if (!currentReplyMessage) return;
+      
+      // Hide edit bar if it's open
+      if (currentEditMessage) {
+        hideEditBar();
+      }
+      
+      // Set the author name
+      replyAuthor.textContent = currentReplyMessage.author;
+      
+      // Set the preview content based on message type
+      let previewText = '';
+      switch (currentReplyMessage.messageType) {
+        case 'image':
+          previewText = '📷 Photo';
+          break;
+        case 'video':
+          previewText = '🎥 Video';
+          break;
+        case 'pendingDownload':
+          previewText = '📎 File';
+          break;
+        default:
+          previewText = currentReplyMessage.content;
+          break;
+      }
+      
+      replyPreview.textContent = previewText;
+      
+      // Show the reply bar
+      replyBar.classList.add('active');
+      
+      // Adjust chat container bottom position
+      chatContainer.style.bottom = '120px'; // 60px input + 60px reply bar
+    }
+    
+    function hideReplyBar() {
+      currentReplyMessage = null;
+      replyBar.classList.remove('active');
+      
+      // Reset chat container bottom position if edit bar is not active
+      if (!currentEditMessage) {
+        chatContainer.style.bottom = '60px'; // Just input bar height
+      }
+    }
+    
+    function showEditBar() {
+      if (!currentEditMessage) return;
+      
+      // Set the preview content
+      editPreview.textContent = currentEditMessage.content;
+      
+      // Show the edit bar
+      editBar.classList.add('active');
+      
+      // Adjust chat container bottom position
+      chatContainer.style.bottom = '120px'; // 60px input + 60px edit bar
+    }
+    
+    function hideEditBar() {
+      currentEditMessage = null;
+      editBar.classList.remove('active');
+      
+      // Clear the input field
+      messageText.value = '';
+      
+      // Reset chat container bottom position if reply bar is not active
+      if (!currentReplyMessage) {
+        chatContainer.style.bottom = '60px'; // Just input bar height
+      }
+    }
+    
+    function scrollToMessage(messageId) {
+      const targetMessage = document.querySelector(`[data-message-id="${messageId}"]`);
+      if (targetMessage) {
+        // Highlight the message briefly
+        targetMessage.classList.add('highlighted');
+        
+        // Scroll to the message
+        targetMessage.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+        
+        // Remove highlight after animation
+        setTimeout(() => {
+          targetMessage.classList.remove('highlighted');
+        }, 2000);
+      } else {
+        console.log('Original message not found in current view');
+        // Could potentially load older messages here if needed
+      }
+    }
+
+    function forwardMessage(messageElement) {
+      console.log('Forward message:', messageElement.dataset.messageId);
+      
+      // Get message content for forwarding
+      const messageContent = getMessageTextContent(messageElement);
+      const messageType = messageElement.dataset.messageType;
+      const messageId = messageElement.dataset.messageId;
+      
+      // For now, we'll implement a simple forward by opening contact picker
+      // In a real app, this would open a contact/session selection interface
+      controller.forwardMessage(messageId, messageContent, messageType);
+    }
+
+    function editMessage(messageElement) {
+      console.log('Edit message:', messageElement.dataset.messageId);
+      
+      // Hide reply bar if it's open
+      hideReplyBar();
+      
+      // Store the message being edited
+      currentEditMessage = {
+        messageId: messageElement.dataset.messageId,
+        content: getMessageTextContent(messageElement),
+        element: messageElement
+      };
+      
+      // Show the edit bar
+      showEditBar();
+      
+      // Pre-fill the input with the current message content
+      messageText.value = currentEditMessage.content;
+      
+      // Focus on the input field
+      messageText.focus();
+    }
+
+    function deleteMessage(messageElement) {
+      console.log('Delete message:', messageElement.dataset.messageId);
+      controller.deleteMessage(messageElement.dataset.messageId);
+    }
+
+    function addLongPressListeners(messageElement) {
+      // Skip system messages and deleted messages
+      if (messageElement.classList.contains('system-message') || messageElement.classList.contains('deleted')) {
+        return;
+      }
+
+      let touchStartTime = 0;
+      let mouseStartTime = 0;
+
+      // Touch events for mobile
+      messageElement.addEventListener('touchstart', (e) => {
+        touchStartTime = Date.now();
+        isLongPress = false;
+        startLongPress(e, messageElement);
+      }, { passive: false });
+
+      messageElement.addEventListener('touchend', (e) => {
+        const touchDuration = Date.now() - touchStartTime;
+        endLongPress(messageElement);
+        
+        // Only prevent default if it was actually a long press
+        if (isLongPress || touchDuration >= longPressThreshold) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, { passive: false });
+
+      messageElement.addEventListener('touchmove', (e) => {
+        // Cancel long press if user moves finger
+        endLongPress(messageElement);
+      }, { passive: true });
+
+      messageElement.addEventListener('touchcancel', (e) => {
+        // Cancel long press if touch is cancelled
+        endLongPress(messageElement);
+      }, { passive: true });
+
+      // Mouse events for desktop
+      messageElement.addEventListener('mousedown', (e) => {
+        // Handle right mouse button for immediate context menu on desktop
+        if (e.button === 2) {
+          e.preventDefault();
+          showContextMenu(e, messageElement);
+          return;
+        }
+        
+        // Handle left mouse button with long press detection
+        if (e.button === 0) {
+          mouseStartTime = Date.now();
+          isLongPress = false;
+          startLongPress(e, messageElement);
+        }
+      });
+
+      messageElement.addEventListener('mouseup', (e) => {
+        if (e.button === 0) {
+          const mouseDuration = Date.now() - mouseStartTime;
+          endLongPress(messageElement);
+          
+          // Only prevent click if it was actually a long press
+          if (isLongPress || mouseDuration >= longPressThreshold) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }
+      });
+
+      messageElement.addEventListener('mouseleave', () => {
+        endLongPress(messageElement);
+      });
+
+      // Prevent browser's context menu on right click
+      messageElement.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+      });
+    }
+
+    function addMessage(content, author, time, type = 'text', status = null, messageId = null, animate = false, contact = null, caption = null, replyTo = null, isEdited = false) {
+      const currentDate = formatDate(time);
+      
+      
+      // If updating an existing message, handle as before
+      if (messageId !== null) {
+        const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (existingMsg) {
+          const nextElement = existingMsg.nextElementSibling;
+          existingMsg.remove();
+          const updatedMessage = createMessageElement(content, author, time, type, status, messageId, false, contact, caption, replyTo, isEdited);
+          
+          if (nextElement) {
+            chatContainer.insertBefore(updatedMessage, nextElement);
+          } else {
+            chatContainer.appendChild(updatedMessage);
+          }
+          return;
+        }
+      }
+
+      // Create system message element if it's a system message
+      let messageElement;
+      if (author === 'SYSTEM') {
+        messageElement = document.createElement('div');
+        messageElement.classList.add('system-message');
+        messageElement.dataset.time = time;
+        if (messageId !== null) {
+          messageElement.dataset.messageId = messageId;
+        }
+        
+        const contentWrapper = document.createElement('div');
+        contentWrapper.classList.add('system-message-content');
+        contentWrapper.textContent = content;
+        messageElement.appendChild(contentWrapper);
+        
+        const systemMessageTime = document.createElement('div');
+        systemMessageTime.classList.add('system-message-time');
+        systemMessageTime.textContent = formatTime(time);
+        messageElement.appendChild(systemMessageTime);
+      } else {
+        // Only animate if it's a truly new message (recent timestamp and animate flag is true)
+        const isRecentMessage = time > Date.now() - 5000; // Within 5 seconds
+        messageElement = createMessageElement(content, author, time, type, status, messageId, animate && isRecentMessage, contact, caption, replyTo, isEdited);
+      }
+
+      // For older messages (scrolling up) or chronological insertion
+      if (time < Date.now() - 5000) { // Changed from 1000ms to 5000ms to be more conservative
+        // Find the appropriate position for the message
+        let insertPosition = null;
+        const messages = Array.from(chatContainer.children);
+        
+        for (const msg of messages) {
+          const msgTime = parseInt(msg.dataset.time || msg.dataset.messageId);
+          if (msgTime > time) {
+            insertPosition = msg;
+            break;
+          }
+        }
+
+        // Add date separator if needed
+        if (currentDate !== lastDisplayedDate || !lastDisplayedDate) {
+          const dateElement = document.createElement('div');
+          dateElement.classList.add('date-separator');
+          const dateSpan = document.createElement('span');
+          dateSpan.textContent = currentDate;
+          dateElement.appendChild(dateSpan);
+          
+          if (insertPosition) {
+            chatContainer.insertBefore(dateElement, insertPosition);
+          } else {
+            chatContainer.appendChild(dateElement);
+          }
+        }
+        
+        // Insert message at the correct position
+        if (insertPosition) {
+          chatContainer.insertBefore(messageElement, insertPosition);
+        } else {
+          chatContainer.appendChild(messageElement);
+        }
+        
+        lastDisplayedDate = currentDate;
+      } else {
+        // For new messages (including new system messages)
+        if (currentDate !== lastDisplayedDate) {
+          const dateElement = document.createElement('div');
+          dateElement.classList.add('date-separator');
+          const dateSpan = document.createElement('span');
+          dateSpan.textContent = currentDate;
+          dateElement.appendChild(dateSpan);
+          chatContainer.appendChild(dateElement);
+          lastDisplayedDate = currentDate;
+        }
+        chatContainer.appendChild(messageElement);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+      
+      if (author !== 'SYSTEM') {
+        lastAuthor = author;
+      }
+    }
+
+    function sendMessage(message) {
+      if (sessionId !== null && !isNaN(sessionId)) {
+        controller.sendMessage(sessionId, message, true);
+      }
+      else if (remoteId !== 'null' && remoteId !== null) {
+        controller.sendMessage(remoteId, message, false);
+      }
+    }
+    
+    function sendReplyMessage(message, replyToMessageId) {
+      if (sessionId !== null && !isNaN(sessionId)) {
+        controller.sendReplyMessage(sessionId, message, replyToMessageId, true);
+      }
+      else if (remoteId !== 'null' && remoteId !== null) {
+        controller.sendReplyMessage(remoteId, message, replyToMessageId, false);
+      }
+    }
+    
+    function sendEditMessage(message, messageId) {
+      controller.sendEditMessage(messageId, message);
+    }
+
+    // Helper function to create message elements
+    function createMessageElement(content, author, time, type, status, messageId, animate, contact, caption, replyTo = null, isEdited = false) {
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message', author !== localId && author !== 'SYSTEM' ? 'received' : 'sent');
+      if (animate) {
+        messageElement.classList.add('animate');
+        // Remove animate class after animation completes to prevent retriggering
+        messageElement.addEventListener('animationend', () => {
+          messageElement.classList.remove('animate');
+        }, { once: true });
+      }
+      
+      // Check if this is a deleted message (status 8)
+      const isDeleted = status === 8;
+      if (isDeleted) {
+        messageElement.classList.add('deleted');
+      }
+      
+      // Check if this is a reply message
+      if (replyTo) {
+        messageElement.classList.add('reply');
+      }
+      
+      if (messageId !== null) {
+        messageElement.dataset.messageId = messageId;
+        messageElement.dataset.time = time;
+      }
+      
+      // Store the message type as a data attribute
+      messageElement.dataset.messageType = type;
+
+      // Show contact name for messages FROM the other person (where author is NOT localId)
+      // Don't show for system messages or consecutive messages from same author
+      if (author !== localId && author !== 'SYSTEM' && author !== lastAuthor) {
+        const authorElement = document.createElement('div');
+        authorElement.classList.add('message-author');
+        authorElement.textContent = contact || author;
+        messageElement.appendChild(authorElement);
+      }
+
+      const contentElement = document.createElement('div');
+      contentElement.classList.add('message-content');
+      
+      // Add reply reference if this is a reply message
+      if (replyTo && !isDeleted) {
+        console.log("Creating reply reference - Author:", replyTo.author, "Content:", replyTo.content);
+        const replyReference = document.createElement('div');
+        replyReference.classList.add('reply-reference');
+        
+        const replyAuthor = document.createElement('div');
+        replyAuthor.classList.add('reply-reference-author');
+        replyAuthor.textContent = replyTo.author || 'Unknown';
+        replyReference.appendChild(replyAuthor);
+        
+        const replyContent = document.createElement('div');
+        replyContent.classList.add('reply-reference-content');
+        
+        // Set preview text based on original message type
+        let previewText = '';
+        switch (replyTo.messageType) {
+          case 'image':
+            previewText = '📷 Photo';
+            break;
+          case 'video':
+            previewText = '🎥 Video';
+            break;
+          case 'pendingDownload':
+            previewText = '📎 File';
+            break;
+          default:
+            previewText = replyTo.content || '';
+            break;
+        }
+        
+        replyContent.textContent = previewText;
+        replyReference.appendChild(replyContent);
+        
+        // Add click handler to scroll to original message
+        replyReference.addEventListener('click', (e) => {
+          e.stopPropagation();
+          scrollToMessage(replyTo.messageId);
+        });
+        
+        contentElement.appendChild(replyReference);
+      }
+      
+      // If the message is deleted, show deletion text instead of content
+      if (isDeleted) {
+        contentElement.textContent = 'This message has been deleted';
+      } else if (type === 'text') {
+        // For text messages, create a separate div for the actual text content
+        // so it doesn't overwrite the reply reference
+        const textContent = document.createElement('div');
+        textContent.classList.add('message-text');
+        textContent.textContent = content;
+        contentElement.appendChild(textContent);
+      } else if (type === 'image') {
+        // Create a container for the image and caption
+        const imageContainer = document.createElement('div');
+        imageContainer.classList.add('image-container');
+        
+        // Add the image
+        const img = document.createElement('img');
+        img.src = content;
+        img.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openFullscreenViewer(content);
+        });
+        imageContainer.appendChild(img);
+        
+        // Add the image to the content element
+        contentElement.appendChild(imageContainer);
+        
+        // If there's caption text, display it below the image
+        // if (caption) {
+          const captionElement = document.createElement('div');
+          captionElement.classList.add('image-caption');
+          captionElement.textContent = caption;
+          contentElement.appendChild(captionElement);
+        // }
+      } else if (type === 'video') {
+        // Create a container for the video and caption
+        const videoContainer = document.createElement('div');
+        videoContainer.classList.add('video-container');
+        
+        // Add the video element
+        const videoElement = document.createElement('video');
+        videoElement.src = content;
+        videoElement.controls = true;
+        videoElement.preload = "metadata";
+        videoElement.classList.add('message-video');
+        
+        // Add ability to go fullscreen on click
+        videoElement.addEventListener('click', (e) => {
+          if (e.target === videoElement) {
+            if (videoElement.requestFullscreen) {
+              videoElement.requestFullscreen();
+            } else if (videoElement.webkitRequestFullscreen) {
+              videoElement.webkitRequestFullscreen();
+            } else if (videoElement.msRequestFullscreen) {
+              videoElement.msRequestFullscreen();
+            }
+          }
+        });
+        
+        videoContainer.appendChild(videoElement);
+        contentElement.appendChild(videoContainer);
+        
+        // If there's caption text, display it below the video
+        if (caption) {
+          const captionElement = document.createElement('div');
+          captionElement.classList.add('video-caption');
+          captionElement.textContent = caption;
+          contentElement.appendChild(captionElement);
+        }
+      } else if (type === 'pendingDownload') {
+        // Create file download UI using content as fileIdObj
+        const fileContainer = document.createElement('div');
+        fileContainer.classList.add('file-container');
+        
+        const fileIcon = document.createElement('span');
+        fileIcon.classList.add('material-icons');
+        fileIcon.textContent = 'insert_drive_file';
+        fileContainer.appendChild(fileIcon);
+        
+        const fileInfo = document.createElement('div');
+        fileInfo.classList.add('file-info');
+        
+        const fileName = document.createElement('div');
+        fileName.classList.add('file-name');
+        fileName.textContent = content.name || 'Unknown file';
+        fileInfo.appendChild(fileName);
+        
+        const fileSize = document.createElement('div');
+        fileSize.classList.add('file-size');
+        fileSize.textContent = formatFileSize(content.size || 0);
+        fileInfo.appendChild(fileSize);
+        
+        fileContainer.appendChild(fileInfo);
+        
+        const downloadButton = document.createElement('button');
+        downloadButton.classList.add('download-button');
+        downloadButton.innerHTML = '<span class="material-icons">download</span>';
+        downloadButton.addEventListener('click', () => {
+          window.parent.postMessage({ 
+            action: 'download-file', 
+            body: { messageId: messageId, fileId: content.fileId} 
+          }, '*');
+        });
+        
+        fileContainer.appendChild(downloadButton);
+        contentElement.appendChild(fileContainer);
+        
+        // If there's a caption associated with the file, display it
+        if (caption) {
+          const captionElement = document.createElement('div');
+          captionElement.classList.add('file-caption');
+          captionElement.textContent = caption;
+          contentElement.appendChild(captionElement);
+        }
+      }
+      
+      messageElement.appendChild(contentElement);
+
+      const footerElement = document.createElement('div');
+      footerElement.classList.add('message-footer');
+
+      // Add edited indicator if the message was edited (before time)
+      if (isEdited) {
+        const editedElement = document.createElement('span');
+        editedElement.classList.add('message-edited');
+        editedElement.textContent = 'edited';
+        footerElement.appendChild(editedElement);
+      }
+
+      const timeElement = document.createElement('div');
+      timeElement.classList.add('message-time');
+      timeElement.textContent = formatTime(time);
+      footerElement.appendChild(timeElement);
+
+      // Don't show status icons for deleted messages, and handle status 8 case
+      if (messageElement.classList.contains('sent') && status !== null && status !== 8) {
+        const statusIcon = document.createElement('span');
+        statusIcon.classList.add('material-icons', 'message-status-icon');
+        switch (status) {
+          case 0: statusIcon.textContent = 'schedule'; break;
+          case 1: statusIcon.textContent = 'done'; break;
+          case 2: statusIcon.textContent = 'error'; break;
+          case 4: statusIcon.textContent = 'done_all'; break;
+          default: statusIcon.textContent = ''; break;
+        }
+        footerElement.appendChild(statusIcon);
+      }
+
+      messageElement.appendChild(footerElement);
+      
+      // Add long press listeners to the message
+      addLongPressListeners(messageElement);
+      
+      return messageElement;
+    }
+
+    // Helper function to format file size
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Set the chat title
+    console.log("sessionName:", sessionName);
+    console.log("remoteId:", remoteId);
+    if (sessionName && sessionName !== 'null' && sessionName !== null) {
+      document.getElementById("title").textContent = sessionName;
+    }
+    else {
+      sessionName = remoteId;
+      document.getElementById("title").textContent = remoteId;
+    }
+
+    // Call button logic
+    document.getElementById("call-button").addEventListener("click", () => {
+      hideContextMenu(); // Hide context menu when calling
+      window.parent.postMessage({ 
+        action: 'call', 
+        body: { 
+          sessionId: sessionId,
+          sessionName: sessionName  // Use global contact
+        }
+      }, '*');
+    });
+
+    function closeChat() {
+        window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
+    }
+    // Test messages for reply functionality (uncomment to test)
+    // addMessage("Encryption key received", "SYSTEM", Date.now(), "text", null, null, false);
+    // addMessage("Hey girlll", "testing", Date.now(), "text", null, null, false, null, null);
+    // addMessage("Wassup", "dukedennis.eth", Date.now(), "text", null, null, false, null, null);
+    // addMessage("This is a reply!", localId, Date.now(), "text", null, null, false, null, null, {author: "testing", content: "Hey girlll", messageType: "text"});
+    
+    // Example of how a reply message from the new data structure would be processed:
+    // const exampleReplyMessage = ["7382395475652879604", 1760100239670, "dude1", "Hey", 1, null, 0, null, [7382395403749487040, "dude2", "Hi"], null, null];
+    // This would create a message with reply information showing "dude2: Hi" as the replied-to message
+
+    document.getElementById("back-button").addEventListener("click", () => {
+        hideContextMenu(); // Hide context menu when going back
+        window.parent.postMessage({ action: 'closeChat', body: { sessionId: sessionId } }, '*');
+    });
+
+    sendButton.addEventListener('click', () => {
+      hideContextMenu(); // Hide context menu when sending
+      const message = messageText.value.trim();
+      if (message) {
+        console.log("Sending message:", message);
+        
+        // Check if this is an edit
+        if (currentEditMessage) {
+          sendEditMessage(message, currentEditMessage.messageId);
+          hideEditBar();
+        }
+        // Check if this is a reply
+        else if (currentReplyMessage) {
+          sendReplyMessage(message, currentReplyMessage.messageId);
+          hideReplyBar();
+        } 
+        // Regular message
+        else {
+          sendMessage(message);
+        }
+        
+        messageText.value = '';
+      }
+    });
+    
+    // Reply close button event listener
+    replyCloseBtn.addEventListener('click', () => {
+      hideReplyBar();
+    });
+    
+    // Edit close button event listener
+    editCloseBtn.addEventListener('click', () => {
+      hideEditBar();
+    });
+
+    // Add image button event listener
+    
+
+    messageText.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendButton.click();
+      }
+    });
+
+    /*
+    imageButton.addEventListener('click', () => {
+      console.log("Choosing image");
+      controller.imagePicker();
+    });
+    */
+
+    // Hide context menu when typing
+    messageText.addEventListener('focus', hideContextMenu);
+    messageText.addEventListener('input', hideContextMenu);
+    
+    // Hide reply/edit bar when pressing Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (currentEditMessage) {
+          hideEditBar();
+        } else if (currentReplyMessage) {
+          hideReplyBar();
+        }
+      }
+    });
+
+
+    // Add scroll event listener for infinite scrolling
+    chatContainer.addEventListener('scroll', () => {
+      // Hide context menu when scrolling
+      hideContextMenu();
+      
+      if (chatContainer.scrollTop === 0 && hasMoreMessages) {
+        const messages = document.querySelectorAll('[data-message-id]');
+        if (messages.length > 0) {
+          const oldestMessage = messages[0];
+          const oldestMessageId = oldestMessage.dataset.messageId;
+          if (oldestMessageId) {
+            console.log("Fetching older messages with ID:", oldestMessageId);
+            getMessages(20, oldestMessageId);
+          }
+        }
+      }
+    });
+
+    function getMessages(range, startMessage) {
+      if (sessionId !== null) {
+        controller.getMessages(sessionId, range, startMessage, true);
+      }
+      else if (remoteId !== null) {
+        controller.getMessages(remoteId, range, startMessage, false);
+      }
+    }
+
+    function updateMessage(messageId, content, status, caption, replyTo = null, isEdited = false) {
+        const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (existingMsg) {
+            // Check if this is a deleted message update (status 8)
+            const isDeleted = status === 8;
+            const wasDeleted = existingMsg.classList.contains('deleted');
+            
+            if (isDeleted && !wasDeleted) {
+                // Message is being deleted
+                existingMsg.classList.add('deleted');
+                const contentElement = existingMsg.querySelector('.message-content');
+                if (contentElement) {
+                    contentElement.textContent = 'This message has been deleted';
+                }
+                // Remove status icon for deleted messages
+                const statusIcon = existingMsg.querySelector('.message-status-icon');
+                if (statusIcon) {
+                    statusIcon.remove();
+                }
+            } else if (!isDeleted && wasDeleted) {
+                // Message is being restored from deleted state
+                existingMsg.classList.remove('deleted');
+                // Restore the original content - this would need the original content passed in
+                // For now, we'll use the content parameter
+                const contentElement = existingMsg.querySelector('.message-content');
+                if (contentElement && existingMsg.dataset.messageType === 'text') {
+                    contentElement.textContent = content;
+                }
+            } else if (!isDeleted) {
+                // Regular message update (not deleted)
+                if (existingMsg.classList.contains('system-message')) {
+                    // Update system message content
+                    const contentWrapper = existingMsg.querySelector('.system-message-content');
+                    if (contentWrapper) {
+                        contentWrapper.textContent = content;
+                    }
+                } else {
+                    // Update regular message content
+                    const contentElement = existingMsg.querySelector('.message-content');
+                    if (contentElement) {
+                        // Check if this is a file or image message
+                        if (existingMsg.dataset.messageType === 'pendingDownload') {
+                            // For pending downloads, update the file info if content is an object
+                            if (typeof content === 'object' && content !== null) {
+                                const fileName = existingMsg.querySelector('.file-name');
+                                if (fileName) {
+                                    fileName.textContent = content.name || 'Unknown file';
+                                }
+                                
+                                const fileSize = existingMsg.querySelector('.file-size');
+                                if (fileSize) {
+                                    fileSize.textContent = formatFileSize(content.size || 0);
+                                }
+                                
+                                // Update download button click handler
+                                const downloadButton = existingMsg.querySelector('.download-button');
+                                if (downloadButton) {
+                                    // Remove old event listeners
+                                    const newButton = downloadButton.cloneNode(true);
+                                    downloadButton.parentNode.replaceChild(newButton, downloadButton);
+                                    
+                                    // Add new event listener
+                                    newButton.addEventListener('click', () => {
+                                        window.parent.postMessage({ 
+                                            action: 'download-file', 
+                                            body: { fileId: content.fileId} 
+                                        }, '*');
+                                    });
+                                }
+                            }
+                            
+                            // Update caption if provided
+                            if (caption) {
+                                let captionElement = existingMsg.querySelector('.file-caption');
+                                
+                                // If caption element doesn't exist but we have a caption, create it
+                                if (!captionElement) {
+                                    captionElement = document.createElement('div');
+                                    captionElement.classList.add('file-caption');
+                                    contentElement.appendChild(captionElement);
+                                }
+                                
+                                // Update the caption text
+                                captionElement.textContent = caption;
+                            }
+                        } else if (existingMsg.dataset.messageType === 'image' || existingMsg.dataset.messageType === 'video') {
+                            // For images and videos, update captions if they exist
+                            if (caption) {
+                                let captionElement = existingMsg.querySelector(
+                                    existingMsg.dataset.messageType === 'image' ? '.image-caption' : '.video-caption'
+                                );
+                                
+                                // If caption element doesn't exist but we have a caption, create it
+                                if (!captionElement) {
+                                    captionElement = document.createElement('div');
+                                    captionElement.classList.add(
+                                        existingMsg.dataset.messageType === 'image' ? 'image-caption' : 'video-caption'
+                                    );
+                                    contentElement.appendChild(captionElement);
+                                }
+                                
+                                // Update the caption text
+                                captionElement.textContent = caption;
+                            }
+                        } else {
+                            // For text messages, update the content
+                            contentElement.textContent = content;
+                        }
+                    }
+                }
+            }
+            
+            // Handle edited indicator
+            const footerElement = existingMsg.querySelector('.message-footer');
+            if (footerElement) {
+                let editedElement = existingMsg.querySelector('.message-edited');
+                
+                if (isEdited && !editedElement) {
+                    // Add edited indicator if it doesn't exist but should
+                    editedElement = document.createElement('span');
+                    editedElement.classList.add('message-edited');
+                    editedElement.textContent = 'edited';
+                    
+                    // Insert before the time element
+                    const timeElement = footerElement.querySelector('.message-time');
+                    if (timeElement) {
+                        footerElement.insertBefore(editedElement, timeElement);
+                    } else {
+                        footerElement.appendChild(editedElement);
+                    }
+                } else if (!isEdited && editedElement) {
+                    // Remove edited indicator if it exists but shouldn't
+                    editedElement.remove();
+                }
+            }
+            
+            // Update status icon for non-deleted sent messages
+            if (existingMsg.classList.contains('sent') && status !== null && status !== 8) {
+                let statusIcon = existingMsg.querySelector('.message-status-icon');
+                if (!statusIcon) {
+                    // Create status icon if it doesn't exist
+                    statusIcon = document.createElement('span');
+                    statusIcon.classList.add('material-icons', 'message-status-icon');
+                    const footerElement = existingMsg.querySelector('.message-footer');
+                    if (footerElement) {
+                        footerElement.appendChild(statusIcon);
+                    }
+                }
+                
+                if (statusIcon) {
+                    switch (status) {
+                        case 0: statusIcon.textContent = 'schedule'; break;
+                        case 1: statusIcon.textContent = 'done'; break;
+                        case 2: statusIcon.textContent = 'error'; break;
+                        case 4: statusIcon.textContent = 'done_all'; break;
+                        default: statusIcon.textContent = ''; break;
+                    }
+                }
+            }
+        }
+    }
+
+    channel.addEventListener('message', (event) => {
+      try {
+        console.log("Received channel message:", event.data);
+        const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        
+        if (data.contactName) {
+            const titleElement = document.getElementById('title');
+            titleElement.textContent = data.contactName;
+            window.sessionName = data.contactName;  // Update global contact
+        }
+
+        if (data.sessionId) {
+            sessionId = (data.sessionId === 'null' || data.sessionId === null) ? null : parseInt(data.sessionId);
+        }
+        
+        if (data.message) {
+          console.log("Received single message data:", data.message);
+          const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId, replyInfo, editInfo, forwardInfo] = data.message;
+          console.log("msgSessionId:", msgSessionId);
+          console.log("sessionId:", sessionId);
+          const isEdited = editInfo === 1;
+          if (msgSessionId === sessionId) {
+            let fileIdObj;
+            
+            // Check if fileId is already an object (not a string)
+            if (typeof fileId === 'object' && fileId !== null) {
+              fileIdObj = fileId;
+            } else {
+              try {
+                fileIdObj = fileId ? JSON.parse(fileId) : {};
+              } catch (e) {
+                console.error("Error parsing fileId JSON:", e);
+                fileIdObj = {};
+              }
+            }
+
+            // Process reply information
+            let replyToData = null;
+            if (replyInfo && Array.isArray(replyInfo) && replyInfo.length >= 3) {
+              const [replyToMessageId, replyAuthor, replyContent] = replyInfo;
+              replyToData = {
+                messageId: replyToMessageId,
+                author: replyAuthor,
+                content: replyContent,
+                messageType: 'text' // Default to text, could be enhanced to detect type
+              };
+              console.log("Processing reply data - Author:", replyToData.author, "Content:", replyToData.content);
+            }
+
+            // Check if this message already exists
+            const existingMessage = document.querySelector(`[data-message-id="${messageId}"]`);
+            const shouldAnimate = !existingMessage && (time > Date.now() - 2000); // Only animate truly new messages within 2 seconds
+
+            if (Object.keys(fileIdObj).length > 0) {
+              // This is a file message
+              if (fileIdObj.fileUrl) {
+                // Downloaded image/video ready to display
+                const fileUrl = fileIdObj.fileUrl;
+                const fileExtension = fileUrl.split('.').pop().toLowerCase();
+                const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+                const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
+                addMessage(fileUrl, author, time, messageType, msgStatus, messageId, shouldAnimate, contact, content, replyToData, isEdited);
+              } else {
+                // Pending download - display with file info
+                addMessage(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, shouldAnimate, contact, content, replyToData, isEdited);
+              }
+            } else {
+              // Normal text message
+              addMessage(content, author, time, "text", msgStatus, messageId, shouldAnimate, contact, null, replyToData, isEdited);
+            }
+            controller.updateSessionTimestamp(sessionId);
+          }
+        } else if (data.messages) {
+          console.log("Received multiple messages data:", data.messages);
+          
+          if (!data.messages || data.messages.length === 0) {
+            hasMoreMessages = false;
+            return;
+          }
+
+          const scrollHeightBefore = chatContainer.scrollHeight;
+          
+          // Sort messages by time in ASCENDING order (oldest first)
+          const sortedMessages = [...data.messages].sort((a, b) => a[1] - b[1]);
+          
+          // Reset lastAuthor before processing the batch of messages
+          lastAuthor = null;
+          
+          sortedMessages.forEach(msg => {
+            const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId, replyInfo, editInfo, forwardInfo] = msg;
+            const isEdited = editInfo === 1;
+            if (msgSessionId === sessionId) {
+              let fileIdObj;
+              
+              // Check if fileId is already an object (not a string)
+              if (typeof fileId === 'object' && fileId !== null) {
+                fileIdObj = fileId;
+              } else {
+                try {
+                  fileIdObj = fileId ? JSON.parse(fileId) : {};
+                } catch (e) {
+                  console.error("Error parsing fileId JSON:", e);
+                  fileIdObj = {};
+                }
+              }
+
+              // Process reply information for batch messages
+              let replyToData = null;
+              if (replyInfo && Array.isArray(replyInfo) && replyInfo.length >= 3) {
+                const [replyToMessageId, replyAuthor, replyContent] = replyInfo;
+                replyToData = {
+                  messageId: replyToMessageId,
+                  author: replyAuthor,
+                  content: replyContent,
+                  messageType: 'text' // Default to text, could be enhanced to detect type
+                };
+              }
+
+              if (Object.keys(fileIdObj).length > 0) {
+                // This is a file message
+                if (fileIdObj.fileUrl) {
+                  // Downloaded image/video ready to display
+                  const fileUrl = fileIdObj.fileUrl;
+                  const fileExtension = fileUrl.split('.').pop().toLowerCase();
+                  const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+                  const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
+                  addMessage(fileUrl, author, time, messageType, msgStatus, messageId, false, contact, content, replyToData, isEdited);
+                } else {
+                  // Pending download - display with file info
+                  addMessage(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content, replyToData, isEdited);
+                }
+              } else {
+                // Normal text message
+                addMessage(content, author, time, "text", msgStatus, messageId, false, contact, null, replyToData, isEdited);
+              }
+            }
+          });
+
+          // If these are older messages (loaded from scrolling up)
+          if (data.messages[0][1] < Date.now() - 1000) {
+            // Maintain scroll position
+            const scrollHeightDiff = chatContainer.scrollHeight - scrollHeightBefore;
+            chatContainer.scrollTop = scrollHeightDiff;
+          } else {
+            // For new messages, scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+          }
+          
+          controller.updateSessionTimestamp(sessionId);
+        } else if (data.updatedMessage) {
+          console.log("Received updatedMessage data:", data.updatedMessage);
+          const [messageId, time, author, content, msgSessionId, contact, msgStatus, fileId, replyInfo, editInfo, forwardInfo] = data.updatedMessage;
+          const isEdited = editInfo === 1;
+          if (msgSessionId === sessionId) {
+            let fileIdObj;
+            
+            // Check if fileId is already an object (not a string)
+            if (typeof fileId === 'object' && fileId !== null) {
+              fileIdObj = fileId;
+            } else {
+              try {
+                fileIdObj = fileId ? JSON.parse(fileId) : {};
+              } catch (e) {
+                console.error("Error parsing fileId JSON:", e);
+                fileIdObj = {};
+              }
+            }
+
+            // Process reply information for updated messages
+            let replyToData = null;
+            if (replyInfo && Array.isArray(replyInfo) && replyInfo.length >= 3) {
+              const [replyToMessageId, replyAuthor, replyContent] = replyInfo;
+              replyToData = {
+                messageId: replyToMessageId,
+                author: replyAuthor,
+                content: replyContent,
+                messageType: 'text' // Default to text, could be enhanced to detect type
+              };
+            }
+
+            // If there's a fileId object with data, we need special handling
+            if (Object.keys(fileIdObj).length > 0) {
+              // Find the existing message
+              const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
+              console.log("Found existing message:", existingMsg);
+              
+              // Whether existing message exists or not, we need to handle the fileId
+              if (!existingMsg || existingMsg.dataset.messageType === 'pendingDownload') {
+                // Need to replace with image message - either the message doesn't exist yet
+                // or it was a pending download that is now ready
+                const nextElement = existingMsg ? existingMsg.nextElementSibling : null;
+                if (existingMsg) existingMsg.remove();
+                
+                if (fileIdObj.fileUrl) {
+                  // Downloaded file ready to display
+                  const fileUrl = fileIdObj.fileUrl;
+                  const fileExtension = fileUrl.split('.').pop().toLowerCase();
+                  const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+                  const messageType = videoExtensions.includes(fileExtension) ? "video" : "image";
+                  
+                  const updatedMessage = createMessageElement(fileUrl, author, time, messageType, msgStatus, messageId, false, contact, content, replyToData, isEdited);
+                  if (nextElement) {
+                    chatContainer.insertBefore(updatedMessage, nextElement);
+                  } else {
+                    chatContainer.appendChild(updatedMessage);
+                  }
+                } else {
+                  // Still a pending download
+                  const updatedMessage = createMessageElement(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content, replyToData, isEdited);
+                  if (nextElement) {
+                    chatContainer.insertBefore(updatedMessage, nextElement);
+                  } else {
+                    chatContainer.appendChild(updatedMessage);
+                  }
+                }
+              } else {
+                // Handle existing message
+                if (fileIdObj.fileUrl) {
+                  const fileUrl = fileIdObj.fileUrl;
+                  const fileExtension = fileUrl.split('.').pop().toLowerCase();
+                  const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+                  const isVideo = videoExtensions.includes(fileExtension);
+                  
+                  if (isVideo) {
+                    // Handle video update
+                    if (existingMsg.dataset.messageType === 'video') {
+                      // Just update the video source if it's already a video element
+                      const videoElement = existingMsg.querySelector('.message-content video');
+                      if (videoElement) {
+                        videoElement.src = fileUrl + '?t=' + new Date().getTime();
+                        videoElement.load(); // Force the video to reload
+                        
+                        // Update status
+                        const statusIcon = existingMsg.querySelector('.message-status-icon');
+                        if (statusIcon && msgStatus !== null) {
+                          switch (msgStatus) {
+                            case 0: statusIcon.textContent = 'schedule'; break;
+                            case 1: statusIcon.textContent = 'done'; break;
+                            case 2: statusIcon.textContent = 'error'; break;
+                            case 4: statusIcon.textContent = 'done_all'; break;
+                            default: statusIcon.textContent = ''; break;
+                          }
+                        }
+                      } else {
+                        // Replace the entire message if video element not found
+                        const nextElement = existingMsg.nextElementSibling;
+                        existingMsg.remove();
+                        const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content, replyToData, isEdited);
+                        if (nextElement) {
+                          chatContainer.insertBefore(updatedMessage, nextElement);
+                        } else {
+                          chatContainer.appendChild(updatedMessage);
+                        }
+                      }
+                    } else {
+                      // If it's not already a video message, replace the entire message
+                      const nextElement = existingMsg.nextElementSibling;
+                      existingMsg.remove();
+                      const updatedMessage = createMessageElement(fileUrl, author, time, "video", msgStatus, messageId, false, contact, content, replyToData, isEdited);
+                      if (nextElement) {
+                        chatContainer.insertBefore(updatedMessage, nextElement);
+                      } else {
+                        chatContainer.appendChild(updatedMessage);
+                      }
+                    }
+                  } else {
+                    // Handle image update
+                    if (existingMsg.dataset.messageType === 'image') {
+                      const imageElement = existingMsg.querySelector('.message-content img');
+                      if (imageElement) {
+                        // Force a complete refresh of the image
+                        imageElement.src = fileUrl + '?t=' + new Date().getTime();
+                      } else {
+                        // Replace the entire message if image element not found
+                        const nextElement = existingMsg.nextElementSibling;
+                        existingMsg.remove();
+                        const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content, replyToData, isEdited);
+                        if (nextElement) {
+                          chatContainer.insertBefore(updatedMessage, nextElement);
+                        } else {
+                          chatContainer.appendChild(updatedMessage);
+                        }
+                      }
+                    } else {
+                      // If it's not already an image message, replace the entire message
+                      const nextElement = existingMsg.nextElementSibling;
+                      existingMsg.remove();
+                      const updatedMessage = createMessageElement(fileUrl, author, time, "image", msgStatus, messageId, false, contact, content, replyToData, isEdited);
+                      if (nextElement) {
+                        chatContainer.insertBefore(updatedMessage, nextElement);
+                      } else {
+                        chatContainer.appendChild(updatedMessage);
+                      }
+                    }
+                  }
+                } else {
+                  // Still a pending download - if there's reply data, recreate the message
+                  if (replyToData) {
+                    console.log("Recreating file message with reply data:", replyToData);
+                    const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
+                    if (existingMsg) {
+                      const nextElement = existingMsg.nextElementSibling;
+                      const author = existingMsg.classList.contains('sent') ? localId : (contact || 'Unknown');
+                      existingMsg.remove();
+                      const updatedMessage = createMessageElement(fileIdObj, author, time, "pendingDownload", msgStatus, messageId, false, contact, content, replyToData, isEdited);
+                      if (nextElement) {
+                        chatContainer.insertBefore(updatedMessage, nextElement);
+                      } else {
+                        chatContainer.appendChild(updatedMessage);
+                      }
+                    }
+                  } else {
+                    // Update the pending download info display
+                    updateMessage(messageId, fileIdObj, msgStatus, content, replyToData, isEdited);
+                  }
+                }
+              }
+            } else {
+              // Regular text message update
+              // If there's reply data, we need to recreate the message to show the reply reference
+              if (replyToData) {
+                console.log("Recreating text message with reply data:", replyToData);
+                const existingMsg = document.querySelector(`[data-message-id="${messageId}"]`);
+                if (existingMsg) {
+                  const nextElement = existingMsg.nextElementSibling;
+                  const author = existingMsg.classList.contains('sent') ? localId : (contact || 'Unknown');
+                  existingMsg.remove();
+                  const updatedMessage = createMessageElement(content, author, time, "text", msgStatus, messageId, false, contact, null, replyToData, isEdited);
+                  if (nextElement) {
+                    chatContainer.insertBefore(updatedMessage, nextElement);
+                  } else {
+                    chatContainer.appendChild(updatedMessage);
+                  }
+                }
+              } else {
+                updateMessage(messageId, content, msgStatus, null, replyToData, isEdited);
+              }
+            }
+          }
+        } else if (data.imagePickerResult) {
+          console.log("Received imagePickerResult data:", data.imagePickerResult);
+          // Create iframe and show image directly
+          const iframe = document.createElement('iframe');
+          iframe.style.position = 'fixed';
+          iframe.style.top = '0';
+          iframe.style.left = '0';
+          iframe.style.width = '100%';
+          iframe.style.height = '100%';
+          iframe.style.border = 'none';
+          iframe.style.zIndex = '1000';
+          
+          // Pass both the image data and URI to the imagepicker
+          const params = new URLSearchParams();
+          params.set('imageData', data.imagePickerResult);
+          params.set('imageId', data.imageId || '');
+          iframe.src = 'imagepicker.html#' + encodeURIComponent(params.toString());
+          
+          document.body.appendChild(iframe);
+        }
+      } catch (error) {
+        console.error("Error processing message data:", error);
+      }
+    });
+
+    // Update message handler for iframe communications
+    window.addEventListener('message', (event) => {
+      if (event.data.action === 'closeImagePicker') {
+        const iframe = document.querySelector('iframe');
+        if (iframe) iframe.remove();
+      } else if (event.data.action === 'sendImage') {
+        const iframe = document.querySelector('iframe');
+        if (iframe) iframe.remove();
+        if (event.data.body.caption === '') {
+                console.log("Caption is empty 1");
+        }
+        // Call controller method with all required parameters
+        controller.sendImageMessage(
+          sessionId,
+          event.data.body.imageId,
+          event.data.body.caption || ''
+        );
+      }
+    });
+
+    // Create the fullscreen image viewer element
+    function createFullscreenViewer() {
+      const viewer = document.createElement('div');
+      viewer.classList.add('fullscreen-image-viewer');
+      
+      const closeBtn = document.createElement('div');
+      closeBtn.classList.add('close-viewer');
+      closeBtn.innerHTML = '<span class="material-icons">close</span>';
+      closeBtn.addEventListener('click', closeFullscreenViewer);
+      
+      const img = document.createElement('img');
+      
+      viewer.appendChild(img);
+      viewer.appendChild(closeBtn);
+      
+      // Close viewer on clicking anywhere outside the image
+      viewer.addEventListener('click', (e) => {
+        if (e.target === viewer) {
+          closeFullscreenViewer();
+        }
+      });
+      
+      return viewer;
+    }
+
+    // Open the fullscreen viewer with the specified image
+    function openFullscreenViewer(imageId) {
+      let viewer = document.querySelector('.fullscreen-image-viewer');
+      
+      if (!viewer) {
+        viewer = createFullscreenViewer();
+        document.body.appendChild(viewer);
+      }
+      
+      const img = viewer.querySelector('img');
+      img.src = imageId;
+      
+      // Force reflow
+      void viewer.offsetWidth;
+      viewer.classList.add('active');
+      
+      // Prevent body scrolling
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Close the fullscreen viewer
+    function closeFullscreenViewer() {
+      const viewer = document.querySelector('.fullscreen-image-viewer');
+      if (viewer) {
+        viewer.classList.remove('active');
+        
+        // Wait for transition to complete before removing
+        setTimeout(() => {
+          if (viewer.parentNode) {
+            viewer.parentNode.removeChild(viewer);
+          }
+          // Restore body scrolling
+          document.body.style.overflow = '';
+        }, 300);
+      }
+    }
+
+    // Add this function at an appropriate location in your script section
+    function scrollToBottom(immediate = false) {
+      if (immediate) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        return;
+      }
+      
+      // For a smoother approach with multiple attempts
+      const maxAttempts = 5;
+      let attempts = 0;
+      
+      // Initial immediate scroll attempt
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      
+      // Then try a few more times with increasing delays
+      const scrollInterval = setInterval(() => {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        attempts++;
+        
+        if (attempts >= maxAttempts) {
+          clearInterval(scrollInterval);
+        }
+      }, 300); // Try every 300ms
+    }
+
+    // Replace your existing window.onload function with this one
+    window.onload = function() {
+      // Ensure the chat container is properly sized and positioned before animation starts
+      chatContainer.style.opacity = '1';
+      
+      // Immediate scroll attempt
+      scrollToBottom(true);
+      
+      // Additional scroll attempt after a short delay
+      setTimeout(() => {
+        scrollToBottom(true);
+        
+        // Signal to parent that chat is ready
+        window.parent.postMessage({ action: 'chatReady' }, '*');
+        
+        // One final scroll attempt after everything else is done
+        setTimeout(() => {
+          scrollToBottom(true);
+        }, 500);
+      }, 100);
+    };
+  </script>
+</body>
+</html>

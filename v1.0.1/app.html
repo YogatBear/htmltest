@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>User Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background-color: #fff;
+            margin: 0;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #121212;
+                color: #ffffff;
+            }
+            iframe {
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <iframe id="screenFrame" frameBorder="0" style="width:100%; height:100vh;"></iframe>
+    <script>
+
+        const controller = window.top.controller;
+        const channel = new BroadcastChannel('myChannel');
+        const screenFrame = document.getElementById('screenFrame');
+        const urlParams = new URLSearchParams(window.location.search);
+        const screen = decodeURIComponent(urlParams.get('screen'));
+        const localId = decodeURIComponent(urlParams.get('localId'));
+        const remoteId = decodeURIComponent(urlParams.get('remoteId'));
+
+        switch (screen) {
+            case 'MAIN':
+                screenFrame.src = "mainscreen.html?localId="+encodeURIComponent(localId);
+                break;
+            case 'CHAT':
+            //    history.replaceState({}, '', 'app.html?screen=MAIN&localId='+encodeURIComponent(localId)+'&remoteId=null');
+                screenFrame.src = "mainscreen.html?localId="+encodeURIComponent(localId)+"&remoteId="+encodeURIComponent(remoteId);
+            //    screenFrame.onload = function() {
+            //        screenFrame.contentWindow.postMessage({
+            //            action: 'chat',
+            //            body: {
+            //                sessionId: encodeURIComponent(remoteId)
+            //            }
+            //       }, '*');
+            //    };
+                break;
+            case 'CALL':
+                screenFrame.src = "incall.html?to=" + encodeURIComponent(remoteId);
+                break;
+            case 'RING':
+                screenFrame.src = "ringing.html?to=" + encodeURIComponent(remoteId);
+                break;
+            case 'INCOMING':
+                screenFrame.src = "incomingcall.html?from=" + encodeURIComponent(remoteId);
+                break;
+        }
+
+        class App {
+            constructor(ens, main, ringing, incall, incomingcall) {
+                this.ens = ens;
+                this.urls = {
+                    "main": main,
+                    "ringing": ringing,
+                    "incall": incall,
+                    "incomingcall": incomingcall
+                };
+            }
+
+            setPage(pageId, param = {}) {
+                const iframe = document.getElementById("screenFrame");
+                iframe.src = this.urls[pageId];
+                if (Object.keys(param).length > 0) {
+                    iframe.src += `?${param.key}=${encodeURIComponent(param.value)}`;
+                }
+            }
+
+            ring(to) {
+                screenFrame.contentWindow.postMessage({ action: 'ringing' }, '*');
+            }
+
+            callStarted(_with) {
+                this.setPage('incall', {key:"to",value:_with}); // Show in-call screen
+            }
+            callEnded() {
+                //this.setPage('main');
+            }
+            receivingCall(from) {
+                this.setPage('incomingcall', {key:"from",value:from}); // Receiving call logic and show incoming call screen
+            }
+
+            showError(message) {
+                const errorFrame = document.getElementById('error-frame');
+                errorFrame.style.display = 'block';
+                errorFrame.contentWindow.postMessage({action: 'showError', message: message}, '*');
+                screenFrame.contentWindow.postMessage({action: 'hideAttempt'}, '*');
+            }
+            hideError() {
+                const errorFrame = document.getElementById('error-frame');
+                errorFrame.style.display = 'none';
+            }
+            
+            dataFetched(jsonData) {
+                console.log('Received raw data:', JSON.stringify(jsonData));
+                const data = JSON.parse(JSON.stringify(jsonData));
+                try {
+                    channel.postMessage(data);
+                } catch (error) {
+                    console.error("Error parsing JSON or processing data:", error);
+                }
+            }
+            openContacts() {
+                controller.openContacts();
+            }
+            fillInput(body) {
+                screenFrame.contentWindow.postMessage({ action: 'fillInput', body: body }, '*');
+            }
+        }
+
+        const app = new App(
+            "test.eth",
+            "mainscreen.html",
+            "ringing.html",
+            "incall.html",
+            "incomingcall.html"
+        );
+
+        window.app = app;
+
+        window.addEventListener('popstate', () => {
+            screenFrame.contentWindow.postMessage({ action: 'closeChat' }, '*');
+        });
+
+        window.addEventListener('message', (event) => {
+            console.log('Received message:', event.data);
+            const data = event.data;
+            const action = data.action;
+            const body = data.body;
+
+            switch (action) {
+                case 'ringing':
+                    app.ring(body.to);
+                    break;
+                case 'call-started':
+                    app.callStarted(body.from);
+                    break;
+                case 'call-ended':
+                    app.callEnded(body.from);
+                    break;
+                case 'receiving-call':
+                    app.receivingCall(body.from);
+                    break;
+                case 'error':
+                    app.showError(body.e);
+                    break;
+                case 'close-error':
+                    app.hideError();
+                    break;
+                case 'data-retrieved':
+                    app.dataFetched(body);
+                    break;
+                case 'mute-state':
+                    app.dataFetched(body);
+                    break;
+                case 'local-hold-state':
+                    app.dataFetched(body);
+                    break;
+                case 'remote-hold-state':
+                    app.dataFetched(body);
+                    break;
+                case 'active-calls':
+                    app.dataFetched(body);
+                    break;
+                case 'speaker-state':
+                    app.dataFetched(body);
+                    break;
+                case 'recent-messages':
+                    app.dataFetched(body);
+                    break;
+                case 'new-message':
+                    app.dataFetched(body);
+                    break;
+                case 'inject-remote-id':
+                    app.dataFetched(body);
+                    break;
+                default:
+                    console.log('Unknown action:', action);
+                    break;
+            }
+
+            // Handle URL update requests from iframe children
+            if (action === 'update-url') {
+                try {
+                    console.log("Received request to update URL");
+                    const currentUrl = new URL(window.location.href);
+                    
+                    // Update parameters from the request
+                    if (body) {
+                        Object.keys(body).forEach(key => {
+                            currentUrl.searchParams.set(key, body[key]);
+                        });
+                    }
+                    
+                    // Update the URL
+                    history.replaceState({}, '', currentUrl.toString());
+                    console.log("URL updated to:", currentUrl.toString());
+                } catch (e) {
+                    console.error("Error updating URL in parent:", e);
+                }
+            }
+        });
+    </script>
+    <iframe id="error-frame" src="errorwindow.html" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;"></iframe>
+</body>
+</html>

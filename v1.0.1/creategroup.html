@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Create Group Chat</title>
+    <link rel="stylesheet" href="assets/fonts/fonts.css">
+    <link rel="stylesheet" href="assets/fonts/system-fonts.css">
+    <link rel="stylesheet" href="assets/icons/material-icons.css">
+    <style>
+        :root {
+            --primary-white: #ffffff;
+            --secondary-purple: rgb(115, 66, 160);
+            --light-purple: #8e8aff;
+            --dark-purple: #3634a3;
+            --purple-10: rgba(115, 66, 160, 0.1);
+            --purple-20: rgba(115, 66, 160, 0.2);
+            --system-gray: #f2f2f7;
+            --system-gray2: #e5e5ea;
+            --text-primary: #000000;
+            --text-secondary: #8e8e93;
+            --separator-color: rgba(60, 60, 67, 0.12);
+            --background-color: #ffffff;
+            --input-bg: #f2f2f7;
+            --shadow-color: rgba(115, 66, 160, 0.3);
+            --shadow-color-active: rgba(115, 66, 160, 0.2);
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-white: #1a1a1a;
+                --secondary-purple: rgb(138, 93, 180);
+                --light-purple: #a28bc7;
+                --dark-purple: #5e3b88;
+                --purple-10: rgba(138, 93, 180, 0.15);
+                --purple-20: rgba(138, 93, 180, 0.25);
+                --system-gray: #2c2c2e;
+                --system-gray2: #3a3a3c;
+                --text-primary: #ffffff;
+                --text-secondary: #aeaeb2;
+                --separator-color: rgba(200, 200, 205, 0.12);
+                --background-color: rgb(23, 23, 23);
+                --input-bg: #2c2c2e;
+                --shadow-color: rgba(0, 0, 0, 0.5);
+                --shadow-color-active: rgba(0, 0, 0, 0.7);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            font-family: -apple-system, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            background-color: var(--background-color);
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100vh;
+            background-color: var(--background-color);
+        }
+
+        /* Header */
+        .header {
+            padding: 8px 16px;
+            background-color: var(--background-color);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            border-bottom: 0.5px solid var(--separator-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 56px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+            margin-left: -8px;
+        }
+
+        .back-button:active {
+            background-color: var(--purple-10);
+        }
+
+        .back-button i {
+            font-size: 24px;
+            color: var(--secondary-purple);
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-left: 4px;
+        }
+
+        .text-input {
+            background-color: var(--input-bg);
+            border: 1px solid transparent;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .text-input:focus {
+            background-color: var(--purple-10);
+            border-color: var(--secondary-purple);
+        }
+
+        .text-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .textarea-input {
+            background-color: var(--input-bg);
+            border: 1px solid transparent;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+            max-height: 120px;
+        }
+
+        .textarea-input:focus {
+            background-color: var(--purple-10);
+            border-color: var(--secondary-purple);
+        }
+
+        .textarea-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Participants section */
+        .participants-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .add-participant-container {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .participant-input {
+            flex: 1;
+        }
+
+        .add-participant-button {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background-color: var(--secondary-purple);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .add-participant-button:active {
+            transform: scale(0.95);
+            background-color: var(--dark-purple);
+        }
+
+        .add-participant-button i {
+            font-size: 24px;
+        }
+
+        .participants-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .participant-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--input-bg);
+            padding: 12px 16px;
+            border-radius: 12px;
+            transition: background-color 0.2s ease;
+        }
+
+        .participant-name {
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .remove-participant {
+            background: none;
+            border: none;
+            padding: 4px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-participant:active {
+            background-color: var(--purple-10);
+        }
+
+        .remove-participant i {
+            font-size: 20px;
+            color: var(--text-secondary);
+        }
+
+        /* Bottom section */
+        .bottom-section {
+            padding: 16px;
+            background-color: var(--background-color);
+            border-top: 0.5px solid var(--separator-color);
+        }
+
+        .create-button {
+            width: 100%;
+            height: 52px;
+            background: linear-gradient(135deg, var(--secondary-purple) 0%, var(--dark-purple) 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            letter-spacing: -0.2px;
+        }
+
+        .create-button:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px var(--shadow-color-active);
+        }
+
+        .create-button:disabled {
+            background: var(--system-gray2);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--system-gray2);
+            border-radius: 2px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Empty state */
+        .empty-participants {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <button class="back-button" id="backButton">
+                    <i class="material-icons">arrow_back</i>
+                </button>
+                <h1 class="header-title">Create Group Chat</h1>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="form-section">
+                <div class="input-group">
+                    <label class="input-label">Group Name</label>
+                    <input type="text" class="text-input" id="groupName" placeholder="Enter group name" maxlength="50">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Description (Optional)</label>
+                    <textarea class="textarea-input" id="groupDescription" placeholder="Enter group description" maxlength="200"></textarea>
+                </div>
+            </div>
+
+            <div class="participants-section">
+                <div class="section-title">Participants</div>
+                
+                <div class="add-participant-container">
+                    <div class="input-group participant-input">
+                        <input type="text" class="text-input" id="participantInput" placeholder="Enter participant ID">
+                    </div>
+                    <button class="add-participant-button" id="addParticipantButton">
+                        <i class="material-icons">add</i>
+                    </button>
+                </div>
+
+                <div class="participants-list" id="participantsList">
+                    <div class="empty-participants" id="emptyParticipants">
+                        No participants added yet
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-section">
+            <button class="create-button" id="createGroupButton" disabled>
+                Create Group
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const backButton = document.getElementById('backButton');
+        const groupNameInput = document.getElementById('groupName');
+        const groupDescriptionInput = document.getElementById('groupDescription');
+        const participantInput = document.getElementById('participantInput');
+        const addParticipantButton = document.getElementById('addParticipantButton');
+        const participantsList = document.getElementById('participantsList');
+        const emptyParticipants = document.getElementById('emptyParticipants');
+        const createGroupButton = document.getElementById('createGroupButton');
+        const controller = window.top.controller;
+
+        let participants = [];
+
+        // Back button functionality
+        backButton.addEventListener('click', function() {
+            window.parent.postMessage({ action: 'closeGroupCreation' }, '*');
+        });
+
+        // Add participant functionality
+        function addParticipant() {
+            const participantId = participantInput.value.trim().toLowerCase();
+            
+            if (participantId === '') {
+                return;
+            }
+
+            if (participants.includes(participantId)) {
+                // Participant already exists, clear input and return
+                participantInput.value = '';
+                return;
+            }
+
+            participants.push(participantId);
+            participantInput.value = '';
+            updateParticipantsList();
+            updateCreateButton();
+        }
+
+        addParticipantButton.addEventListener('click', addParticipant);
+
+        participantInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addParticipant();
+            }
+        });
+
+        // Remove participant functionality
+        function removeParticipant(participantId) {
+            participants = participants.filter(p => p !== participantId);
+            updateParticipantsList();
+            updateCreateButton();
+        }
+
+        // Update participants list display
+        function updateParticipantsList() {
+            if (participants.length === 0) {
+                participantsList.innerHTML = '<div class="empty-participants">No participants added yet</div>';
+                return;
+            }
+
+            const participantsHTML = participants.map(participant => `
+                <div class="participant-item">
+                    <span class="participant-name">${participant}</span>
+                    <button class="remove-participant" onclick="removeParticipant('${participant}')">
+                        <i class="material-icons">close</i>
+                    </button>
+                </div>
+            `).join('');
+
+            participantsList.innerHTML = participantsHTML;
+        }
+
+        // Update create button state
+        function updateCreateButton() {
+            const groupName = groupNameInput.value.trim();
+            const hasParticipants = participants.length > 0;
+            
+            createGroupButton.disabled = !(groupName && hasParticipants);
+        }
+
+        // Listen for input changes
+        groupNameInput.addEventListener('input', updateCreateButton);
+
+        // Convert input to lowercase
+        participantInput.addEventListener('input', function(e) {
+            this.value = this.value.toLowerCase();
+        });
+
+        // Create group functionality
+        createGroupButton.addEventListener('click', function() {
+            const groupData = {
+                name: groupNameInput.value.trim(),
+                description: groupDescriptionInput.value.trim(),
+                participants: participants
+            };
+
+            // Call the controller's create group function
+            controller.createGroup(groupData);
+
+            // Close the group creation screen
+            window.parent.postMessage({ action: 'closeGroupCreation' }, '*');
+        });
+
+        // Handle back navigation
+        window.addEventListener('popstate', function(event) {
+            window.parent.postMessage({ action: 'closeGroupCreation' }, '*');
+        });
+    </script>
+</body>
+</html>
